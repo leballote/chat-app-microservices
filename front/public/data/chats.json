@@ -1,0 +1,105 @@
+{
+  "data": {
+    "chats": [
+      {
+        "id": "1",
+        "avatar": "https://avatars.dicebear.com/api/bottts/John.svg?background=%230000ff",
+        "type": "individual",
+        "name": "John",
+        "lastMessage": {
+          "sentBy": "John",
+          "content": "Hi dude, how are you doing?",
+          "sentAt": "2022-05-15"
+        }
+      },
+      {
+        "id": "2",
+        "avatar": "https://avatars.dicebear.com/api/identicon/CollegueFriends.svg?background=%23c37db0",
+        "type": "group",
+        "name": "Collegue friends",
+        "lastMessage": {
+          "sentBy": "Michael",
+          "content": "What was the task for today?",
+          "sentAt": "2022-05-16"
+        }
+      },
+      {
+        "id": "3",
+        "avatar": "https://avatars.dicebear.com/api/bottts/Ellisa.svg?background=%2399e51b",
+        "type": "individual",
+        "name": "Ellisa",
+        "lastMessage": {
+          "sentBy": "Ellisa",
+          "content": "I am trying to understand this.",
+          "sentAt": "2022-10-10"
+        }
+      },
+      {
+        "id": "4",
+        "avatar": "https://avatars.dicebear.com/api/bottts/John4.svg?background=%230000ff",
+        "type": "individual",
+        "name": "John",
+        "lastMessage": {
+          "sentBy": "John",
+          "content": "Hi dude, how are you doing?",
+          "sentAt": "2022-05-15"
+        }
+      },
+      {
+        "id": "5",
+        "avatar": "https://avatars.dicebear.com/api/identicon/CollegueFriends5.svg?background=%23c37db0",
+        "type": "group",
+        "name": "Collegue friends",
+        "lastMessage": {
+          "sentBy": "Michael",
+          "content": "What was the task for today?",
+          "sentAt": "2022-05-16"
+        }
+      },
+      {
+        "id": "6",
+        "avatar": "https://avatars.dicebear.com/api/bottts/Ellisa6.svg?background=%2399e51b",
+        "type": "individual",
+        "name": "Ellisa",
+        "lastMessage": {
+          "sentBy": "Ellisa",
+          "content": "I am trying to understand this.",
+          "sentAt": "2022-10-10"
+        }
+      },
+      {
+        "id": "7",
+        "avatar": "https://avatars.dicebear.com/api/bottts/John7.svg?background=%230000ff",
+        "type": "individual",
+        "name": "John",
+        "lastMessage": {
+          "sentBy": "John",
+          "content": "Hi dude, how are you doing?",
+          "sentAt": "2022-05-15"
+        }
+      },
+      {
+        "id": "8",
+        "avatar": "https://avatars.dicebear.com/api/identicon/CollegueFriends8.svg?background=%23c37db0",
+        "type": "group",
+        "name": "Collegue friends",
+        "lastMessage": {
+          "sentBy": "Michael",
+          "content": "What was the task for today?",
+          "sentAt": "2022-05-16"
+        }
+      },
+      {
+        "id": "9",
+        "avatar": "https://avatars.dicebear.com/api/bottts/Ellisa9.svg?background=%2399e51b",
+        "type": "individual",
+        "name": "Ellisa",
+        "lastMessage": {
+          "sentBy": "Ellisa",
+          "content": "I am trying to understand this.",
+          "sentAt": "2022-10-10"
+        }
+      }
+    ]
+  }
+}
