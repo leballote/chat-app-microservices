@@ -7,6 +7,12 @@ const errors = {
   userNotFound: { message: "User not found" },
 };
 
+router.get("/", (req, res) => {
+  console.log(req.cookies);
+  res.cookie("name", "hey");
+  res.send("Cookie set");
+});
+
 router.post("/user", async (req, res) => {
   const { id, username, name, birthDate, email } = req.body;
   try {
@@ -26,7 +32,7 @@ router.post("/user", async (req, res) => {
 router.get("/user/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findOne({ _id: id });
+    const user = await User.findOne({ _id: id }).populate("friends");
     if (!user) {
       return res.status(404).send(errors.userNotFound);
     }
@@ -41,6 +47,8 @@ router.get("/user", async (req, res) => {
     limit = 1000,
     offset = 0,
     email,
+    username,
+    name,
     birthDate,
     birthDateLte,
     birthDateGte,
@@ -48,6 +56,8 @@ router.get("/user", async (req, res) => {
   //TODO: if needed fix the query by birthDate
   let baseQueryParams = {
     email,
+    username,
+    name,
     birthDate,
     // $and: [
     //   birthDate,

@@ -4,8 +4,9 @@ const typeDefs = gql`
   type Chat {
     id: ID
     name: String
-    messages: [Message]
-    participants: [User]
+    messages: [Message!]!
+    participants: [User!]!
+    lastMessage: Message
   }
 
   type Message {
@@ -18,10 +19,17 @@ const typeDefs = gql`
     id: ID
     name: String!
     chats: [Chat!]!
+    friends: [User!]!
   }
 
   type Query {
-    chats: [Chat]
+    chats: [Chat!]!
+    viewer: User
+    login: User
+  }
+
+  type Mutation {
+    signup: User
   }
 `;
 export default typeDefs;
