@@ -22,14 +22,23 @@ const typeDefs = gql`
     friends: [User!]!
   }
 
+  type SignUpResponse {
+    success: Boolean!
+  }
+
+  type LoginResponse {
+    success: Boolean!
+    token: String!
+  }
+
   type Query {
     chats: [Chat!]!
     viewer: User
-    login: User
   }
 
   type Mutation {
-    signup: User
+    signup: SignUpResponse
+    login: LoginResponse
   }
 `;
 export default typeDefs;

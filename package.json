@@ -1,0 +1,23 @@
+{
+  "name": "chat-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:all": "concurrently \" cd front && npm run dev  \" \" cd services/chat && npm run dev \" \"cd services/user && npm run dev \" \" cd services/auth && npm run dev\" \"cd gateway && npm run dev\" "
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leballote/chat-app-microservices.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/leballote/chat-app-microservices/issues"
+  },
+  "homepage": "https://github.com/leballote/chat-app-microservices#readme",
+  "devDependencies": {
+    "concurrently": "^7.5.0"
+  }
+}

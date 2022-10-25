@@ -32,15 +32,16 @@ const resolvers = {
       const viewer_ = await dataSources.userAPI.getUser(id);
       return viewer_;
     },
-
-    login: async (_, { username, password }, { dataSources }) => {
-      const id = "3";
-    },
   },
 
   Mutation: {
     signup: async (parent, { username, password }, { dataSources }) => {
+      //TODO: finish this mutation
       dataSources.authAPI.registerUser({ username, password });
+    },
+
+    login: async (_, { username, password }, { dataSources }) => {
+      //TODO: finish this mutation
     },
   },
 
