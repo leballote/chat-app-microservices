@@ -43,9 +43,9 @@ interface Props {
 }
 
 export default function ChatHeader({ height }: Props) {
-  const { meta, participants } = useContext(ChatContext);
+  const { participants, ...chatInfo } = useContext(ChatContext);
 
-  return meta.type == "individual" ? (
+  return chatInfo.type == "individual" ? (
     <IndividualChatHeader height={height} />
   ) : (
     <GroupChatHeader height={height} />
@@ -53,38 +53,35 @@ export default function ChatHeader({ height }: Props) {
 }
 
 function IndividualChatHeader({ height }: WithHeight) {
-  const { meta, participants } = useContext(ChatContext);
+  const { participants, ...chatInfo } = useContext(ChatContext);
   const currentUser = useContext(CurrentUserContext);
   //TODO: handle this more elegantly "currentUser?.id, how to be sure that it is already loaded";
-  const receiverKey = Object.keys(participants).filter(
-    (id) => id != currentUser?.id
-  )[0];
-  const receiver = participants[receiverKey];
+  const receiver = participants.filter(({ id }) => id != currentUser?.id)[0];
 
   const props = {
-    name: meta.name,
+    name: chatInfo.name,
     status: receiver.status,
-    phrase: receiver.phrase ?? meta.phrase,
-    avatarSrc: receiver.avatar ?? meta.avatar,
-    avatarName: getAvatarInitialsFromName(receiver.name ?? meta.name),
+    phrase: receiver.phrase ?? chatInfo.phrase,
+    avatarSrc: receiver.avatar ?? chatInfo.avatar,
+    avatarName: getAvatarInitialsFromName(receiver.name ?? chatInfo.name),
     height,
-    to: `/profile/user/${meta.id}`,
+    to: `/profile/user/${chatInfo.id}`,
   };
 
   return <BaseChatHeader {...props} />;
 }
 
 function GroupChatHeader({ height }: WithHeight) {
-  const { meta, participants } = useContext(ChatContext);
+  const { participants, ...chatInfo } = useContext(ChatContext);
   const currentUser = useContext(CurrentUserContext);
 
   const props: BaseChatHeaderProps = {
-    name: meta.name,
-    phrase: meta.phrase ?? "",
-    avatarSrc: meta.avatar,
-    avatarName: getAvatarInitialsFromName(meta.name),
+    name: chatInfo.name,
+    phrase: chatInfo.phrase ?? "",
+    avatarSrc: chatInfo.avatar,
+    avatarName: getAvatarInitialsFromName(chatInfo.name),
     height,
-    to: `/profile/group/${meta.id}`,
+    to: `/profile/group/${chatInfo.id}`,
   };
   return <BaseChatHeader {...props} />;
 }

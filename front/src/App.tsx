@@ -8,6 +8,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ChatSection from "./sections/ChatSection";
 import { User } from "./types/AppTypes";
 import { CurrentUserContext } from "./contexts";
+import { useQuery, gql } from "@apollo/client";
 
 //TODO: this component will be removed
 const Placeholder = ({ text }: any) => {
@@ -18,27 +19,25 @@ const Placeholder = ({ text }: any) => {
   );
 };
 
-const App: React.FunctionComponent = function () {
-  const [user, setUser] = useState<User>(null);
-
-  async function getUserData() {
-    const mockUser: User = {
-      id: "0",
-      username: "ealjkl",
-      name: "Luis Eduardo Ballote Rosado",
-      phrase: "This is a new phrase",
-      status: "online",
-    };
-    setUser(mockUser);
+const GET_USER_DATA = gql`
+  query GetUser {
+    viewer {
+      id
+      username
+      name
+      phrase
+      status
+    }
   }
-  useEffect(() => {
-    getUserData();
-  }, []);
-  return (
+`;
+
+const App: React.FunctionComponent = function () {
+  const { error, loading, data } = useQuery(GET_USER_DATA);
+  return !loading ? (
     <div className="App">
       <BrowserRouter>
         <CssBaseline />
-        <CurrentUserContext.Provider value={user}>
+        <CurrentUserContext.Provider value={data.viewer}>
           <Box sx={{ display: "flex" }}>
             <SideBar />
             <Routes>
@@ -52,6 +51,8 @@ const App: React.FunctionComponent = function () {
         </CurrentUserContext.Provider>
       </BrowserRouter>
     </div>
+  ) : (
+    <h1>Loading...</h1>
   );
 };
 

@@ -3,11 +3,10 @@ import { ChatContextType } from "../types/ChatSectionTypes";
 import { User } from "../types/AppTypes";
 
 export const ChatContext = createContext<ChatContextType>({
-  meta: {
-    name: "",
-    type: "group",
-  },
-  participants: {},
+  id: "",
+  name: "",
+  type: "individual",
+  participants: {}
 });
 
 export const CurrentUserContext = createContext<User>(null);

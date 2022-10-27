@@ -14,29 +14,18 @@ export type ChatUser = {
   status: "online" | "offline";
 };
 
-export type ChatMeta = {
+export type Chat = {
   id: string;
   name: string;
   avatar?: string;
   status?: string;
   phrase?: string;
   type: "individual" | "group";
-};
-
-export type Chat = {
-  meta: ChatMeta;
-  participants: {
-    [userId: string]: ChatUser;
-  };
+  participants: ChatUser[];
   messages: Message[];
 };
 
-export type ChatContextType = {
-  meta: ChatMeta;
-  participants: {
-    [userId: string]: ChatUser;
-  };
-};
+export type ChatContextType = Omit<Chat, "messages">;
 
 export type ChatDataResponse = {
   data: Chat;

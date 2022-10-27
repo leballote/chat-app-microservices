@@ -21,7 +21,6 @@ import {
   Chat,
   ChatContextType,
   ChatDataResponse,
-  ChatMeta,
   ChatUser,
   Message,
 } from "../types/ChatSectionTypes";
@@ -30,12 +29,11 @@ import ChatHeader from "../components/ChatSectionComponents/ChatHeader";
 import { WithHeight } from "../types/utilTypes";
 
 const defaultChat: Chat = {
-  meta: {
-    name: "",
-    type: "group",
-  },
-  participants: {
-    "1": {
+  id: "",
+  name: "",
+  type: "individual",
+  participants: [
+    {
       id: "",
       status: "online",
       name: "",
@@ -43,7 +41,7 @@ const defaultChat: Chat = {
       admin: false,
       avatar: "",
     },
-  },
+  ],
   messages: [],
 };
 
@@ -58,7 +56,7 @@ function formatDate(dateString: string) {
 }
 
 function ChatBody({ messages, height }: Props) {
-  const { participants, meta } = useContext(ChatContext);
+  const { participants, ...otherChatInfo } = useContext(ChatContext);
   const currentUser = useContext(CurrentUserContext);
 
   return (
@@ -159,17 +157,15 @@ export default function ChatSection() {
   //TODO: maybe change this defaultChat to null and handle on loading
   const [chat, setChat] = useState<Chat>(defaultChat);
 
-  const { meta, messages, participants } = chat;
+  const { messages, participants, ...chatInfo } = chat;
 
   async function getChatData(id: string) {
     let url: string;
-    console.log(id);
     if (["2", "5", "8"].includes(id)) {
       url = "../data/mockGroupChat.json";
     } else {
       url = "../data/mockOneToOneChat.json";
     }
-    console.log(url);
     const fetched = await fetch(url);
     const { data }: ChatDataResponse = await fetched.json();
     setChat(data);
@@ -188,7 +184,7 @@ export default function ChatSection() {
         marginBottom: "0",
       }}
     >
-      <ChatContext.Provider value={{ meta, participants }}>
+      <ChatContext.Provider value={{ participants, ...chatInfo }}>
         <ChatHeader height={"10vh"} />
         <ChatBody messages={messages} height={"70vh"} />
         <ChatsFooter height={"20vh"} />
