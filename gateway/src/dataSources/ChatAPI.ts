@@ -1,28 +1,8 @@
 import { RESTDataSource } from "@apollo/datasource-rest";
-
-//TODO: settle down with one type implementation
-type ChatResponse = {
-  id: string;
-  name: string;
-  messages: string[];
-  participants: string[];
-};
-
-type MessageResponse = {
-  id: string;
-  sentBy: string;
-  content: string;
-};
-
-type UserResponse = {
-  id: string;
-  name: string;
-  chats: string;
-};
-
-type DataChat = {
-  data: ChatResponse;
-};
+import {
+  ChatModelResponse,
+  MessageModelResponse,
+} from "../types/apiResponse.types";
 
 type DataResponse<T> = {
   data: T;
@@ -32,27 +12,27 @@ export default class ChatAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
   override baseURL = "http://localhost:6000";
 
-  async getChat(id: string): Promise<ChatResponse> {
-    const { data } = await this.get<DataResponse<ChatResponse>>(
+  async getChat(id: string): Promise<ChatModelResponse> {
+    const { data } = await this.get<DataResponse<ChatModelResponse>>(
       `chat/${encodeURIComponent(id)}`
     );
     return data;
   }
   async getChats(
     args: {
-      limit?: string;
-      offset?: string;
+      limit?: number;
+      offset?: number;
       type?: string;
       userId?: string;
       user1Id?: string;
       user2Id?: string;
     } = {}
-  ): Promise<ChatResponse[]> {
+  ): Promise<ChatModelResponse[]> {
     const query = Object.entries(args)
       .map(([key, val]) => `${key}=${val}`)
       .join("&");
 
-    const { data } = await this.get<DataResponse<ChatResponse[]>>(
+    const { data } = await this.get<DataResponse<ChatModelResponse[]>>(
       `chat/?${query}`
     );
     return data;
@@ -64,17 +44,17 @@ export default class ChatAPI extends RESTDataSource {
 
   async getMessages(
     args: {
-      limit?: string;
-      offset?: string;
+      limit?: number;
+      offset?: number;
       chatId?: string;
       userId?: string;
     } = {}
-  ): Promise<MessageResponse[]> {
+  ): Promise<MessageModelResponse[]> {
     const query = Object.entries(args)
       .map(([key, val]) => `${key}=${val}`)
       .join("&");
 
-    const { data } = await this.get<DataResponse<MessageResponse[]>>(
+    const { data } = await this.get<DataResponse<MessageModelResponse[]>>(
       `message/?${query}`
     );
     return data;

@@ -1,30 +1,25 @@
 import { RESTDataSource } from "@apollo/datasource-rest";
+import {
+  LogInModelResponse,
+  SignUpModelResponse,
+} from "../types/apiResponse.types";
 
 type DataResponse<T> = {
   data: T;
-};
-
-type LoginResponse = {
-  success: boolean;
-  token: string;
-};
-
-type SignUpResponse = {
-  success: boolean;
 };
 
 export default class AuthAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
   override baseURL = "http://localhost:6002";
 
-  async signup({
+  async signUp({
     username,
     password,
   }: {
     username: string;
     password: string;
-  }): Promise<SignUpResponse> {
-    const { data } = await this.post<DataResponse<SignUpResponse>>(
+  }): Promise<SignUpModelResponse> {
+    const { data } = await this.post<DataResponse<SignUpModelResponse>>(
       `auth/signup`,
       {
         body: { username, password },
@@ -33,8 +28,8 @@ export default class AuthAPI extends RESTDataSource {
     return data;
   }
 
-  async login({ username, password }): Promise<LoginResponse> {
-    const { data } = await this.post<DataResponse<LoginResponse>>(
+  async logIn({ username, password }): Promise<LogInModelResponse> {
+    const { data } = await this.post<DataResponse<LogInModelResponse>>(
       `auth/login`,
       {
         body: { username, password },

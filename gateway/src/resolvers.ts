@@ -1,53 +1,98 @@
-console.log("RESOLVERS START");
+import { PubSub } from "graphql-subscriptions";
+import {
+  ChatModelResponse,
+  UserModelResponse,
+  MessageModelResponse,
+  Status,
+} from "./types/apiResponse.types";
+import { getReceiver } from "./utils";
+import { Resolvers } from "./generated/graphql";
 
-type Message = {
-  id: string;
-  sentBy: string | User;
-  content: string;
-};
+const pubsub = new PubSub();
 
-type User = {
-  id: string;
-  name: string;
-  chats: string[] | Chat[];
-  friends: string[] | User[];
-};
+const posts = [
+  { author: "Luis", comment: "cool" },
+  { author: "Jorge", comment: "great" },
+];
 
-type Chat = {
-  id: string;
-  name: string;
-  messages: string[] | Message[];
-};
-
-const resolvers = {
+const resolvers: Resolvers = {
   Query: {
-    chats: async (_, args = {}, { dataSources }) => {
+    chats: async (_, args = {}, context) => {
+      const { dataSources } = context;
+      console.log("CONTEXT: ", context);
       const data = await dataSources.chatAPI.getChats(args);
       return data;
     },
 
     viewer: async (_, {}, { dataSources }) => {
       //TODO: here must be the authentication and the getting of the user, so theorethically we count with the user id
-      const id = "3"; // TODO: the id should be taken from the cookies
-      const viewer_ = await dataSources.userAPI.getUser(id);
+      const viewer_ = await dataSources.getViewer();
       return viewer_;
     },
   },
 
   Mutation: {
-    signup: async (parent, { username, password }, { dataSources }) => {
+    signup: async (_, { username, password }, { dataSources }) => {
       //TODO: finish this mutation
-      dataSources.authAPI.registerUser({ username, password });
+      const res = await dataSources.authAPI.signUp({ username, password });
+      return res;
     },
 
     login: async (_, { username, password }, { dataSources }) => {
-      //TODO: finish this mutation
+      const res = await dataSources.authAPI.logIn({ username, password });
+      return res;
     },
+
+    // createPost(parent, args, context) {
+    //   posts.push(args);
+    //   pubsub.publish("POST_CREATED", { postCreated: args });
+    //   return args;
+    // },
   },
 
+  // Subscription: {
+  //   postCreated: {
+  //     subscribe: () => pubsub.asyncIterator(["POST_CREATED"]),
+  //   },
+  // },
+
   Chat: {
-    id: (parent) => {
+    id: (parent, {}, { dataSources }) => {
       return parent._id;
+    },
+    type: (parent: ChatModelResponse) => {
+      //TODO: this is probably not correct
+      return parent.type;
+    },
+    phrase: async (parent: ChatModelResponse, _, { dataSources }) => {
+      if (parent.type == "group") {
+        return parent.phrase ?? "";
+      } else {
+        //TODO: this type should be infered
+        const participants: UserModelResponse[] = await Promise.all(
+          parent.participants.map((participantId) => {
+            return dataSources.userAPI.getUser(participantId);
+          })
+        );
+        const viewer = await dataSources.getViewer();
+        const receiver = getReceiver(participants, viewer._id);
+        return receiver.phrase ?? "";
+      }
+    },
+    name: async (parent, {}, { dataSources }) => {
+      if (parent.type == "group") {
+        return parent.name ?? "";
+      } else {
+        //TODO: this also could be made with less roundtrips
+        const participants: UserModelResponse[] = await Promise.all(
+          parent.participants.map((participantId) => {
+            return dataSources.userAPI.getUser(participantId);
+          })
+        );
+        const viewer = await dataSources.getViewer();
+        const receiver = getReceiver(participants, viewer._id);
+        return receiver.name ?? "";
+      }
     },
     lastMessage: async (parent, {}, { dataSources }) => {
       const [message] = await dataSources.chatAPI.getMessages({ limit: 1 });
@@ -63,7 +108,7 @@ const resolvers = {
 
       return participants_;
     },
-    messages: (parent, {}, { dataSources }) => {
+    messages: (parent: ChatModelResponse, {}, { dataSources }) => {
       return dataSources.chatAPI.getMessages({ chatId: parent._id });
     },
   },
@@ -82,18 +127,25 @@ const resolvers = {
     friends: async (parent, {}, { dataSources }) => {
       //it is supposed to be only one of two things: list of users or list of strings
       if (parent.friends.length > 0 && typeof parent.friends[0] == "string") {
-        const usersPromises = parent.friends.map((friendId) => {
+        //TODO: there should be a way for the compiler to know, a better safeguard than indicating it with "as"
+        const friends = parent.friends as string[];
+        const usersPromises = friends.map((friendId: string) => {
           const user = dataSources.userAPI.getUser(friendId);
           return user;
         });
         const users = await Promise.all(usersPromises);
         return users;
       } else {
-        return parent.friends;
+        const friends = parent.friends as UserModelResponse[];
+        return friends;
       }
     },
     chats: async (parent, {}, { dataSources }) => {
       return dataSources.chatAPI.getChats({ userId: parent._id });
+    },
+    status: () => {
+      //TODO see how you are going to solve this
+      return Status.ONLINE;
     },
   },
 };

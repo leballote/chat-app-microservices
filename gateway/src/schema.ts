@@ -2,31 +2,51 @@ import gql from "graphql-tag";
 
 const typeDefs = gql`
   type Chat {
-    id: ID
+    id: ID!
     name: String
+    type: ChatType!
+    phrase: String!
     messages: [Message!]!
     participants: [User!]!
     lastMessage: Message
   }
 
+  enum ChatType {
+    INDIVIDUAL
+    GROUP
+  }
+
+  enum Status {
+    ONLINE
+    OFFLINE
+  }
+
+  type Temp {
+    temp: String;
+  }
+
   type Message {
-    id: ID
+    id: ID!
     sentBy: User!
     content: String!
   }
 
   type User {
-    id: ID
+    id: ID!
+    username: String!
     name: String!
     chats: [Chat!]!
     friends: [User!]!
+    phrase: String!
+    status: Status!
+    avatar: String
   }
 
   type SignUpResponse {
     success: Boolean!
   }
 
-  type LoginResponse {
+  type LogInResponse {
     success: Boolean!
     token: String!
   }
@@ -37,8 +57,18 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    signup: SignUpResponse
-    login: LoginResponse
+    signup(username: String, password: String): SignUpResponse
+    login(username: String, password: String): LogInResponse
+    createPost(author: String, comment: String): Post
+  }
+
+  type Post {
+    author: String!
+    comment: String!
+  }
+
+  type Subscription {
+    postCreated: Post
   }
 `;
 export default typeDefs;
