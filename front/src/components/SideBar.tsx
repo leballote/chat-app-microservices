@@ -3,6 +3,8 @@ import Drawer from "@mui/material/Drawer";
 import MainDrawerView from "./MainDrawerView";
 import ContactPreview from "./ContactPreview";
 import ContactsDrawerSection from "./ContactsDrawerSection";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { getValue } from "../app/features/currentUserSlice";
 
 const drawerWidth = 280;
 
@@ -25,6 +27,7 @@ enum DrawerSection {
 
 export default function ResponsiveDrawer() {
   //TODO: Change any for the proper data type
+
   const [currentDrawerSection, setCurrentDrawerSection] =
     useState<DrawerSection>(DrawerSection.MAIN);
 
@@ -32,7 +35,9 @@ export default function ResponsiveDrawer() {
   if (currentDrawerSection == DrawerSection.MAIN) {
     section = (
       <MainDrawerView
-        onMoreClick={() => console.log("more clicked!")}
+        onMoreClick={() => {
+          console.log("clicked more");
+        }}
         onContactsClick={() => setCurrentDrawerSection(DrawerSection.CONTACTS)}
       />
     );

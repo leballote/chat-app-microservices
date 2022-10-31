@@ -2,6 +2,7 @@ require("./utils/validateEnvVariables")();
 
 const express = require("express");
 const mongoose = require("mongoose");
+mongoose.Schema.Types.String.checkRequired((v) => typeof v === "string");
 
 const chatRouter = require("./routes/chat.routes");
 const messageRouter = require("./routes/message.routes");

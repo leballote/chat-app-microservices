@@ -10,13 +10,19 @@ import ChatPreview, { Props as ChatPreviewProps } from "./ChatPreview";
 import DrawerSearchBar from "./DrawerSearchBar";
 import { ChangeEvent, useState, useEffect } from "react";
 import * as React from "react";
+import { gql, useQuery } from "@apollo/client";
+import {
+  getValue as getChatsPreviewsValue,
+  setSearchTerm,
+} from "../app/features/chatsPreviewsSlice";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
 
 interface Chat {
   id: string;
-  avatar: string;
   type: string;
   name: string;
-  lastMessage: {
+  avatar: string;
+  lastMessage?: {
     sentBy: string;
     content: string;
     sentAt: string | string;
@@ -31,62 +37,65 @@ interface ChatsResponse {
 
 //TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
 export default function ChatDrawerSection() {
-  const [chatSearched, setChatSearched] = useState<string>("");
-  const [chats, setChats] = useState<ChatPreviewProps[]>([]);
+  const {
+    value: chats,
+    loading,
+    error,
+    searchTerm: chatSearched,
+  } = useAppSelector((state) => state.chatsPreviews);
+  const dispatch = useAppDispatch();
+  console.log(chats, loading, error, chatSearched);
+
+  useEffect(() => {
+    dispatch(getChatsPreviewsValue(""));
+  }, []);
 
   function handleSearch(ev: ChangeEvent<HTMLInputElement>) {
-    setChatSearched(ev.target.value);
+    dispatch(setSearchTerm(ev.target.value));
   }
   function handleEscapeOnSearch(ev: KeyboardEvent) {
     if (ev.key === "Escape") {
-      setChatSearched("");
+      dispatch(setSearchTerm(""));
     }
   }
 
-  async function getChatsData() {
-    const preNewData = await fetch("../data/chats.json", {
-      headers: {
-        Accept: "application/json",
-      },
-    });
-    const newData: ChatsResponse = await preNewData.json();
-    let newChats;
-    if (chatSearched === "") {
-      newChats = newData.data?.chats || [];
-    } else {
-      newChats = newData.data.chats.filter((val) =>
-        val.name.toLowerCase().includes(chatSearched.toLowerCase())
-      );
-    }
-    setChats(newChats);
+  let component: React.ReactElement;
+  if (loading) {
+    component = <h1>Loading...</h1>;
+  } else if (error) {
+    component = (
+      <div>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+      </div>
+    );
+  } else {
+    component = (
+      <>
+        <Typography
+          component="h2"
+          fontSize="1.2em"
+          fontWeight="light"
+          color="MenuText"
+          sx={{ margin: "1em .2em .2em .5em" }}
+        >
+          Chats
+        </Typography>
+        <DrawerSearchBar
+          value={chatSearched}
+          onSearch={handleSearch}
+          onKeyDown={handleEscapeOnSearch}
+        />
+        <Box sx={{ overflow: "scroll", marginTop: ".2em" }}>
+          <List>
+            {chats.map((props: ChatPreviewProps) => (
+              <ChatPreview {...props} key={props.id} />
+            ))}
+          </List>
+        </Box>
+      </>
+    );
   }
 
-  useEffect(() => {
-    getChatsData();
-  }, [chatSearched]);
-  return (
-    <>
-      <Typography
-        component="h2"
-        fontSize="1.2em"
-        fontWeight="light"
-        color="MenuText"
-        sx={{ margin: "1em .2em .2em .5em" }}
-      >
-        Chats
-      </Typography>
-      <DrawerSearchBar
-        value={chatSearched}
-        onSearch={handleSearch}
-        onKeyDown={handleEscapeOnSearch}
-      />
-      <Box sx={{ overflow: "scroll", marginTop: ".2em" }}>
-        <List>
-          {chats.map((props: ChatPreviewProps) => (
-            <ChatPreview {...props} key={props.id} />
-          ))}
-        </List>
-      </Box>
-    </>
-  );
+  return component;
 }

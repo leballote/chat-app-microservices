@@ -1,3 +1,4 @@
+const Chat = require("../models/message.model");
 const Message = require("../models/message.model");
 
 const router = require("express").Router();
@@ -8,7 +9,13 @@ const errors = {
 
 router.post("/message", async (req, res) => {
   try {
+    const { chatId } = req.body;
     const message = await Message.create(req.body);
+    await Chat.findOneAndUpdate(
+      { _id: chatId },
+      { lastMessage: message._id },
+      { new: true }
+    );
     return res.status(201).send({ data: message });
   } catch (e) {
     return res.status(500).send(errors.serverError);

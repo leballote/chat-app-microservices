@@ -5,8 +5,10 @@ import { User } from "../types/AppTypes";
 export const ChatContext = createContext<ChatContextType>({
   id: "",
   name: "",
-  type: "individual",
-  participants: {}
+  phrase: "string",
+  type: "INDIVIDUAL",
+  status: "OFFLINE",
+  participants: [],
 });
 
 export const CurrentUserContext = createContext<User>(null);

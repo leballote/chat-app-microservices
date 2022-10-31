@@ -9,6 +9,8 @@ import ChatSection from "./sections/ChatSection";
 import { User } from "./types/AppTypes";
 import { CurrentUserContext } from "./contexts";
 import { useQuery, gql } from "@apollo/client";
+import { useAppDispatch, useAppSelector } from "./app/hooks";
+import { getValue as getCurrentUserValue } from "./app/features/currentUserSlice";
 
 //TODO: this component will be removed
 const Placeholder = ({ text }: any) => {
@@ -19,25 +21,31 @@ const Placeholder = ({ text }: any) => {
   );
 };
 
-const GET_USER_DATA = gql`
-  query GetUser {
-    viewer {
-      id
-      username
-      name
-      phrase
-      status
-    }
-  }
-`;
-
 const App: React.FunctionComponent = function () {
-  const { error, loading, data } = useQuery(GET_USER_DATA);
-  return !loading ? (
-    <div className="App">
+  // let { error, loading, data } = useQuery(GET_USER_DATA);
+  const currentUserState = useAppSelector((state) => state.currentUser);
+  const { value: currentUser, loading, error } = currentUserState;
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getCurrentUserValue());
+  }, []);
+
+  let component;
+  if (error) {
+    component = (
+      <div>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+      </div>
+    );
+  } else if (loading) {
+    component = <h1>Loading...</h1>;
+  } else {
+    component = (
       <BrowserRouter>
         <CssBaseline />
-        <CurrentUserContext.Provider value={data.viewer}>
+        <CurrentUserContext.Provider value={currentUser}>
           <Box sx={{ display: "flex" }}>
             <SideBar />
             <Routes>
@@ -50,10 +58,9 @@ const App: React.FunctionComponent = function () {
           </Box>
         </CurrentUserContext.Provider>
       </BrowserRouter>
-    </div>
-  ) : (
-    <h1>Loading...</h1>
-  );
+    );
+  }
+  return <div className="App">{component}</div>;
 };
 
 export default App;

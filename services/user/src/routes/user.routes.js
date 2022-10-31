@@ -14,7 +14,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/user", async (req, res) => {
-  const { id, username, name, birthDate, email } = req.body;
+  const { id, username, name, birthDate, email, phrase, avatar } = req.body;
   try {
     const user = await User.create({
       _id: id,
@@ -22,9 +22,12 @@ router.post("/user", async (req, res) => {
       name,
       birthDate,
       email,
+      phrase: phrase ?? "",
+      avatar,
     });
     return res.send({ data: user });
   } catch (e) {
+    return res.status(500).send(e);
     return res.status(500).send(errors.serverError);
   }
 });
@@ -83,11 +86,11 @@ router.get("/user", async (req, res) => {
 
 router.put("/user/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, birthDate, email } = req.body;
+  const { name, birthDate, phrase, avatar } = req.body;
   try {
     const user = await User.findOneAndUpdate(
       { _id: id },
-      { name, birthDate, email },
+      { name, birthDate, email, phrase, avatar },
       { new: true }
     );
     if (!user) {

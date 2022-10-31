@@ -3,12 +3,13 @@ import gql from "graphql-tag";
 const typeDefs = gql`
   type Chat {
     id: ID!
-    name: String
+    name: String!
     type: ChatType!
     phrase: String!
     messages: [Message!]!
     participants: [User!]!
     lastMessage: Message
+    avatar: String
   }
 
   enum ChatType {
@@ -21,13 +22,10 @@ const typeDefs = gql`
     OFFLINE
   }
 
-  type Temp {
-    temp: String;
-  }
-
   type Message {
     id: ID!
     sentBy: User!
+    sentAt: String!
     content: String!
   }
 

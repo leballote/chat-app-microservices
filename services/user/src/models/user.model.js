@@ -25,6 +25,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
+    phrase: {
+      type: String,
+      required: true,
+    },
+    avatar: {
+      type: String,
+    },
     //TODO: check if it is better to use mongoose.SchemaTypes.ObjectId
     //TODO: make validation for uniqueness within list
     friends: [{ type: String, ref: "user" }],

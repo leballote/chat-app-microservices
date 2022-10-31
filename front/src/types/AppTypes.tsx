@@ -3,5 +3,6 @@ export type User = {
   username: string;
   name: string;
   phrase: string;
+  avatar: string;
   status: "online" | "offline";
 } | null;

@@ -5,6 +5,12 @@ import { ChangeEvent, useState, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import * as React from "react";
+import { useQuery, gql } from "@apollo/client";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import {
+  getValue as getContactsPreviewsValue,
+  setSearchTerm,
+} from "../app/features/contactsPreviewsSlice";
 
 interface Contact {
   id: string;
@@ -20,50 +26,65 @@ interface ContactsResponse {
   };
 }
 
+const GET_FRIENDS_DATA = gql`
+  query GetFriends {
+    viewer {
+      friends {
+        id
+        name
+        phrase
+        status
+        avatar
+      }
+    }
+  }
+`;
+
 interface Props {
   onBackClick: (ev: React.MouseEvent<HTMLElement>) => void;
   onAddContactClick: (ev: React.MouseEvent<HTMLElement>) => void;
 }
 
 //TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
-export default function ChatDrawerSection({
+export default function ContactsDrawerSection({
   onBackClick,
   onAddContactClick,
 }: Props) {
-  const [contactSearched, setContactSearched] = useState<string>("");
-  const [contacts, setContacts] = useState<Contact[]>([]);
+  const {
+    value: contacts,
+    loading,
+    error,
+    searchTerm: contactSearched,
+  } = useAppSelector((state) => state.contactsPreviews);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(getContactsPreviewsValue(""));
+  }, []);
 
   function handleSearch(ev: ChangeEvent<HTMLInputElement>) {
-    setContactSearched(ev.target.value);
+    dispatch(setSearchTerm(ev.target.value));
   }
   function handleEscapeOnSearch(ev: KeyboardEvent) {
     if (ev.key === "Escape") {
-      setContactSearched("");
+      dispatch(setSearchTerm(""));
     }
   }
 
-  async function getChatsData() {
-    const preNewData = await fetch("../data/contacts.json", {
-      headers: {
-        Accept: "application/json",
-      },
-    });
-    const newData: ContactsResponse = await preNewData.json();
-    let newContacts: Contact[];
-    if (contactSearched === "") {
-      newContacts = newData.data?.contacts || [];
-    } else {
-      newContacts = newData.data.contacts.filter((val) =>
-        val.name.toLowerCase().includes(contactSearched.toLowerCase())
-      );
-    }
-    console.log(newContacts);
-    setContacts(newContacts);
+  let component;
+  if (loading) {
+    component = <h1>Loading...</h1>;
+    return component;
+  } else if (error) {
+    component = (
+      <div>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+      </div>
+    );
+    return component;
   }
 
-  useEffect(() => {
-    getChatsData();
-  }, [contactSearched]);
   return (
     <>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>

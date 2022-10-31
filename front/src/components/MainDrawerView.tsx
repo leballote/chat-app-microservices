@@ -5,7 +5,8 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ProfilePreview, { Props as ProfilePreviewProps } from "./ProfilePreview";
 import ChatsDrawerSection from "./ChatsDrawerSection";
 import ContactsIcon from "@mui/icons-material/Contacts";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { CurrentUserContext } from "../contexts";
 
 const userMock: ProfilePreviewProps = {
   id: "203",
@@ -22,23 +23,24 @@ interface Props {
 }
 
 export default function MainDrawerView(props: Props) {
-  const [userInfo, setUserInfo] = useState<ProfilePreviewProps>({
-    id: "",
-    avatar: "",
-    name: "",
-    phrase: "",
-    status: "offline",
-  });
+  const userInfo = useContext(CurrentUserContext);
+  // const [userInfo, setUserInfo] = useState<ProfilePreviewProps>({
+  //   id: "",
+  //   avatar: "",
+  //   name: "",
+  //   phrase: "",
+  //   status: "offline",
+  // });
 
-  async function getProfilePreviewData() {
-    setUserInfo(userMock);
-  }
+  // async function getProfilePreviewData() {
+  //   setUserInfo(userMock);
+  // }
 
-  useEffect(() => {
-    getProfilePreviewData();
-  }, []);
+  // useEffect(() => {
+  //   getProfilePreviewData();
+  // }, []);
 
-  return (
+  return userInfo ? (
     <>
       <ProfilePreview {...userInfo} />
       <Divider />
@@ -53,5 +55,7 @@ export default function MainDrawerView(props: Props) {
       <Divider />
       <ChatsDrawerSection />
     </>
+  ) : (
+    <h1>Temp</h1>
   );
 }

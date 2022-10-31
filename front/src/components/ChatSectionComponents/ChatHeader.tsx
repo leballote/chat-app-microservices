@@ -20,23 +20,7 @@ import ImageIcon from "@mui/icons-material/Image";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { ChatContext, CurrentUserContext } from "../../contexts";
 import { WithHeight } from "../../types/utilTypes";
-
-function getAvatarInitialsFromName(name: string): string {
-  if (name == "" || name == null) {
-    return "";
-  }
-  const splitted = name.split(" ") ?? ["N", "A"];
-  if (splitted.length == 1) {
-    let word = splitted[0];
-    if (word.length == 1) {
-      return word[0];
-    } else {
-      return word[0] + word[1];
-    }
-  } else {
-    return splitted[0][0] + splitted[1][0];
-  }
-}
+import FormatedAvatar from "../../utils/FormatedAvatar";
 
 interface Props {
   height: string | number;
@@ -45,7 +29,7 @@ interface Props {
 export default function ChatHeader({ height }: Props) {
   const { participants, ...chatInfo } = useContext(ChatContext);
 
-  return chatInfo.type == "individual" ? (
+  return chatInfo.type == "INDIVIDUAL" ? (
     <IndividualChatHeader height={height} />
   ) : (
     <GroupChatHeader height={height} />
@@ -61,9 +45,9 @@ function IndividualChatHeader({ height }: WithHeight) {
   const props = {
     name: chatInfo.name,
     status: receiver.status,
-    phrase: receiver.phrase ?? chatInfo.phrase,
-    avatarSrc: receiver.avatar ?? chatInfo.avatar,
-    avatarName: getAvatarInitialsFromName(receiver.name ?? chatInfo.name),
+    phrase: chatInfo.phrase,
+    avatarSrc: chatInfo.avatar,
+    avatarName: chatInfo.name,
     height,
     to: `/profile/user/${chatInfo.id}`,
   };
@@ -79,7 +63,7 @@ function GroupChatHeader({ height }: WithHeight) {
     name: chatInfo.name,
     phrase: chatInfo.phrase ?? "",
     avatarSrc: chatInfo.avatar,
-    avatarName: getAvatarInitialsFromName(chatInfo.name),
+    avatarName: chatInfo.name,
     height,
     to: `/profile/group/${chatInfo.id}`,
   };
@@ -89,7 +73,7 @@ function GroupChatHeader({ height }: WithHeight) {
 //TODO: check out why do I need to include avatarName? and avatarSrc? two times
 type BaseChatHeaderProps = {
   name: string;
-  status?: "online" | "offline";
+  status?: "ONLINE" | "OFFLINE";
   phrase: string;
   avatarName?: string;
   avatarSrc?: string;
@@ -98,7 +82,7 @@ type BaseChatHeaderProps = {
   WithHeight;
 
 function BaseChatHeader(props: BaseChatHeaderProps) {
-  const { name, status, phrase, avatarSrc, avatarName, height, to } = props;
+  const { name, status, phrase, height, to } = props;
 
   return (
     <Box
@@ -124,7 +108,7 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
         component={RouterLink}
         to={to}
       >
-        {avatarSrc ? <Avatar src={avatarSrc} /> : <Avatar>{avatarName}</Avatar>}
+        <FormatedAvatar {...props} />
         {/* <Link to={to} component={RouterLink} sx={{ textDecoration: "none" }}> */}
         <Container>
           <Typography component="h1" fontWeight="bold">

@@ -31,11 +31,12 @@ import { WithHeight } from "../types/utilTypes";
 const defaultChat: Chat = {
   id: "",
   name: "",
-  type: "individual",
+  type: "INDIVIDUAL",
+  phrase: "",
   participants: [
     {
       id: "",
-      status: "online",
+      status: "ONLINE",
       name: "",
       phrase: "",
       admin: false,

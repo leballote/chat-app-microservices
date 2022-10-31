@@ -1,7 +1,8 @@
 export type Message = {
   id: string;
-  sentBy: string | User;
+  sentBy: string;
   content: string;
+  sentAt: string;
 };
 
 export type User = {
@@ -13,7 +14,7 @@ export type User = {
   chats: string[] | Chat[];
   phrase: string;
   avatar: string;
-  status: Status;
+  status: UserModelStatus;
   friends: string[] | User[];
 };
 
@@ -37,24 +38,25 @@ export type UserModelResponse = {
   updatedAt: string;
 };
 
-export enum ChatType {
+export enum ChatModelType {
   INDIVIDUAL = "individual",
   GROUP = "group",
 }
 
-export enum Status {
+export enum UserModelStatus {
   ONLINE = "online",
   OFFLINE = "offline",
 }
 
 export type ChatModelResponse = {
   _id: string;
-  type: ChatType;
+  type: ChatModelType;
   name?: string;
   phrase?: string;
   createdAt: string;
   updatedAt: string;
   participants: string[];
+  avatar?: string;
 };
 
 export type MessageModelResponse = {

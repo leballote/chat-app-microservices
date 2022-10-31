@@ -15,10 +15,10 @@ const config: CodegenConfig = {
           SignUpResponse: "../types/apiResponse.types#SignUpModelResponse",
           LogInResponse: "../types/apiResponse.types#LogInModelResponse",
         },
-        enumValues: {
-          Status: "../types/apiResponse.types#Status",
-          ChatType: "../types/apiResponse.types#ChatType",
-        },
+        // enumValues: {
+        //   Status: "../types/apiResponse.types#Status",
+        //   ChatType: "../types/apiResponse.types#ChatType",
+        // },
       },
     },
   },

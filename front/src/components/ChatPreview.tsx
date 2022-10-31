@@ -12,12 +12,14 @@ import {
 
 export interface Props {
   id: string;
-  avatar: string;
+  avatar?: string;
   type: string;
   name: string;
   to?: string;
-  lastMessage: {
-    sentBy: string;
+  lastMessage?: {
+    sentBy: {
+      id: string;
+    };
     content: string;
     sentAt: string | Date;
   };
@@ -29,15 +31,39 @@ export default function ChatPreview({
   type,
   name,
   to,
-  lastMessage: { sentBy, content, sentAt },
+  lastMessage,
 }: Props) {
+  let previewSection: React.ReactElement;
+  let { sentBy, content, sentAt } = lastMessage || {
+    sentBy: "",
+    content: "",
+    sentAt: "",
+  };
   if (typeof sentAt === "string") sentAt = new Date(sentAt);
+  if (lastMessage) {
+    previewSection = (
+      <Typography component="p" fontSize={".8em"} color="textSecondary">
+        {content}
+      </Typography>
+    );
+  } else {
+    previewSection = (
+      <Typography
+        component="p"
+        fontSize={".8em"}
+        color="textSecondary"
+        fontStyle={"italic"}
+      >
+        {"new chat"}
+      </Typography>
+    );
+  }
 
   return (
     <ListItem button component={RouterLink} to={`chat/${id}`}>
       <ListItemAvatar>
         <Avatar
-          alt={`${avatar} of ${name}`}
+          alt={`avatar of ${name}`}
           src={avatar}
           sx={{
             width: 60,
@@ -58,9 +84,7 @@ export default function ChatPreview({
         >
           {name}
         </Typography>
-        <Typography component="p" fontSize={".8em"} color="textSecondary">
-          {content}
-        </Typography>
+        {previewSection}
       </ListItemText>
     </ListItem>
   );

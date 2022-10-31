@@ -17,7 +17,10 @@ const chatSchema = new mongoose.Schema(
     },
     phrase: {
       type: String,
-      required: true,
+    },
+    lastMessageId: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: "message",
     },
   },
   { timestamps: true }

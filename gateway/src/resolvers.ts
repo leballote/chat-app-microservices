@@ -3,10 +3,11 @@ import {
   ChatModelResponse,
   UserModelResponse,
   MessageModelResponse,
-  Status,
+  UserModelStatus,
+  ChatModelType,
 } from "./types/apiResponse.types";
-import { getReceiver } from "./utils";
-import { Resolvers } from "./generated/graphql";
+import { getReceiver, isStringArray } from "./utils";
+import { Resolvers, ChatType, Status } from "./generated/graphql";
 
 const pubsub = new PubSub();
 
@@ -62,7 +63,11 @@ const resolvers: Resolvers = {
     },
     type: (parent: ChatModelResponse) => {
       //TODO: this is probably not correct
-      return parent.type;
+      if (parent.type == ChatModelType.GROUP) {
+        return ChatType.Group;
+      } else {
+        return ChatType.Individual;
+      }
     },
     phrase: async (parent: ChatModelResponse, _, { dataSources }) => {
       if (parent.type == "group") {
@@ -92,6 +97,21 @@ const resolvers: Resolvers = {
         const viewer = await dataSources.getViewer();
         const receiver = getReceiver(participants, viewer._id);
         return receiver.name ?? "";
+      }
+    },
+    avatar: async (parent, {}, { dataSources }) => {
+      if (parent.type == "group") {
+        return parent.avatar;
+      } else {
+        //TODO: this also could be made with less roundtrips
+        const participants: UserModelResponse[] = await Promise.all(
+          parent.participants.map((participantId) => {
+            return dataSources.userAPI.getUser(participantId);
+          })
+        );
+        const viewer = await dataSources.getViewer();
+        const receiver = getReceiver(participants, viewer._id);
+        return receiver.avatar;
       }
     },
     lastMessage: async (parent, {}, { dataSources }) => {
@@ -125,11 +145,11 @@ const resolvers: Resolvers = {
       return parent._id;
     },
     friends: async (parent, {}, { dataSources }) => {
-      //it is supposed to be only one of two things: list of users or list of strings
-      if (parent.friends.length > 0 && typeof parent.friends[0] == "string") {
-        //TODO: there should be a way for the compiler to know, a better safeguard than indicating it with "as"
-        const friends = parent.friends as string[];
-        const usersPromises = friends.map((friendId: string) => {
+      if (parent.friends.length == 0) {
+        return [];
+      }
+      if (isStringArray(parent.friends)) {
+        const usersPromises = parent.friends.map((friendId: string) => {
           const user = dataSources.userAPI.getUser(friendId);
           return user;
         });
@@ -143,9 +163,9 @@ const resolvers: Resolvers = {
     chats: async (parent, {}, { dataSources }) => {
       return dataSources.chatAPI.getChats({ userId: parent._id });
     },
-    status: () => {
+    status: (parent) => {
       //TODO see how you are going to solve this
-      return Status.ONLINE;
+      return Status.Online;
     },
   },
 };

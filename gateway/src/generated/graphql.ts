@@ -1,5 +1,3 @@
-import { Status } from '../types/apiResponse.types';
-import { ChatType } from '../types/apiResponse.types';
 import { GraphQLResolveInfo } from 'graphql';
 import { ChatModelResponse, MessageModelResponse, UserModelResponse, SignUpModelResponse, LogInModelResponse } from '../types/apiResponse.types';
 import { MyContext } from '../index';
@@ -8,7 +6,6 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type EnumResolverSignature<T, AllowedValues = any> = { [key in keyof T]?: AllowedValues };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -20,19 +17,23 @@ export type Scalars = {
 
 export type Chat = {
   __typename?: 'Chat';
-  id?: Maybe<Scalars['ID']>;
+  avatar?: Maybe<Scalars['String']>;
+  id: Scalars['ID'];
   lastMessage?: Maybe<Message>;
   messages: Array<Message>;
-  name?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
   participants: Array<User>;
   phrase: Scalars['String'];
   type: ChatType;
 };
 
-export { ChatType };
+export enum ChatType {
+  Group = 'GROUP',
+  Individual = 'INDIVIDUAL'
+}
 
-export type LoginResponse = {
-  __typename?: 'LoginResponse';
+export type LogInResponse = {
+  __typename?: 'LogInResponse';
   success: Scalars['Boolean'];
   token: Scalars['String'];
 };
@@ -40,14 +41,14 @@ export type LoginResponse = {
 export type Message = {
   __typename?: 'Message';
   content: Scalars['String'];
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   sentBy: User;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
   createPost?: Maybe<Post>;
-  login?: Maybe<LoginResponse>;
+  login?: Maybe<LogInResponse>;
   signup?: Maybe<SignUpResponse>;
 };
 
@@ -86,7 +87,10 @@ export type SignUpResponse = {
   success: Scalars['Boolean'];
 };
 
-export { Status };
+export enum Status {
+  Offline = 'OFFLINE',
+  Online = 'ONLINE'
+}
 
 export type Subscription = {
   __typename?: 'Subscription';
@@ -98,7 +102,7 @@ export type User = {
   avatar?: Maybe<Scalars['String']>;
   chats: Array<Chat>;
   friends: Array<User>;
-  id?: Maybe<Scalars['ID']>;
+  id: Scalars['ID'];
   name: Scalars['String'];
   phrase: Scalars['String'];
   status: Status;
@@ -178,7 +182,7 @@ export type ResolversTypes = {
   Chat: ResolverTypeWrapper<ChatModelResponse>;
   ChatType: ChatType;
   ID: ResolverTypeWrapper<Scalars['ID']>;
-  LoginResponse: ResolverTypeWrapper<LoginResponse>;
+  LogInResponse: ResolverTypeWrapper<LogInModelResponse>;
   Message: ResolverTypeWrapper<MessageModelResponse>;
   Mutation: ResolverTypeWrapper<{}>;
   Post: ResolverTypeWrapper<Post>;
@@ -195,7 +199,7 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   Chat: ChatModelResponse;
   ID: Scalars['ID'];
-  LoginResponse: LoginResponse;
+  LogInResponse: LogInModelResponse;
   Message: MessageModelResponse;
   Mutation: {};
   Post: Post;
@@ -207,19 +211,18 @@ export type ResolversParentTypes = {
 };
 
 export type ChatResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Chat'] = ResolversParentTypes['Chat']> = {
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   lastMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType>;
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
-  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   participants?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   phrase?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<ResolversTypes['ChatType'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type ChatTypeResolvers = EnumResolverSignature<{ GROUP?: any, INDIVIDUAL?: any }, ResolversTypes['ChatType']>;
-
-export type LoginResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['LoginResponse'] = ResolversParentTypes['LoginResponse']> = {
+export type LogInResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['LogInResponse'] = ResolversParentTypes['LogInResponse']> = {
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -227,14 +230,14 @@ export type LoginResponseResolvers<ContextType = MyContext, ParentType extends R
 
 export type MessageResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = {
   content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   sentBy?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, Partial<MutationCreatePostArgs>>;
-  login?: Resolver<Maybe<ResolversTypes['LoginResponse']>, ParentType, ContextType, Partial<MutationLoginArgs>>;
+  login?: Resolver<Maybe<ResolversTypes['LogInResponse']>, ParentType, ContextType, Partial<MutationLoginArgs>>;
   signup?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, Partial<MutationSignupArgs>>;
 };
 
@@ -254,8 +257,6 @@ export type SignUpResponseResolvers<ContextType = MyContext, ParentType extends 
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type StatusResolvers = EnumResolverSignature<{ OFFLINE?: any, ONLINE?: any }, ResolversTypes['Status']>;
-
 export type SubscriptionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   postCreated?: SubscriptionResolver<Maybe<ResolversTypes['Post']>, "postCreated", ParentType, ContextType>;
 };
@@ -264,7 +265,7 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
   friends?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
-  id?: Resolver<Maybe<ResolversTypes['ID']>, ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   phrase?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
@@ -274,14 +275,12 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
 
 export type Resolvers<ContextType = MyContext> = {
   Chat?: ChatResolvers<ContextType>;
-  ChatType?: ChatTypeResolvers;
-  LoginResponse?: LoginResponseResolvers<ContextType>;
+  LogInResponse?: LogInResponseResolvers<ContextType>;
   Message?: MessageResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   SignUpResponse?: SignUpResponseResolvers<ContextType>;
-  Status?: StatusResolvers;
   Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };

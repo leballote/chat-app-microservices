@@ -16,6 +16,10 @@ router.post("/friendship", async (req, res) => {
       User.findOne({ _id: user2Id }),
     ]);
 
+    if (user1.friends.includes(user2._id)) {
+      res.status(400).send({ message: "Already friends" });
+    }
+
     user1.friends.push(user2._id);
     user2.friends.push(user1._id);
 

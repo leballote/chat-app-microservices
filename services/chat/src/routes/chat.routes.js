@@ -36,7 +36,6 @@ router.post("/chat", async (req, res) => {
     }
 
     //TODO: we should also handle unique key error; see how you handeled it before in auth
-    console.log(user1Id, user2Id);
     try {
       const individualRel = await IndividualRel.findOne({
         user1Id,

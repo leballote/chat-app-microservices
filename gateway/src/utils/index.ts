@@ -4,11 +4,9 @@ export function getReceiver(
   participants: UserModelResponse[],
   viewerId: string
 ) {
-  const unWrappedReceiver = participants.filter((participant) => {
-    console.log(receiver);
+  const receiver = participants.filter((participant) => {
     return participant._id != viewerId;
-  });
-  const receiver = unWrappedReceiver[0];
+  })[0];
   return receiver;
 }
 

@@ -1,0 +1,7 @@
+This week I focused on "finishing" the graphql server
+
+In general this has been a constant editing and rethinking of almost every part of the app, so in one day I might have changed a couple of apis or improve slightly everything, but as a summary of the new things:
+
+On Monday I had finished almost all resolvers with the exeptions being the mutations the queries and the subscriptions (again, this was not the final version).
+On Tuesday I set up the subscriptions, which wasn't completely compatible with my already working code, and made one example subscription.
+On Wednesday I started connecting the client with the server since everything was mocked.

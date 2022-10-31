@@ -11,16 +11,16 @@ export type ChatUser = {
   admin: false;
   phrase: string;
   avatar: string;
-  status: "online" | "offline";
+  status: "ONLINE" | "OFFLINE";
 };
 
 export type Chat = {
   id: string;
   name: string;
   avatar?: string;
-  status?: string;
-  phrase?: string;
-  type: "individual" | "group";
+  status?: "ONLINE" | "OFFLINE"; //this one makes no sense try to take it away
+  phrase: string;
+  type: "INDIVIDUAL" | "GROUP";
   participants: ChatUser[];
   messages: Message[];
 };

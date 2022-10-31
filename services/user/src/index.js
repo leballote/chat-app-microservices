@@ -3,6 +3,7 @@ require("./utils/validateEnvVariables")();
 const express = require("express");
 const cors = require("cors"); //TODO: erease this when tests with cookies are finished
 const mongoose = require("mongoose");
+mongoose.Schema.Types.String.checkRequired((v) => typeof v === "string");
 
 const PORT = process.env.PORT;
 const MONGODB_CONNECTION_STRING = process.env.MONGODB_CONNECTION_STRING;
