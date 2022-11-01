@@ -2,7 +2,9 @@ import { RESTDataSource } from "@apollo/datasource-rest";
 import {
   ChatModelResponse,
   MessageModelResponse,
+  CreateMessageModelInput,
 } from "../types/apiResponse.types";
+import { CreateMessageResponse } from "../generated/graphql";
 
 type DataResponse<T> = {
   data: T;
@@ -12,10 +14,22 @@ export default class ChatAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
   override baseURL = "http://localhost:6000";
 
-  async getChat(id: string): Promise<ChatModelResponse> {
+  async getChat(
+    id: string,
+    options?: {
+      userId: string;
+    }
+  ): Promise<ChatModelResponse> {
     const { data } = await this.get<DataResponse<ChatModelResponse>>(
       `chat/${encodeURIComponent(id)}`
     );
+    if (!options) {
+      return data;
+    }
+    const { userId } = options;
+    if (!data.participants.includes(userId)) {
+      return null;
+    }
     return data;
   }
   async getChats(
@@ -58,5 +72,35 @@ export default class ChatAPI extends RESTDataSource {
       `message/?${query}`
     );
     return data;
+  }
+
+  async createMessage(input: CreateMessageModelInput): Promise<any> {
+    try {
+      const { data } = await this.post("message", { body: input });
+      //TODO: right now our APIs when something has an error, returns an object with property message, it should change to something like error, and that should imply that there was an error :p
+
+      //this should not happen, so this throws unwknon error
+      if (!data || data.message) {
+        return {
+          message: data,
+          success: false,
+          error: {
+            reason: "Unknown error",
+          },
+        };
+      }
+      return {
+        message: data,
+        success: true,
+      };
+    } catch {
+      return {
+        message: null,
+        success: false,
+        error: {
+          reason: "Server error",
+        },
+      };
+    }
   }
 }

@@ -25,6 +25,7 @@ const typeDefs = gql`
   type Message {
     id: ID!
     sentBy: User!
+    chat: Chat!
     sentAt: String!
     content: String!
   }
@@ -38,6 +39,7 @@ const typeDefs = gql`
     phrase: String!
     status: Status!
     avatar: String
+    chat(chatId: String): Chat
   }
 
   type SignUpResponse {
@@ -49,6 +51,24 @@ const typeDefs = gql`
     token: String!
   }
 
+  input CreateMessageInput {
+    sentById: ID!
+    sentAt: String!
+    content: String!
+    chatId: ID!
+  }
+
+  type CreateMessageResponse {
+    success: Boolean!
+    message: Message
+    error: Error
+  }
+
+  type Error {
+    reason: String!
+    code: Int
+  }
+
   type Query {
     chats: [Chat!]!
     viewer: User
@@ -58,6 +78,7 @@ const typeDefs = gql`
     signup(username: String, password: String): SignUpResponse
     login(username: String, password: String): LogInResponse
     createPost(author: String, comment: String): Post
+    createMessage(input: CreateMessageInput): CreateMessageResponse
   }
 
   type Post {
@@ -65,8 +86,12 @@ const typeDefs = gql`
     comment: String!
   }
 
+  type MessageCreatedSubscriptionResponse {
+    message: Message
+  }
+
   type Subscription {
-    postCreated: Post
+    messageCreated: MessageCreatedSubscriptionResponse
   }
 `;
 export default typeDefs;

@@ -4,13 +4,13 @@ import { watcherSaga } from "./sagas/rootSaga";
 import userReducer from "./features/currentUserSlice";
 import chatsPreviewsReducer from "./features/chatsPreviewsSlice";
 import contactsPreviewsReducer from "./features/contactsPreviewsSlice";
-
-// ...
+import currentChatReducer from "./features/currentChatSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
   reducer: {
     currentUser: userReducer,
+    currentChat: currentChatReducer,
     chatsPreviews: chatsPreviewsReducer,
     contactsPreviews: contactsPreviewsReducer,
   },

@@ -67,6 +67,14 @@ export type MessageModelResponse = {
   content: string;
 };
 
+export type CreateMessageModelInput = {
+  chatId: string;
+  userId: string;
+  sentAt: string;
+  sentBy: string;
+  content: string;
+};
+
 export type LogInModelResponse = {
   success: boolean;
   token: string;

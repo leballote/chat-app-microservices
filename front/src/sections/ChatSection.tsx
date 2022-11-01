@@ -3,7 +3,7 @@ import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { useParams } from "react-router-dom";
-import { useState, useEffect, useContext, createContext } from "react";
+import { useState, useEffect, useContext, createContext, useRef } from "react";
 import {
   List,
   ListItem,
@@ -27,6 +27,13 @@ import {
 import { ChatContext, CurrentUserContext } from "../contexts";
 import ChatHeader from "../components/ChatSectionComponents/ChatHeader";
 import { WithHeight } from "../types/utilTypes";
+import indexArrayByField from "../utils/indexArrayByField";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { User } from "../types/AppTypes";
+import {
+  getValue as getCurrentChatValue,
+  sendMessage,
+} from "../app/features/currentChatSlice";
 
 const defaultChat: Chat = {
   id: "",
@@ -57,48 +64,54 @@ function formatDate(dateString: string) {
 }
 
 function ChatBody({ messages, height }: Props) {
-  const { participants, ...otherChatInfo } = useContext(ChatContext);
+  let { participants: participantList, ...otherChatInfo } =
+    useContext(ChatContext);
+  const participants = indexArrayByField(participantList, "id");
+
   const currentUser = useContext(CurrentUserContext);
 
   return (
     <Box sx={{ overflow: "auto", height }}>
       <List sx={{ display: "flex", flexFlow: "column" }}>
-        {/* //TODO: solve this any */}
-        {messages.map((message: any, index: number) => (
+        {messages.map((message, index: number) => (
           <Box
             sx={{
               bgcolor:
-                message.sentBy == currentUser?.id ? "#999999" : "#579977",
+                message.sentBy.id == currentUser?.id ? "#999999" : "#579977",
               borderRadius: "5px",
               margin: ".1em",
               display: "flex",
               flexBasis: "50%",
               flex: "1",
               alignSelf:
-                message.sentBy == currentUser?.id ? "flex-end" : "flex-start",
+                message.sentBy.id == currentUser?.id
+                  ? "flex-end"
+                  : "flex-start",
               maxWidth: "70%",
             }}
             key={message.id}
           >
             <ListItem>
-              {index == 0 || messages[index - 1].sentBy != message.sentBy ? (
+              {index == 0 ||
+              messages[index - 1].sentBy.id != message.sentBy.id ? (
                 <ListItemAvatar>
-                  <Avatar src={participants[message.sentBy].avatar} />
+                  <Avatar src={participants[message.sentBy.id].avatar} />
                 </ListItemAvatar>
               ) : null}
 
               <ListItemText>
-                {index == 0 || messages[index - 1].sentBy != message.sentBy ? (
+                {index == 0 ||
+                messages[index - 1].sentBy.id != message.sentBy.id ? (
                   <Typography
                     component="h3"
                     sx={{ fontSize: "1.1em" }}
                     fontWeight="bold"
                   >
-                    {participants[message.sentBy].name}
+                    {participants[message.sentBy.id].name}
                   </Typography>
                 ) : null}
                 {index == 0 ||
-                messages[index - 1].sentBy != message.sentBy ||
+                messages[index - 1].sentBy.id != message.sentBy.id ||
                 Math.abs(
                   Date.parse(messages[index - 1].sentAt) -
                     Date.parse(message.sentAt)
@@ -122,6 +135,56 @@ function ChatBody({ messages, height }: Props) {
 }
 
 function ChatsFooter({ height }: { height: string | number }) {
+  const dispatch = useAppDispatch();
+  const { id: chatId } = useContext(ChatContext);
+  const user = useContext(CurrentUserContext);
+  const messageTextInput = useRef<HTMLInputElement>(null);
+
+  function clearInput() {
+    if (messageTextInput.current?.value) {
+      messageTextInput.current.value = "";
+    }
+  }
+
+  function triggerSendMessage() {
+    //the last condition is not really necessary, but I think it makes it more explicit
+    if (
+      user &&
+      messageTextInput.current?.value &&
+      messageTextInput.current.value.length > 0
+    ) {
+      dispatch(
+        sendMessage({
+          chatId,
+          content: messageTextInput.current?.value,
+          sentAt: new Date().toISOString(),
+          sentBy: user?.id,
+        })
+      );
+    }
+    clearInput();
+  }
+
+  function handleClick() {
+    triggerSendMessage();
+  }
+
+  function handleEnter() {
+    triggerSendMessage();
+  }
+
+  function handleEscape() {
+    clearInput();
+  }
+
+  function handleKeyDown(ev: React.KeyboardEvent<HTMLInputElement>) {
+    if (ev.key === "Escape") {
+      handleEscape();
+    } else if (ev.key === "Enter") {
+      handleEnter();
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -141,8 +204,17 @@ function ChatsFooter({ height }: { height: string | number }) {
       <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }}>
         <EmojiEmotionsIcon />
       </Button>
-      <TextField sx={{ width: "50%" }} />
-      <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }}>
+      <TextField
+        sx={{ width: "50%" }}
+        // ref={messageTextInput}
+        InputProps={{ onKeyDown: handleKeyDown }}
+        inputRef={messageTextInput}
+      />
+      <Button
+        variant="outlined"
+        sx={{ aspectRatio: "1 / 1" }}
+        onClick={handleClick}
+      >
         <SendIcon />
       </Button>
     </Box>
@@ -151,45 +223,59 @@ function ChatsFooter({ height }: { height: string | number }) {
 
 export default function ChatSection() {
   const { id } = useParams();
+  const dispatch = useAppDispatch();
 
-  //TODO: figure out why can id be undefined, and how to handle that case
-  const chatId = id ?? "1";
+  let chatId = id;
+  let nonExistingChat = false;
+  let {
+    error,
+    loading,
+    value: chat,
+  } = useAppSelector((state) => state.currentChat);
 
-  //TODO: maybe change this defaultChat to null and handle on loading
-  const [chat, setChat] = useState<Chat>(defaultChat);
-
-  const { messages, participants, ...chatInfo } = chat;
-
-  async function getChatData(id: string) {
-    let url: string;
-    if (["2", "5", "8"].includes(id)) {
-      url = "../data/mockGroupChat.json";
-    } else {
-      url = "../data/mockOneToOneChat.json";
-    }
-    const fetched = await fetch(url);
-    const { data }: ChatDataResponse = await fetched.json();
-    setChat(data);
+  if (chatId == undefined) {
+    error = new Error("Chat not defined");
   }
 
+  //TODO: try to handle better the fact that chat could be null
+
   useEffect(() => {
-    getChatData(chatId);
+    if (chatId) {
+      dispatch(getCurrentChatValue(chatId));
+    }
   }, [id]);
 
-  return (
-    <Container
-      sx={{
-        position: "relative",
-        height: "100vh",
-        marginTop: "0",
-        marginBottom: "0",
-      }}
-    >
-      <ChatContext.Provider value={{ participants, ...chatInfo }}>
-        <ChatHeader height={"10vh"} />
-        <ChatBody messages={messages} height={"70vh"} />
-        <ChatsFooter height={"20vh"} />
-      </ChatContext.Provider>
-    </Container>
-  );
+  let component;
+  if (loading) {
+    component = <h1>Loading...</h1>;
+  } else if (error) {
+    component = (
+      <div>
+        <h1>Loading...</h1>
+        <p>Error: {error.message}</p>
+      </div>
+    );
+  } else if (chat != null) {
+    const { messages, participants, ...chatInfo } = chat;
+    component = (
+      <Container
+        sx={{
+          position: "relative",
+          height: "100vh",
+          marginTop: "0",
+          marginBottom: "0",
+        }}
+      >
+        <ChatContext.Provider value={{ participants, ...chatInfo }}>
+          <ChatHeader height={"10vh"} />
+          <ChatBody messages={messages} height={"70vh"} />
+          <ChatsFooter height={"20vh"} />
+        </ChatContext.Provider>
+      </Container>
+    );
+  } else {
+    return <h1>This should not be possible</h1>;
+  }
+
+  return component;
 }

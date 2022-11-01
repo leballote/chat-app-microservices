@@ -10,6 +10,7 @@ import { getReceiver, isStringArray } from "./utils";
 import { Resolvers, ChatType, Status } from "./generated/graphql";
 
 const pubsub = new PubSub();
+const MESSAGE_CREATED = "MESSAGE_CREATED";
 
 const posts = [
   { author: "Luis", comment: "cool" },
@@ -44,6 +45,20 @@ const resolvers: Resolvers = {
       return res;
     },
 
+    createMessage: async (_, { input }, { dataSources }) => {
+      const { chatId, content, sentAt, sentById } = input;
+      const viewer = await dataSources.getViewer();
+      const message = await dataSources.chatAPI.createMessage({
+        chatId,
+        userId: viewer._id,
+        content,
+        sentAt,
+        sentBy: sentById,
+      });
+      pubsub.publish(MESSAGE_CREATED, { messageCreated: message });
+      return message;
+    },
+
     // createPost(parent, args, context) {
     //   posts.push(args);
     //   pubsub.publish("POST_CREATED", { postCreated: args });
@@ -51,11 +66,16 @@ const resolvers: Resolvers = {
     // },
   },
 
-  // Subscription: {
-  //   postCreated: {
-  //     subscribe: () => pubsub.asyncIterator(["POST_CREATED"]),
-  //   },
-  // },
+  Subscription: {
+    messageCreated: {
+      subscribe: () => ({
+        [Symbol.asyncIterator]: () => pubsub.asyncIterator([MESSAGE_CREATED]),
+      }),
+    },
+    // postCreated: {
+    //   subscribe: () => pubsub.asyncIterator(["POST_CREATED"]),
+    // },
+  },
 
   Chat: {
     id: (parent, {}, { dataSources }) => {
@@ -136,7 +156,12 @@ const resolvers: Resolvers = {
     id: (parent) => {
       return parent._id;
     },
+    chat: async (parent, {}, { dataSources }) => {
+      return dataSources.chatAPI.getChat(parent.chatId);
+    },
     sentBy: (parent, {}, { dataSources }) => {
+      console.log("it gets called");
+      console.log(dataSources);
       return dataSources.userAPI.getUser(parent.sentBy);
     },
   },
@@ -162,6 +187,12 @@ const resolvers: Resolvers = {
     },
     chats: async (parent, {}, { dataSources }) => {
       return dataSources.chatAPI.getChats({ userId: parent._id });
+    },
+    chat: async (parent, { chatId }, { dataSources }) => {
+      //TODO: again, getViewer needs to do a roundtrip which may be unecessary if all queries are using it
+      return dataSources.chatAPI.getChat(chatId, {
+        userId: (await dataSources.getViewer())._id,
+      });
     },
     status: (parent) => {
       //TODO see how you are going to solve this

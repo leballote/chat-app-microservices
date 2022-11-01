@@ -44,7 +44,6 @@ export default function ChatDrawerSection() {
     searchTerm: chatSearched,
   } = useAppSelector((state) => state.chatsPreviews);
   const dispatch = useAppDispatch();
-  console.log(chats, loading, error, chatSearched);
 
   useEffect(() => {
     dispatch(getChatsPreviewsValue(""));

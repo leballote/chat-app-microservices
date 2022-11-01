@@ -65,6 +65,7 @@ const wsServer = new WebSocketServer({
 const serverCleanup = useServer(
   {
     schema,
+    context,
   },
   wsServer
 );

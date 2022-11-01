@@ -6,6 +6,7 @@ export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string;
@@ -32,6 +33,26 @@ export enum ChatType {
   Individual = 'INDIVIDUAL'
 }
 
+export type CreateMessageInput = {
+  chatId: Scalars['ID'];
+  content: Scalars['String'];
+  sentAt: Scalars['String'];
+  sentById: Scalars['ID'];
+};
+
+export type CreateMessageResponse = {
+  __typename?: 'CreateMessageResponse';
+  error?: Maybe<Error>;
+  message?: Maybe<Message>;
+  success: Scalars['Boolean'];
+};
+
+export type Error = {
+  __typename?: 'Error';
+  code?: Maybe<Scalars['Int']>;
+  reason: Scalars['String'];
+};
+
 export type LogInResponse = {
   __typename?: 'LogInResponse';
   success: Scalars['Boolean'];
@@ -40,16 +61,29 @@ export type LogInResponse = {
 
 export type Message = {
   __typename?: 'Message';
+  chat: Chat;
   content: Scalars['String'];
   id: Scalars['ID'];
+  sentAt: Scalars['String'];
   sentBy: User;
+};
+
+export type MessageCreatedSubscriptionResponse = {
+  __typename?: 'MessageCreatedSubscriptionResponse';
+  message?: Maybe<Message>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
+  createMessage?: Maybe<CreateMessageResponse>;
   createPost?: Maybe<Post>;
   login?: Maybe<LogInResponse>;
   signup?: Maybe<SignUpResponse>;
+};
+
+
+export type MutationCreateMessageArgs = {
+  input?: InputMaybe<CreateMessageInput>;
 };
 
 
@@ -94,12 +128,13 @@ export enum Status {
 
 export type Subscription = {
   __typename?: 'Subscription';
-  postCreated?: Maybe<Post>;
+  messageCreated?: Maybe<MessageCreatedSubscriptionResponse>;
 };
 
 export type User = {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']>;
+  chat?: Maybe<Chat>;
   chats: Array<Chat>;
   friends: Array<User>;
   id: Scalars['ID'];
@@ -107,6 +142,11 @@ export type User = {
   phrase: Scalars['String'];
   status: Status;
   username: Scalars['String'];
+};
+
+
+export type UserChatArgs = {
+  chatId?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -181,9 +221,14 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']>;
   Chat: ResolverTypeWrapper<ChatModelResponse>;
   ChatType: ChatType;
+  CreateMessageInput: CreateMessageInput;
+  CreateMessageResponse: ResolverTypeWrapper<Omit<CreateMessageResponse, 'message'> & { message?: Maybe<ResolversTypes['Message']> }>;
+  Error: ResolverTypeWrapper<Error>;
   ID: ResolverTypeWrapper<Scalars['ID']>;
+  Int: ResolverTypeWrapper<Scalars['Int']>;
   LogInResponse: ResolverTypeWrapper<LogInModelResponse>;
   Message: ResolverTypeWrapper<MessageModelResponse>;
+  MessageCreatedSubscriptionResponse: ResolverTypeWrapper<Omit<MessageCreatedSubscriptionResponse, 'message'> & { message?: Maybe<ResolversTypes['Message']> }>;
   Mutation: ResolverTypeWrapper<{}>;
   Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<{}>;
@@ -198,9 +243,14 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   Chat: ChatModelResponse;
+  CreateMessageInput: CreateMessageInput;
+  CreateMessageResponse: Omit<CreateMessageResponse, 'message'> & { message?: Maybe<ResolversParentTypes['Message']> };
+  Error: Error;
   ID: Scalars['ID'];
+  Int: Scalars['Int'];
   LogInResponse: LogInModelResponse;
   Message: MessageModelResponse;
+  MessageCreatedSubscriptionResponse: Omit<MessageCreatedSubscriptionResponse, 'message'> & { message?: Maybe<ResolversParentTypes['Message']> };
   Mutation: {};
   Post: Post;
   Query: {};
@@ -222,6 +272,19 @@ export type ChatResolvers<ContextType = MyContext, ParentType extends ResolversP
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type CreateMessageResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CreateMessageResponse'] = ResolversParentTypes['CreateMessageResponse']> = {
+  error?: Resolver<Maybe<ResolversTypes['Error']>, ParentType, ContextType>;
+  message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType>;
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ErrorResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = {
+  code?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  reason?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type LogInResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['LogInResponse'] = ResolversParentTypes['LogInResponse']> = {
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   token?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -229,13 +292,21 @@ export type LogInResponseResolvers<ContextType = MyContext, ParentType extends R
 };
 
 export type MessageResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Message'] = ResolversParentTypes['Message']> = {
+  chat?: Resolver<ResolversTypes['Chat'], ParentType, ContextType>;
   content?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  sentAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   sentBy?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MessageCreatedSubscriptionResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['MessageCreatedSubscriptionResponse'] = ResolversParentTypes['MessageCreatedSubscriptionResponse']> = {
+  message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  createMessage?: Resolver<Maybe<ResolversTypes['CreateMessageResponse']>, ParentType, ContextType, Partial<MutationCreateMessageArgs>>;
   createPost?: Resolver<Maybe<ResolversTypes['Post']>, ParentType, ContextType, Partial<MutationCreatePostArgs>>;
   login?: Resolver<Maybe<ResolversTypes['LogInResponse']>, ParentType, ContextType, Partial<MutationLoginArgs>>;
   signup?: Resolver<Maybe<ResolversTypes['SignUpResponse']>, ParentType, ContextType, Partial<MutationSignupArgs>>;
@@ -258,11 +329,12 @@ export type SignUpResponseResolvers<ContextType = MyContext, ParentType extends 
 };
 
 export type SubscriptionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
-  postCreated?: SubscriptionResolver<Maybe<ResolversTypes['Post']>, "postCreated", ParentType, ContextType>;
+  messageCreated?: SubscriptionResolver<Maybe<ResolversTypes['MessageCreatedSubscriptionResponse']>, "messageCreated", ParentType, ContextType>;
 };
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  chat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType, Partial<UserChatArgs>>;
   chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
   friends?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
@@ -275,8 +347,11 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
 
 export type Resolvers<ContextType = MyContext> = {
   Chat?: ChatResolvers<ContextType>;
+  CreateMessageResponse?: CreateMessageResponseResolvers<ContextType>;
+  Error?: ErrorResolvers<ContextType>;
   LogInResponse?: LogInResponseResolvers<ContextType>;
   Message?: MessageResolvers<ContextType>;
+  MessageCreatedSubscriptionResponse?: MessageCreatedSubscriptionResponseResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

@@ -1,6 +1,6 @@
 export type Message = {
   id: string;
-  sentBy: string;
+  sentBy: { id: string };
   sentAt: string;
   content: string;
 };

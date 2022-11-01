@@ -23,37 +23,49 @@
     "messages": [
       {
         "id": "1",
-        "sentBy": "0",
+        "sentBy": {
+          "id": "0"
+        },
         "sentAt": "2022-10-15T10:01:30.417Z",
         "content": "Hi, how are you dude?"
       },
       {
         "id": "2",
-        "sentBy": "0",
+        "sentBy": {
+          "id": "0"
+        },
         "sentAt": "2022-10-15T09:09:56.417Z",
         "content": "Could you do the job?"
       },
       {
         "id": "3",
-        "sentBy": "0",
+        "sentBy": {
+          "id": "0"
+        },
         "sentAt": "2022-10-15T09:09:56.417Z",
         "content": "Thank you btw"
       },
       {
         "id": "4",
-        "sentBy": "1",
+        "sentBy": {
+          "id": "1"
+        },
         "sentAt": "2022-10-15T09:09:56.417Z",
         "content": "Yes I could, I am better than you haha. The way I did it was awesome."
       },
       {
         "id": "5",
-        "sentBy": "0",
+        "sentBy": {
+          "id": "0"
+        },
         "sentAt": "2022-10-15T09:09:56.417Z",
         "content": "Please, tell me!"
       },
       {
         "id": "6",
-        "sentBy": "1",
+        "sentBy": {
+          "id": "1"
+        },
         "sentAt": "2022-10-15T09:09:56.417Z",
         "content": "Never!"
       }

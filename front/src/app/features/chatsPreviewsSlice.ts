@@ -39,7 +39,6 @@ export const chatsPreviewsSlice = createSlice({
   initialState,
   reducers: {
     getValue(state, { payload }: PayloadAction<string>) {
-      console.log("UUUU");
       //TODO: not sure if this is needed
       state.loading = true;
     },

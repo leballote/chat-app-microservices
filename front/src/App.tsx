@@ -8,9 +8,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ChatSection from "./sections/ChatSection";
 import { User } from "./types/AppTypes";
 import { CurrentUserContext } from "./contexts";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, gql, useSubscription } from "@apollo/client";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { getValue as getCurrentUserValue } from "./app/features/currentUserSlice";
+import { pushMessage } from "./app/features/currentChatSlice";
+import { current } from "@reduxjs/toolkit";
 
 //TODO: this component will be removed
 const Placeholder = ({ text }: any) => {
@@ -21,11 +23,47 @@ const Placeholder = ({ text }: any) => {
   );
 };
 
+const MESSAGE_CREATED = gql`
+  subscription {
+    messageCreated {
+      message {
+        id
+        content
+        sentAt
+        sentBy {
+          id
+        }
+        chat {
+          id
+        }
+      }
+    }
+  }
+`;
+
 const App: React.FunctionComponent = function () {
-  // let { error, loading, data } = useQuery(GET_USER_DATA);
   const currentUserState = useAppSelector((state) => state.currentUser);
-  const { value: currentUser, loading, error } = currentUserState;
+  const currentChatState = useAppSelector((state) => state.currentChat);
+
+  const { value: currentUser, loading: userLoading, error } = currentUserState;
   const dispatch = useAppDispatch();
+  const {
+    loading: messageCreatedLoading,
+    error: messageCreatedError,
+    data: messageCreatedData,
+  } = useSubscription(MESSAGE_CREATED);
+
+  useEffect(() => {
+    if (messageCreatedData?.messageCreated.message) {
+      if (
+        messageCreatedData.messageCreated.message.chat.id ==
+          currentChatState.value?.id &&
+        currentChatState.value
+      ) {
+        dispatch(pushMessage(messageCreatedData.messageCreated.message));
+      }
+    }
+  }, [messageCreatedData]);
 
   useEffect(() => {
     dispatch(getCurrentUserValue());
@@ -39,7 +77,7 @@ const App: React.FunctionComponent = function () {
         <p>{error.message}</p>
       </div>
     );
-  } else if (loading) {
+  } else if (userLoading) {
     component = <h1>Loading...</h1>;
   } else {
     component = (
