@@ -11,6 +11,7 @@ export async function requestGetChatsPreviews(
   const GET_CHATS_PREVIEWS_DATA = gql`
     query GetChatPreviews {
       viewer {
+        id
         chats {
           id
           type

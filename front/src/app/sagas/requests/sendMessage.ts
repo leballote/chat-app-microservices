@@ -20,8 +20,8 @@ export async function requestSendMessage({
     mutation CreateMessage($input: CreateMessageInput) {
       createMessage(input: $input) {
         message {
-          content
           id
+          content
           sentAt
           sentBy {
             id

@@ -11,6 +11,7 @@ export async function requestGetContactsPreviews(
   const GET_CONTACTS_PREVIEWS_DATA = gql`
     query GetChatPreviews {
       viewer {
+        id
         friends {
           id
           name

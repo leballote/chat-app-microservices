@@ -30,10 +30,10 @@ export const currentChatSlice = createSlice({
   name: "chatSlice",
   initialState,
   reducers: {
-    getValue(state, action: PayloadAction<string>) {
+    getValue(state, _action: PayloadAction<string>) {
       state.loading = true;
     },
-    sendMessage(state, action: PayloadAction<MessageInput>) {},
+    sendMessage(_, _action: PayloadAction<MessageInput>) {},
     getMessages(
       state,
       action: PayloadAction<{
