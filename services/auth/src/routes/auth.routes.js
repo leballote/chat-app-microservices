@@ -8,19 +8,32 @@ const {
 const router = express.Router();
 
 router.post("/signup", signupMiddleware, (req, res) => {
-  return res.send({ user: { username: req.user.username, _id: req.user._id } });
+  return res.send({
+    data: {
+      success: true,
+      user: {
+        username: req.user.username,
+        _id: req.user._id,
+      },
+    },
+  });
 });
 
 router.post("/login", loginMiddleware, (req, res) => {
   return res.send({
-    user: { username: req.user.username, _id: req.user._id },
-    token: req.token,
+    data: {
+      success: true,
+      user: { username: req.user.username, _id: req.user._id },
+      token: req.token,
+    },
   });
 });
 
 router.post("/auth", jwtMiddleware, (req, res) => {
   return res.send({
-    user: { username: req.user.username, _id: req.user._id },
+    data: {
+      user: { username: req.user.username, _id: req.user._id },
+    },
   });
 });
 

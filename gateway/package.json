@@ -17,6 +17,7 @@
   "dependencies": {
     "@apollo/datasource-rest": "^4.3.2",
     "@apollo/server": "^4.0.1",
+    "cookie-parser": "^1.4.6",
     "graphql-subscriptions": "^2.0.0",
     "graphql-tag": "^2.12.6",
     "graphql-ws": "^5.11.2",
@@ -26,6 +27,7 @@
     "@graphql-codegen/cli": "2.13.8",
     "@graphql-codegen/typescript": "2.8.0",
     "@graphql-codegen/typescript-resolvers": "2.7.5",
+    "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",
     "@types/node": "^18.11.2",
     "@types/ws": "^8.5.3",

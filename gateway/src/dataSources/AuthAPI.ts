@@ -2,7 +2,8 @@ import { RESTDataSource } from "@apollo/datasource-rest";
 import {
   LogInModelResponse,
   SignUpModelResponse,
-} from "../types/apiResponse.types";
+  isSuccessLoginResponse,
+} from "../types/servicesRest";
 
 type DataResponse<T> = {
   data: T;
@@ -19,22 +20,38 @@ export default class AuthAPI extends RESTDataSource {
     username: string;
     password: string;
   }): Promise<SignUpModelResponse> {
-    const { data } = await this.post<DataResponse<SignUpModelResponse>>(
+    console.log("SIGNUP CALLED");
+    const signUpRes = await this.post<DataResponse<SignUpModelResponse>>(
       `auth/signup`,
       {
         body: { username, password },
       }
     );
-    return data;
+    const { data } = signUpRes;
+    console.log("SIGN UP RES", signUpRes);
+    if (data) return data;
+    else return null;
   }
 
   async logIn({ username, password }): Promise<LogInModelResponse> {
-    const { data } = await this.post<DataResponse<LogInModelResponse>>(
+    const loginRes = await this.post<DataResponse<LogInModelResponse>>(
       `auth/login`,
       {
         body: { username, password },
       }
     );
-    return data;
+    const { data } = loginRes;
+    if (data && isSuccessLoginResponse(data)) {
+      const { user, token, success } = data;
+      return {
+        success: success,
+        token: token,
+      };
+    } else {
+      return {
+        success: false,
+        token: null,
+      };
+    }
   }
 }

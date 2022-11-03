@@ -14,25 +14,42 @@ import typeDefs from "./schema";
 import ChatAPI from "./dataSources/ChatAPI";
 import UserAPI from "./dataSources/UserAPI";
 import AuthAPI from "./dataSources/AuthAPI";
-import { UserModelResponse } from "./types/apiResponse.types";
+import { UserModelSuccessResponse } from "./types/servicesRest";
+import cookieParser from "cookie-parser";
+import { Request, Response, NextFunction } from "express";
 
 export interface MyContext {
   listen: { port: number };
+  req: Request;
+  res: Response;
   dataSources: {
     chatAPI: ChatAPI;
     userAPI: UserAPI;
     authAPI: AuthAPI;
-    getViewer: () => Promise<UserModelResponse>;
+    getViewer: () => Promise<UserModelSuccessResponse>;
   };
 }
 
-const context = async (): Promise<MyContext> => {
+//TODO: chec out how to type context correctly
+type ContextFunction = (reqRes: {
+  req: Request;
+  res: Response;
+}) => Promise<MyContext>;
+
+const context: ContextFunction = async ({ req, res }) => {
+  //TODO: this seems to be a circular interdependency:
+  // server requires serverCleanup
+  // serverCleanup requires context
+  // context requires server
+  // So I don't know how is this supposed to work, but it hasn't failed
   const { cache } = server;
   return {
     //TODO: maybe define this as an environmental variable
     listen: { port: 4000 },
     // We create new instances of our data sources with each request,
     // passing in our server's cache.
+    req,
+    res,
     dataSources: {
       chatAPI: new ChatAPI({ cache }),
       userAPI: new UserAPI({ cache }),
@@ -95,9 +112,14 @@ const server = new ApolloServer({
 async function start() {
   await server.start();
 
+  //TODO: turn this into env variables
   app.use(
     "/graphql",
-    cors<cors.CorsRequest>(),
+    cors<cors.CorsRequest>({
+      credentials: true,
+      origin: "http://localhost:5173",
+    }),
+    cookieParser(),
     express.json(),
     expressMiddleware(server, { context })
   );

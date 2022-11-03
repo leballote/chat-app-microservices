@@ -1,7 +1,7 @@
-import { UserModelResponse } from "../types/apiResponse.types";
+import { UserModelSuccessResponse } from "../types/servicesRest";
 
 export function getReceiver(
-  participants: UserModelResponse[],
+  participants: UserModelSuccessResponse[],
   viewerId: string
 ) {
   const receiver = participants.filter((participant) => {

@@ -42,13 +42,20 @@ const typeDefs = gql`
     chat(chatId: String): Chat
   }
 
+  input SignUpInput {
+    username: String!
+    name: String!
+    email: String!
+    password: String!
+  }
+
   type SignUpResponse {
     success: Boolean!
   }
 
   type LogInResponse {
     success: Boolean!
-    token: String!
+    token: String
   }
 
   input CreateMessageInput {
@@ -75,7 +82,7 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    signup(username: String, password: String): SignUpResponse
+    signup(input: SignUpInput): SignUpResponse
     login(username: String, password: String): LogInResponse
     createPost(author: String, comment: String): Post
     createMessage(input: CreateMessageInput): CreateMessageResponse

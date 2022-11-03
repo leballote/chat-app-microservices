@@ -11,7 +11,7 @@ const app = express();
 
 app.use(express.json());
 // app.use(cookieParser);
-app.use(authRouter);
+app.use("/auth", authRouter);
 
 mongoose.connect(MONGODB_CONNECTION_STRING).then(
   app.listen(PORT, async () => {

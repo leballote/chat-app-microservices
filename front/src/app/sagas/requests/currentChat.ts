@@ -6,6 +6,7 @@ export async function requestGetChat(chatId: string): Promise<any> {
   const GET_CHAT_DATA = gql`
     query GetChat {
       viewer {
+        id
         chat(chatId: "${chatId}") {
           id
           name

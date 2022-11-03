@@ -3,7 +3,7 @@ import {
   ChatModelResponse,
   MessageModelResponse,
   CreateMessageModelInput,
-} from "../types/apiResponse.types";
+} from "../types/servicesRest";
 import { CreateMessageResponse } from "../generated/graphql";
 
 type DataResponse<T> = {
@@ -74,18 +74,18 @@ export default class ChatAPI extends RESTDataSource {
     return data;
   }
 
+  //TODO: solve this any
   async createMessage(input: CreateMessageModelInput): Promise<any> {
     try {
       const { data } = await this.post("message", { body: input });
       //TODO: right now our APIs when something has an error, returns an object with property message, it should change to something like error, and that should imply that there was an error :p
 
-      //this should not happen, so this throws unwknon error
-      if (!data || data.message) {
+      if (!data) {
         return {
-          message: data,
+          message: null,
           success: false,
           error: {
-            reason: "Unknown error",
+            reason: "Unknown server error",
           },
         };
       }

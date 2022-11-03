@@ -1,27 +1,23 @@
 import { PubSub } from "graphql-subscriptions";
 import {
   ChatModelResponse,
-  UserModelResponse,
+  UserModelSuccessResponse,
   MessageModelResponse,
   UserModelStatus,
   ChatModelType,
-} from "./types/apiResponse.types";
+} from "./types/servicesRest";
 import { getReceiver, isStringArray } from "./utils";
 import { Resolvers, ChatType, Status } from "./generated/graphql";
+import { withFilter } from "graphql-subscriptions";
+import { CookieOptions } from "express";
 
 const pubsub = new PubSub();
 const MESSAGE_CREATED = "MESSAGE_CREATED";
-
-const posts = [
-  { author: "Luis", comment: "cool" },
-  { author: "Jorge", comment: "great" },
-];
 
 const resolvers: Resolvers = {
   Query: {
     chats: async (_, args = {}, context) => {
       const { dataSources } = context;
-      console.log("CONTEXT: ", context);
       const data = await dataSources.chatAPI.getChats(args);
       return data;
     },
@@ -34,15 +30,47 @@ const resolvers: Resolvers = {
   },
 
   Mutation: {
-    signup: async (_, { username, password }, { dataSources }) => {
+    signup: async (
+      _,
+      { input: { username, name, email, password } },
+      { dataSources }
+    ) => {
       //TODO: finish this mutation
-      const res = await dataSources.authAPI.signUp({ username, password });
-      return res;
+      const authRes = await dataSources.authAPI.signUp({ username, password });
+      console.log("AUTH RES", authRes);
+      const userRes = await dataSources.userAPI.createUser({
+        id: authRes.user._id,
+        username,
+        email,
+        name,
+      });
+      console.log("AUTH RES", userRes);
+      if (!userRes || !authRes) {
+        return {
+          success: false,
+        };
+      } else {
+        return {
+          success: true,
+        };
+      }
     },
 
-    login: async (_, { username, password }, { dataSources }) => {
-      const res = await dataSources.authAPI.logIn({ username, password });
-      return res;
+    login: async (_, { username, password }, { dataSources, req, res }) => {
+      const out = await dataSources.authAPI.logIn({ username, password });
+      console.log("COOKIES:", req.cookies);
+      console.log(out);
+      const options: CookieOptions = {
+        maxAge: 1000 * 60 * 60 * 24, //expires in a day
+        httpOnly: true, // cookie is only accessible by the server
+        // secure: process.env.NODE_ENV === "prod", // only transferred over https
+        secure: true,
+        sameSite: "none",
+      };
+      if (out.token) {
+        res.cookie("jwt_token", out.token, options);
+      }
+      return out;
     },
 
     createMessage: async (_, { input }, { dataSources }) => {
@@ -58,23 +86,22 @@ const resolvers: Resolvers = {
       pubsub.publish(MESSAGE_CREATED, { messageCreated: message });
       return message;
     },
-
-    // createPost(parent, args, context) {
-    //   posts.push(args);
-    //   pubsub.publish("POST_CREATED", { postCreated: args });
-    //   return args;
-    // },
   },
 
   Subscription: {
     messageCreated: {
-      subscribe: () => ({
-        [Symbol.asyncIterator]: () => pubsub.asyncIterator([MESSAGE_CREATED]),
+      subscribe: async () => ({
+        [Symbol.asyncIterator]: withFilter(
+          () => pubsub.asyncIterator([MESSAGE_CREATED]),
+          //TODO: figure out where this payload comes from
+          function filterMessageCreated(payload, variables) {
+            console.log("variables:", variables);
+            console.log("payload:", payload);
+            return true;
+          }
+        ),
       }),
     },
-    // postCreated: {
-    //   subscribe: () => pubsub.asyncIterator(["POST_CREATED"]),
-    // },
   },
 
   Chat: {
@@ -94,7 +121,7 @@ const resolvers: Resolvers = {
         return parent.phrase ?? "";
       } else {
         //TODO: this type should be infered
-        const participants: UserModelResponse[] = await Promise.all(
+        const participants: UserModelSuccessResponse[] = await Promise.all(
           parent.participants.map((participantId) => {
             return dataSources.userAPI.getUser(participantId);
           })
@@ -109,7 +136,7 @@ const resolvers: Resolvers = {
         return parent.name ?? "";
       } else {
         //TODO: this also could be made with less roundtrips
-        const participants: UserModelResponse[] = await Promise.all(
+        const participants: UserModelSuccessResponse[] = await Promise.all(
           parent.participants.map((participantId) => {
             return dataSources.userAPI.getUser(participantId);
           })
@@ -124,7 +151,7 @@ const resolvers: Resolvers = {
         return parent.avatar;
       } else {
         //TODO: this also could be made with less roundtrips
-        const participants: UserModelResponse[] = await Promise.all(
+        const participants: UserModelSuccessResponse[] = await Promise.all(
           parent.participants.map((participantId) => {
             return dataSources.userAPI.getUser(participantId);
           })
@@ -160,9 +187,22 @@ const resolvers: Resolvers = {
       return dataSources.chatAPI.getChat(parent.chatId);
     },
     sentBy: (parent, {}, { dataSources }) => {
-      console.log("it gets called");
-      console.log(dataSources);
       return dataSources.userAPI.getUser(parent.sentBy);
+    },
+  },
+  MessageCreatedSubscriptionResponse: {
+    message: async (parent, {}, { dataSources }) => {
+      console.log("called");
+      const viewer = await dataSources.getViewer();
+      const { participants } = await dataSources.chatAPI.getChat(
+        parent.message.chatId
+      );
+      console.log("participants:", participants);
+      if (participants.includes(viewer._id)) {
+        return parent.message;
+      } else {
+        return null;
+      }
     },
   },
   User: {
@@ -181,7 +221,7 @@ const resolvers: Resolvers = {
         const users = await Promise.all(usersPromises);
         return users;
       } else {
-        const friends = parent.friends as UserModelResponse[];
+        const friends = parent.friends as UserModelSuccessResponse[];
         return friends;
       }
     },

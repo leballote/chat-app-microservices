@@ -13,6 +13,8 @@ import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { getValue as getCurrentUserValue } from "./app/features/currentUserSlice";
 import { pushMessage } from "./app/features/currentChatSlice";
 import { current } from "@reduxjs/toolkit";
+import LoginPage from "./components/LoginPage";
+import SignupPage from "./components/SignupPage";
 
 //TODO: this component will be removed
 const Placeholder = ({ text }: any) => {
@@ -84,16 +86,27 @@ const App: React.FunctionComponent = function () {
       <BrowserRouter>
         <CssBaseline />
         <CurrentUserContext.Provider value={currentUser}>
-          <Box sx={{ display: "flex" }}>
-            <SideBar />
-            <Routes>
-              <Route path="/chat/:id" element={<ChatSection />} />
-              <Route
-                path="/contact/:id"
-                element={<Placeholder text="Contact" />}
-              />
-            </Routes>
-          </Box>
+          <Routes>
+            <Route
+              path="/*"
+              element={
+                <Box sx={{ display: "flex" }}>
+                  <SideBar />
+                  <Routes>
+                    <Route path="chat/:id" element={<ChatSection />} />
+                    <Route
+                      path="contact/:id"
+                      element={<Placeholder text="Contact" />}
+                    />
+                  </Routes>
+                </Box>
+              }
+            />
+            <Route path="/auth">
+              <Route path="login" element={<LoginPage />} />
+              <Route path="signup" element={<SignupPage />} />
+            </Route>
+          </Routes>
         </CurrentUserContext.Provider>
       </BrowserRouter>
     );
