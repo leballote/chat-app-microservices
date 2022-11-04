@@ -71,7 +71,7 @@ function ChatBody({ messages, height }: Props) {
   const currentUser = useContext(CurrentUserContext);
 
   return (
-    <Box sx={{ overflow: "auto", height }}>
+    <Box sx={{ height }}>
       <List sx={{ display: "flex", flexFlow: "column" }}>
         {messages.map((message, index: number) => (
           <Box

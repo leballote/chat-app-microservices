@@ -85,7 +85,7 @@ export default function ChatDrawerSection() {
           onSearch={handleSearch}
           onKeyDown={handleEscapeOnSearch}
         />
-        <Box sx={{ overflow: "scroll", marginTop: ".2em" }}>
+        <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>
           <List>
             {chats.map((props: ChatPreviewProps) => (
               <ChatPreview {...props} key={props.id} />

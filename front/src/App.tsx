@@ -55,6 +55,8 @@ const App: React.FunctionComponent = function () {
     data: messageCreatedData,
   } = useSubscription(MESSAGE_CREATED);
 
+  console.log({ currentUser, userLoading, error });
+
   useEffect(() => {
     if (messageCreatedData?.messageCreated.message) {
       if (
@@ -88,7 +90,7 @@ const App: React.FunctionComponent = function () {
         <CurrentUserContext.Provider value={currentUser}>
           <Routes>
             <Route
-              path="/*"
+              path="/app/*"
               element={
                 <Box sx={{ display: "flex" }}>
                   <SideBar />
