@@ -14,7 +14,9 @@ export function* handleGetChat(action: PayloadAction<{ chatId: string }>): any {
   try {
     put(setLoading());
     //TODO: look how to turn off this error
-    const response = yield call(requestGetChat, payload);
+    const requestGetChat2 = requestGetChat as any;
+    //TODO: solve this any
+    const response = yield call(requestGetChat2, payload);
     const {
       data: {
         viewer: { chat },

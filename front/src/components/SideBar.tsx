@@ -12,20 +12,9 @@ import {
   setMainDrawerSection,
 } from "../app/features/sideBarSlice";
 import { SectionName as DrawerSection } from "../app/features/types";
+import NewGroupDrawerSection from "./NewGroupDrawerSection";
 
-const drawerWidth = 280;
-
-interface Chat {
-  id: string;
-  avatar: string;
-  type: string;
-  name: string;
-  lastMessage: {
-    sentBy: string;
-    content: string;
-    sentAt: string | string;
-  };
-}
+const drawerWidth = 400;
 
 export default function ResponsiveDrawer() {
   //TODO: Change any for the proper data type
@@ -53,6 +42,8 @@ export default function ResponsiveDrawer() {
         onBackClick={() => dispatch(setMainDrawerSection())}
       />
     );
+  } else if (currentDrawerSection == DrawerSection.NEW_GROUP) {
+    section = <NewGroupDrawerSection />;
   } else {
     throw Error("This should be unreachable");
   }

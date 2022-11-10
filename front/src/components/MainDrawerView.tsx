@@ -20,6 +20,7 @@ import { gql, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router";
 import { getValue as getCurrentUserValue } from "../app/features/currentUserSlice";
 import { useTranslation } from "react-i18next";
+import { setNewGroupDrawerSection } from "../app/features/sideBarSlice";
 
 interface Props {
   onContactsClick: (ev: React.MouseEvent<HTMLElement>) => void;
@@ -31,6 +32,7 @@ export default function MainDrawerView(props: Props) {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const anchorRef = useRef<HTMLButtonElement | null>(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { t } = useTranslation();
 
   const LOGOUT = gql`
@@ -63,6 +65,10 @@ export default function MainDrawerView(props: Props) {
     dispatch(getCurrentUserValue());
   }
 
+  async function handleNewGroup() {
+    dispatch(setNewGroupDrawerSection());
+  }
+
   return userInfo ? (
     <>
       <ProfilePreview {...userInfo} />
@@ -93,7 +99,9 @@ export default function MainDrawerView(props: Props) {
             horizontal: "left",
           }}
         >
-          <MenuItem>{t("app.drawer.main.newGroup")}</MenuItem>
+          <MenuItem onClick={handleNewGroup}>
+            {t("app.drawer.main.newGroup")}
+          </MenuItem>
           <MenuItem onClick={handleLogOut}>
             {t("app.drawer.main.logout")}
           </MenuItem>
