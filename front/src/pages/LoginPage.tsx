@@ -8,8 +8,12 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { useRef } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { Link, useNavigate } from "react-router-dom";
+import { getValue as getCurrentUserValue } from "../app/features/currentUserSlice";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { CurrentUserContext } from "../contexts";
 
 const LOGIN = gql`
   mutation Login($username: String!, $password: String!) {
@@ -25,15 +29,29 @@ export default function LoginPage() {
   const passwordInput = useRef<HTMLInputElement>(null);
   //TODO: move this into a saga
   const [mutationFunction, { data, loading, error }] = useMutation(LOGIN);
+  // const user = useContext(CurrentUserContext);
+  const user = useAppSelector((state) => state.currentUser.value);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { t } = useTranslation();
 
-  function handleSubmit(ev: React.FormEvent<HTMLInputElement>) {
+  async function handleSubmit(ev: React.FormEvent<HTMLInputElement>) {
     ev.preventDefault();
     const username = usernameInput.current?.value;
     const password = passwordInput.current?.value;
-    if (username && password) {
-      mutationFunction({ variables: { username, password } });
+    if (!username || !password) {
+      return;
     }
+
+    await mutationFunction({ variables: { username, password } });
+    dispatch(getCurrentUserValue());
   }
+
+  useEffect(() => {
+    if (user) {
+      navigate("/app");
+    }
+  }, [user]);
 
   return (
     <Container
@@ -57,28 +75,28 @@ export default function LoginPage() {
             textAlign="right"
             sx={{ marginBottom: ".5em" }}
           >
-            Log In
+            {t("loginPage.title")}
           </Typography>
           <TextField
             // placeholder="Username"
-            label="Username"
+            label={t("user.username")}
             required
             inputRef={usernameInput}
           />
 
           <TextField
-            label="Password"
+            label={t("user.password")}
             // placeholder="Password"
             required
             type="password"
             inputRef={passwordInput}
           />
           <Button type="submit" variant="outlined">
-            Log In
+            {t("loginPage.loginButton")}
           </Button>
           <Typography textAlign="center">
-            Have an account? &nbsp;
-            <Link to="/auth/signup">Sign Up</Link>
+            {t("loginPage.dontHaveAnAccount")} &nbsp;
+            <Link to="/auth/signup">{t("loginPage.signup")}</Link>
           </Typography>
         </Stack>
       </Paper>

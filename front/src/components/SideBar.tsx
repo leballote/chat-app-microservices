@@ -1,10 +1,17 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 import MainDrawerView from "./MainDrawerView";
 import ContactPreview from "./ContactPreview";
 import ContactsDrawerSection from "./ContactsDrawerSection";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { getValue } from "../app/features/currentUserSlice";
+import {
+  setContactsDrawerSection,
+  setMainDrawerSection,
+} from "../app/features/sideBarSlice";
+import { SectionName as DrawerSection } from "../app/features/types";
 
 const drawerWidth = 280;
 
@@ -20,25 +27,22 @@ interface Chat {
   };
 }
 
-enum DrawerSection {
-  MAIN,
-  CONTACTS,
-}
-
 export default function ResponsiveDrawer() {
   //TODO: Change any for the proper data type
-
-  const [currentDrawerSection, setCurrentDrawerSection] =
-    useState<DrawerSection>(DrawerSection.MAIN);
+  const { name: currentDrawerSection } = useAppSelector(
+    (state) => state.sideBar
+  );
+  const dispatch = useAppDispatch();
 
   let section;
   if (currentDrawerSection == DrawerSection.MAIN) {
     section = (
       <MainDrawerView
+        //TODO: this doesn't work anymore
         onMoreClick={() => {
           console.log("clicked more");
         }}
-        onContactsClick={() => setCurrentDrawerSection(DrawerSection.CONTACTS)}
+        onContactsClick={() => dispatch(setContactsDrawerSection())}
       />
     );
   } else if (currentDrawerSection == DrawerSection.CONTACTS) {
@@ -46,11 +50,11 @@ export default function ResponsiveDrawer() {
       <ContactsDrawerSection
         //TODO handle on add contact click
         onAddContactClick={() => {}}
-        onBackClick={() => setCurrentDrawerSection(DrawerSection.MAIN)}
+        onBackClick={() => dispatch(setMainDrawerSection())}
       />
     );
   } else {
-    throw Error("section not defined correctly");
+    throw Error("This should be unreachable");
   }
 
   return (

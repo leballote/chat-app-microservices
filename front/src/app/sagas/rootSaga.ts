@@ -1,4 +1,4 @@
-import { takeLatest } from "redux-saga/effects";
+import { takeLatest, takeEvery } from "redux-saga/effects";
 import { handleGetUser } from "./handlers/currentUser";
 import { handleChatsPreviews } from "./handlers/chatsPreviews";
 import { handleGetChat } from "./handlers/currentChat";
@@ -15,5 +15,5 @@ export function* watcherSaga() {
   yield takeLatest(getChatsPreviewsValue.toString(), handleChatsPreviews);
   yield takeLatest(getContactsPreviewsValue.toString(), handleContactsPreviews);
   yield takeLatest(getCurrentChatValue.toString(), handleGetChat);
-  yield takeLatest(sendMessage.toString(), handleSendMessage);
+  yield takeEvery(sendMessage.toString(), handleSendMessage);
 }

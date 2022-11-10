@@ -5,6 +5,9 @@ import userReducer from "./features/currentUserSlice";
 import chatsPreviewsReducer from "./features/chatsPreviewsSlice";
 import contactsPreviewsReducer from "./features/contactsPreviewsSlice";
 import currentChatReducer from "./features/currentChatSlice";
+import mainSectionDrawerReducer from "./features/mainSectionDrawerSlice";
+import contactsSectionDrawerReducer from "./features/contactsSectionDrawerSlice";
+import sideBarReducer from "./features/sideBarSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
@@ -13,6 +16,9 @@ export const store = configureStore({
     currentChat: currentChatReducer,
     chatsPreviews: chatsPreviewsReducer,
     contactsPreviews: contactsPreviewsReducer,
+    mainSectionDrawer: mainSectionDrawerReducer,
+    contactsSectionDrawer: contactsSectionDrawerReducer,
+    sideBar: sideBarReducer,
   },
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware({ thunk: false }),

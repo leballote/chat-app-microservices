@@ -18,5 +18,6 @@ const GET_USER_DATA = gql`
 export async function requestGetUser(): Promise<any> {
   return client.query({
     query: GET_USER_DATA,
+    fetchPolicy: "no-cache",
   });
 }

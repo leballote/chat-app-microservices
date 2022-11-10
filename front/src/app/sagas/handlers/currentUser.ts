@@ -13,6 +13,7 @@ export function* handleGetUser(action: Action): any {
     const response = yield call(requestGetUser);
     const { data } = response;
     const { viewer } = data;
+    console.log(response);
     yield put(setCurrentUser(viewer));
   } catch (error) {
     put(setError(error));

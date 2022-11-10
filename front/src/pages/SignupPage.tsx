@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 const SIGNUP = gql`
@@ -25,6 +26,7 @@ export default function SignupPage() {
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
   const confirmPasswordInput = useRef<HTMLInputElement>(null);
+  const { t } = useTranslation();
   //TODO: move this into a saga
   const [mutationFunction, { data, loading, error }] = useMutation(SIGNUP);
   console.log("ERROR", error);
@@ -56,7 +58,6 @@ export default function SignupPage() {
       mutationFunction({ variables: { input: inputs } });
     }
   }
-
   return (
     <Container
       sx={{
@@ -81,30 +82,34 @@ export default function SignupPage() {
             textAlign="right"
             sx={{ marginBottom: ".5em" }}
           >
-            Sign Up
+            {t("signupPage.title")}
           </Typography>
-          <TextField label="Username" required inputRef={usernameInput} />
-          <TextField label="Full Name" required inputRef={nameInput} />
-          <TextField label="email" required inputRef={emailInput} />
+          <TextField
+            label={t("user.username")}
+            required
+            inputRef={usernameInput}
+          />
+          <TextField label={t("user.fullName")} required inputRef={nameInput} />
+          <TextField label={t("user.email")} required inputRef={emailInput} />
 
           <TextField
-            label="Password"
+            label={t("user.password")}
             required
             type="password"
             inputRef={passwordInput}
           />
           <TextField
-            label="Confirm password"
+            label={t("signupPage.confirmPassword")}
             required
             type="password"
             inputRef={confirmPasswordInput}
           />
           <Button type="submit" variant="outlined">
-            Sign Up
+            {t("signupPage.signupButton")}
           </Button>
           <Typography textAlign="center">
-            Have an account? &nbsp;
-            <Link to="/auth/login">Log In</Link>
+            {t("signupPage.haveAnAccount")} &nbsp;
+            <Link to="/auth/login">{t("signupPage.login")}!</Link>
           </Typography>
         </Stack>
       </Paper>

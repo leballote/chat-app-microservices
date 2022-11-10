@@ -11,6 +11,7 @@ import { ApolloProvider } from "@apollo/client";
 import client from "./client";
 import { store } from "./app/store";
 import { Provider } from "react-redux";
+import "./i18n";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <Provider store={store}>

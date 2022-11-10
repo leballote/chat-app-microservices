@@ -11,6 +11,7 @@ import {
   getValue as getContactsPreviewsValue,
   setSearchTerm,
 } from "../app/features/contactsPreviewsSlice";
+import { useTranslation } from "react-i18next";
 
 interface Contact {
   id: string;
@@ -25,20 +26,6 @@ interface ContactsResponse {
     contacts: Contact[];
   };
 }
-
-const GET_FRIENDS_DATA = gql`
-  query GetFriends {
-    viewer {
-      friends {
-        id
-        name
-        phrase
-        status
-        avatar
-      }
-    }
-  }
-`;
 
 interface Props {
   onBackClick: (ev: React.MouseEvent<HTMLElement>) => void;
@@ -57,6 +44,7 @@ export default function ContactsDrawerSection({
     searchTerm: contactSearched,
   } = useAppSelector((state) => state.contactsPreviews);
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(getContactsPreviewsValue(""));
@@ -102,7 +90,7 @@ export default function ContactsDrawerSection({
           >
             <ArrowBackIcon />
           </Button>
-          Friends
+          {t("user.friends")}
         </Typography>
 
         <Button onClick={onAddContactClick}>
@@ -115,7 +103,7 @@ export default function ContactsDrawerSection({
         onSearch={handleSearch}
         onKeyDown={handleEscapeOnSearch}
       />
-      <Box sx={{ overflow: "scroll", marginTop: ".2em" }}>
+      <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>
         <List>
           {contacts.map((contact: ContactPreviewProps) => (
             <ContactPreview

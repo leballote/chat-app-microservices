@@ -69,9 +69,13 @@ function ChatBody({ messages, height }: Props) {
   const participants = indexArrayByField(participantList, "id");
 
   const currentUser = useContext(CurrentUserContext);
+  const chatBottomRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView();
+  }, [messages]);
 
   return (
-    <Box sx={{ height }}>
+    <Box sx={{ height, overflowY: "auto" }}>
       <List sx={{ display: "flex", flexFlow: "column" }}>
         {messages.map((message, index: number) => (
           <Box
@@ -130,6 +134,7 @@ function ChatBody({ messages, height }: Props) {
           </Box>
         ))}
       </List>
+      <Box ref={chatBottomRef}></Box>
     </Box>
   );
 }

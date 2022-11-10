@@ -16,24 +16,7 @@ import {
   setSearchTerm,
 } from "../app/features/chatsPreviewsSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-
-interface Chat {
-  id: string;
-  type: string;
-  name: string;
-  avatar: string;
-  lastMessage?: {
-    sentBy: string;
-    content: string;
-    sentAt: string | string;
-  };
-}
-
-interface ChatsResponse {
-  data: {
-    chats: Chat[];
-  };
-}
+import { useTranslation } from "react-i18next";
 
 //TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
 export default function ChatDrawerSection() {
@@ -44,6 +27,7 @@ export default function ChatDrawerSection() {
     searchTerm: chatSearched,
   } = useAppSelector((state) => state.chatsPreviews);
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   useEffect(() => {
     dispatch(getChatsPreviewsValue(""));
@@ -78,7 +62,7 @@ export default function ChatDrawerSection() {
           color="MenuText"
           sx={{ margin: "1em .2em .2em .5em" }}
         >
-          Chats
+          {t("user.chats")}
         </Typography>
         <DrawerSearchBar
           value={chatSearched}

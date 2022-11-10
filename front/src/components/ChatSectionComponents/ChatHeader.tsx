@@ -57,7 +57,6 @@ function IndividualChatHeader({ height }: WithHeight) {
 
 function GroupChatHeader({ height }: WithHeight) {
   const { participants, ...chatInfo } = useContext(ChatContext);
-  const currentUser = useContext(CurrentUserContext);
 
   const props: BaseChatHeaderProps = {
     name: chatInfo.name,

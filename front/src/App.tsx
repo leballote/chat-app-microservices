@@ -13,17 +13,9 @@ import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { getValue as getCurrentUserValue } from "./app/features/currentUserSlice";
 import { pushMessage } from "./app/features/currentChatSlice";
 import { current } from "@reduxjs/toolkit";
-import LoginPage from "./components/LoginPage";
-import SignupPage from "./components/SignupPage";
-
-//TODO: this component will be removed
-const Placeholder = ({ text }: any) => {
-  return (
-    <Container sx={{ display: "block" }}>
-      <h1>{text}</h1>
-    </Container>
-  );
-};
+import LoginPage from "./pages/LoginPage";
+import SignupPage from "./pages/SignupPage";
+import ChatAppPage from "./pages/ChatAppPage";
 
 const MESSAGE_CREATED = gql`
   subscription {
@@ -54,8 +46,6 @@ const App: React.FunctionComponent = function () {
     error: messageCreatedError,
     data: messageCreatedData,
   } = useSubscription(MESSAGE_CREATED);
-
-  console.log({ currentUser, userLoading, error });
 
   useEffect(() => {
     if (messageCreatedData?.messageCreated.message) {
@@ -89,21 +79,7 @@ const App: React.FunctionComponent = function () {
         <CssBaseline />
         <CurrentUserContext.Provider value={currentUser}>
           <Routes>
-            <Route
-              path="/app/*"
-              element={
-                <Box sx={{ display: "flex" }}>
-                  <SideBar />
-                  <Routes>
-                    <Route path="chat/:id" element={<ChatSection />} />
-                    <Route
-                      path="contact/:id"
-                      element={<Placeholder text="Contact" />}
-                    />
-                  </Routes>
-                </Box>
-              }
-            />
+            <Route path="/app/*" element={<ChatAppPage />} />
             <Route path="/auth">
               <Route path="login" element={<LoginPage />} />
               <Route path="signup" element={<SignupPage />} />
