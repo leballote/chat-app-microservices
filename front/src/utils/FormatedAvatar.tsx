@@ -31,13 +31,22 @@ function hasSrc(avatarInfo: AvatarInfo): avatarInfo is WithSrc {
   return (avatarInfo as WithSrc).avatarSrc !== undefined;
 }
 
-export default function (avatarInfo: AvatarInfo) {
+type AvatarProps = React.ComponentProps<typeof Avatar>;
+
+type Props = AvatarInfo & AvatarProps;
+
+export default function (avatarInfo: Props) {
+  const { avatarSrc, avatarName, ...avatarProps } = {
+    avatarSrc: null,
+    avatarName: null,
+    ...avatarInfo,
+  };
   if (hasSrc(avatarInfo)) {
     const { avatarSrc } = avatarInfo;
-    return <Avatar src={avatarSrc} />;
+    return <Avatar src={avatarSrc} {...avatarProps} />;
   } else {
     const { avatarName } = avatarInfo;
     const formatedAvatarName = getAvatarInitialsFromName(avatarName);
-    return <Avatar>{formatedAvatarName}</Avatar>;
+    return <Avatar {...avatarProps}>{formatedAvatarName}</Avatar>;
   }
 }

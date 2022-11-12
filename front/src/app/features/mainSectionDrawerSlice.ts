@@ -2,13 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SectionName } from "./types";
 
 export type DrawerSectionChats = {
-  name: SectionName.MAIN;
   moreDropdownActive: boolean;
 };
 
 // Define the initial state using that type
 const initialState: DrawerSectionChats = {
-  name: SectionName.MAIN,
   moreDropdownActive: false,
 };
 

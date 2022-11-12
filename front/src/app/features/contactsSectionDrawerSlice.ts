@@ -1,14 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SectionName } from "./types";
 
-export type DrawerSectionContacts = {
-  name: SectionName.CONTACTS;
-};
+export type DrawerSectionContacts = {};
 
 // Define the initial state using that type
-const initialState: DrawerSectionContacts = {
-  name: SectionName.CONTACTS,
-};
+const initialState: DrawerSectionContacts = {};
 
 export const mainDrawerSlice = createSlice({
   name: "mainDrawerSection",

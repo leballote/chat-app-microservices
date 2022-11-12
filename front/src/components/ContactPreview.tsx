@@ -19,9 +19,19 @@ export interface Props {
   status: string;
   avatar: string;
   to?: string;
+  //TODO: change this for the correct type
+  onClick?: any;
 }
 
-export default function ({ name, phrase, status, avatar, id, to }: Props) {
+export default function ({
+  name,
+  phrase,
+  status,
+  avatar,
+  id,
+  to,
+  onClick,
+}: Props) {
   const renderLink = React.useMemo(
     () =>
       React.forwardRef<HTMLAnchorElement, Omit<RouterLinkProps, "to">>(
@@ -39,7 +49,13 @@ export default function ({ name, phrase, status, avatar, id, to }: Props) {
     [to]
   );
   return (
-    <ListItem key={id} button component={renderLink}>
+    <ListItem
+      key={id}
+      button
+      component={to != null ? renderLink : "li"}
+      onClick={onClick}
+      data-contact-id={`${id}`}
+    >
       <ListItemAvatar>
         <Avatar
           alt={`${avatar} of ${name}`}

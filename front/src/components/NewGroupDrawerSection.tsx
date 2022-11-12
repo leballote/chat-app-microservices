@@ -1,4 +1,12 @@
-import { Box, Typography, List, Button, Grid } from "@mui/material";
+import {
+  Box,
+  Typography,
+  List,
+  Button,
+  Grid,
+  BottomNavigation,
+  BottomNavigationAction,
+} from "@mui/material";
 import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
 import DrawerSearchBar from "./DrawerSearchBar";
 import { ChangeEvent, useState, useEffect } from "react";
@@ -10,22 +18,21 @@ import {
 } from "../app/features/contactsPreviewsSlice";
 import { useTranslation } from "react-i18next";
 import { setMainDrawerSection } from "../app/features/sideBarSlice";
-
-interface Contact {
-  id: string;
-  name: string;
-  phrase: string;
-  status: string;
-  avatar: string;
-}
+import { addParticipant } from "../app/features/newGroupSectionDrawerSlice";
+import { ParticipantsToAdd } from "./ParticipantsToAdd";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
 export default function NewGroupDrawerSection() {
-  const {
+  //TODO: change for const
+  let {
     value: contacts,
     loading,
     error,
     searchTerm: contactSearched,
   } = useAppSelector((state) => state.contactsPreviews);
+  const participants = useAppSelector(
+    (state) => state.newGroupSectionDrawer.participantsToAdd
+  );
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
@@ -45,6 +52,15 @@ export default function NewGroupDrawerSection() {
   function handleBackClick() {
     dispatch(setMainDrawerSection());
   }
+
+  //TODO: solve this any
+  function handleAddParticipant(ev: any) {
+    dispatch(addParticipant(ev.currentTarget.dataset.contactId));
+  }
+
+  // function deleteParticipant(ev: any) {
+  //   dispatch();
+  // }
 
   let component;
   if (loading) {
@@ -87,17 +103,25 @@ export default function NewGroupDrawerSection() {
         onSearch={handleSearch}
         onKeyDown={handleEscapeOnSearch}
       />
+      <ParticipantsToAdd />
       <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>
         <List>
           {contacts.map((contact: ContactPreviewProps) => (
             <ContactPreview
               {...contact}
               key={contact.id}
-              to={`contact/${contact.id}`}
+              onClick={handleAddParticipant}
             />
           ))}
         </List>
       </Box>
+      {participants.length > 0 ? (
+        <BottomNavigation>
+          <Button sx={{ width: "100%" }}>
+            <ArrowForwardIcon />
+          </Button>
+        </BottomNavigation>
+      ) : null}
     </>
   );
 }

@@ -34,6 +34,8 @@ import {
   getValue as getCurrentChatValue,
   sendMessage,
 } from "../app/features/currentChatSlice";
+import { setOnBottom } from "../app/features/chatSectionSlice";
+import getScrollHeightGap from "../utils/getScrollHeightGap";
 
 const defaultChat: Chat = {
   id: "",
@@ -55,6 +57,7 @@ const defaultChat: Chat = {
 
 interface Props extends WithHeight {
   messages: Message[];
+  chatAreaRef: React.RefObject<HTMLElement>;
 }
 
 function formatDate(dateString: string) {
@@ -63,19 +66,26 @@ function formatDate(dateString: string) {
   // return `${formatedDate}`;
 }
 
-function ChatBody({ messages, height }: Props) {
+function ChatBody({ messages, height, chatAreaRef }: Props) {
   let { participants: participantList, ...otherChatInfo } =
     useContext(ChatContext);
   const participants = indexArrayByField(participantList, "id");
 
   const currentUser = useContext(CurrentUserContext);
   const chatBottomRef = useRef<HTMLDivElement>(null);
+  const { onBottom } = useAppSelector((state) => state.chatSection);
+  console.log(onBottom);
+
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView();
+    // const element = chatAreaRef.current;
+    // if (element == null) return;
+    if (onBottom) {
+      chatBottomRef.current?.scrollIntoView();
+    }
   }, [messages]);
 
   return (
-    <Box sx={{ height, overflowY: "auto" }}>
+    <Box sx={{ height, overflowY: "auto" }} ref={chatAreaRef}>
       <List sx={{ display: "flex", flexFlow: "column" }}>
         {messages.map((message, index: number) => (
           <Box
@@ -103,7 +113,7 @@ function ChatBody({ messages, height }: Props) {
                 </ListItemAvatar>
               ) : null}
 
-              <ListItemText>
+              <ListItemText sx={{ overflowWrap: "break-word" }}>
                 {index == 0 ||
                 messages[index - 1].sentBy.id != message.sentBy.id ? (
                   <Typography
@@ -139,7 +149,14 @@ function ChatBody({ messages, height }: Props) {
   );
 }
 
-function ChatsFooter({ height }: { height: string | number }) {
+//TODO: solve this any
+function ChatsFooter({
+  height,
+  onSend,
+}: {
+  height: string | number;
+  onSend: any;
+}) {
   const dispatch = useAppDispatch();
   const { id: chatId } = useContext(ChatContext);
   const user = useContext(CurrentUserContext);
@@ -158,6 +175,7 @@ function ChatsFooter({ height }: { height: string | number }) {
       messageTextInput.current?.value &&
       messageTextInput.current.value.length > 0
     ) {
+      onSend();
       dispatch(
         sendMessage({
           chatId,
@@ -170,7 +188,7 @@ function ChatsFooter({ height }: { height: string | number }) {
     clearInput();
   }
 
-  function handleClick() {
+  function handleSendClick() {
     triggerSendMessage();
   }
 
@@ -218,7 +236,7 @@ function ChatsFooter({ height }: { height: string | number }) {
       <Button
         variant="outlined"
         sx={{ aspectRatio: "1 / 1" }}
-        onClick={handleClick}
+        onClick={handleSendClick}
       >
         <SendIcon />
       </Button>
@@ -229,6 +247,7 @@ function ChatsFooter({ height }: { height: string | number }) {
 export default function ChatSection() {
   const { id } = useParams();
   const dispatch = useAppDispatch();
+  const chatAreaRef = useRef<HTMLElement>(null);
 
   let chatId = id;
   let nonExistingChat = false;
@@ -273,8 +292,20 @@ export default function ChatSection() {
       >
         <ChatContext.Provider value={{ participants, ...chatInfo }}>
           <ChatHeader height={"10vh"} />
-          <ChatBody messages={messages} height={"70vh"} />
-          <ChatsFooter height={"20vh"} />
+          <ChatBody
+            messages={messages}
+            height={"70vh"}
+            chatAreaRef={chatAreaRef}
+          />
+          <ChatsFooter
+            height={"20vh"}
+            onSend={() => {
+              const element = chatAreaRef.current;
+              if (element == null) return;
+              const scrollHeightGap = getScrollHeightGap(element);
+              dispatch(setOnBottom(scrollHeightGap < 5));
+            }}
+          />
         </ChatContext.Provider>
       </Container>
     );
