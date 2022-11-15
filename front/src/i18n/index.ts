@@ -168,7 +168,7 @@ const resources: { [language: string]: Translation } = {
 
 const translationConfig = {
   lng: navigator.language,
-  fallbackLng: "en",
+  fallbackLng: ["en", "es", "de"],
   resources,
 };
 

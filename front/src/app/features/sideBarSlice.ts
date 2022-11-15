@@ -31,6 +31,11 @@ export const mainDrawerSlice = createSlice({
         state.name = SectionName.NEW_GROUP;
       }
     },
+    setSettingsDrawerSection(state) {
+      if (state.name != SectionName.SETTINGS) {
+        state.name = SectionName.SETTINGS;
+      }
+    },
   },
 });
 
@@ -38,6 +43,7 @@ export const {
   setMainDrawerSection,
   setContactsDrawerSection,
   setNewGroupDrawerSection,
+  setSettingsDrawerSection,
 } = mainDrawerSlice.actions;
 
 export default mainDrawerSlice.reducer;

@@ -1,10 +1,10 @@
-export interface DataObject<T = any> {
+export type DataObject<T = any> = {
   data: T;
-}
+};
 
-export interface ErrorObject<T = any> {
+export type ErrorObject<T = any> = {
   error: T;
-}
+};
 
 export type APIResponse<T = any, U = any> = DataObject<T> | ErrorObject<U>;
 

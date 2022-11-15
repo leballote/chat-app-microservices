@@ -14,9 +14,14 @@ import typeDefs from "./schema";
 import ChatAPI from "./dataSources/ChatAPI";
 import UserAPI from "./dataSources/UserAPI";
 import AuthAPI from "./dataSources/AuthAPI";
-import { UserModelSuccessResponse } from "./types/servicesRest";
+import {
+  UserModelResponse,
+  UserModelSuccessResponse,
+} from "./types/servicesRest";
 import cookieParser from "cookie-parser";
 import { Request, Response, NextFunction } from "express";
+import { isErrorResponse } from "./types/general.types";
+import cookie from "cookie";
 
 export interface MyContext {
   listen: { port: number };
@@ -26,7 +31,7 @@ export interface MyContext {
     chatAPI: ChatAPI;
     userAPI: UserAPI;
     authAPI: AuthAPI;
-    getViewer: () => Promise<UserModelSuccessResponse>;
+    getViewer: () => Promise<UserModelSuccessResponse | null>;
   };
 }
 
@@ -36,7 +41,7 @@ type ContextFunction = (reqRes: {
   res: Response;
 }) => Promise<MyContext>;
 
-const context: ContextFunction = async ({ req, res }) => {
+const context: ContextFunction = async ({ req, res, ...moreContext }) => {
   //TODO: this seems to be a circular interdependency:
   // server requires serverCleanup
   // serverCleanup requires context
@@ -50,17 +55,32 @@ const context: ContextFunction = async ({ req, res }) => {
     // passing in our server's cache.
     req,
     res,
+    moreContext,
     dataSources: {
       chatAPI: new ChatAPI({ cache }),
       userAPI: new UserAPI({ cache }),
       authAPI: new AuthAPI({ cache }),
       //TODO this should send a request to auth and get the user from the token
       getViewer: async function () {
-        const id = "1";
-        const viewer = await this.userAPI.getUser(id);
-        return viewer;
+        const token = req.cookies.jwt_token;
+        const authUser = await this.authAPI.authorize(token);
+        if (isErrorResponse(authUser)) {
+          return null;
+        }
+        const viewerRes = await this.userAPI.getUser(authUser.data.user._id);
+        if (isErrorResponse(viewerRes)) return null;
+        return viewerRes.data;
       },
     },
+  };
+};
+
+const getDynamicContext = async (ctx, msg, args) => {
+  // ctx is the graphql-ws Context where connectionParams live
+  return {
+    ctx,
+    msg,
+    args,
   };
 };
 
@@ -82,7 +102,27 @@ const wsServer = new WebSocketServer({
 const serverCleanup = useServer(
   {
     schema,
-    context,
+    context: async (ctx, msg, args) => {
+      const { cache } = server;
+      const { jwt_token } = cookie.parse(ctx.extra.request.headers.cookie);
+      let userContext = { user: null };
+
+      const authRes = await new AuthAPI().authorize(jwt_token);
+      if (jwt_token && !isErrorResponse(authRes)) {
+        const {
+          data: { user },
+        } = authRes;
+        userContext.user = user;
+      }
+      return {
+        dataSources: {
+          chatAPI: new ChatAPI({ cache }),
+          userAPI: new UserAPI({ cache }),
+          authAPI: new AuthAPI({ cache }),
+        },
+        ...userContext,
+      };
+    },
   },
   wsServer
 );
@@ -117,7 +157,7 @@ async function start() {
     "/graphql",
     cors<cors.CorsRequest>({
       credentials: true,
-      origin: "http://localhost:5173",
+      origin: ["http://localhost:5173", "http://localhost:4000"],
     }),
     cookieParser(),
     express.json(),

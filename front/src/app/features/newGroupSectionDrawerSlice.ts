@@ -1,13 +1,16 @@
+import { Drawer } from "@mui/material";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import removeOne from "../../utils/removeOne";
-import { SectionName } from "./types";
+import { SectionName, GroupSectionDrawerSubsection } from "./types";
 
 export type DrawerSectionNewGroup = {
+  subsection: GroupSectionDrawerSubsection;
   participantsToAdd: string[];
 };
 
 // Define the initial state using that type
 const initialState: DrawerSectionNewGroup = {
+  subsection: GroupSectionDrawerSubsection.ADD_FRIENDS,
   participantsToAdd: [],
 };
 
@@ -21,6 +24,12 @@ export const newGroupDrawerSlice = createSlice({
         state.participantsToAdd.push(action.payload);
       }
     },
+    setAddFriendsSubsection(state) {
+      state.subsection = GroupSectionDrawerSubsection.ADD_FRIENDS;
+    },
+    setSetTitleAndAvatarSubsection(state) {
+      state.subsection = GroupSectionDrawerSubsection.SET_TITLE_AND_AVATAR;
+    },
     removeParticipant(state, action: PayloadAction<string>) {
       state.participantsToAdd = removeOne(
         state.participantsToAdd,
@@ -33,7 +42,12 @@ export const newGroupDrawerSlice = createSlice({
   },
 });
 
-export const { addParticipant, removeParticipant, resetState } =
-  newGroupDrawerSlice.actions;
+export const {
+  addParticipant,
+  removeParticipant,
+  resetState,
+  setAddFriendsSubsection,
+  setSetTitleAndAvatarSubsection,
+} = newGroupDrawerSlice.actions;
 
 export default newGroupDrawerSlice.reducer;

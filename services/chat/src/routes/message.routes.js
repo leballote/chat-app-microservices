@@ -1,10 +1,13 @@
+//TODO: this doesn't seem to handle errors correctly
+const { default: mongoose } = require("mongoose");
 const Chat = require("../models/message.model");
 const Message = require("../models/message.model");
 
 const router = require("express").Router();
 
 const errors = {
-  serverError: { message: "Server Error" },
+  serverError: { error: { message: "Server Error" } },
+  messageNotFound: { error: { message: "Message not found" } },
 };
 
 router.post("/message", async (req, res) => {
@@ -23,18 +26,25 @@ router.post("/message", async (req, res) => {
 });
 
 router.get("/message", async (req, res) => {
-  const { chatId, userId, limit = 1000, offset = 0 } = req.query;
+  const { chatId, userId, afterDate = 0, limit = 1000, offset = 0 } = req.query;
+  const afterDate_ = new Date(afterDate);
 
   let baseQueryParams = { chatId, userId };
   baseQueryParams = Object.fromEntries(
     Object.entries(baseQueryParams).filter(([key, val]) => val != null)
   );
 
+  const findObject = {
+    ...baseQueryParams,
+    sentAt: { $gt: new Date(afterDate_) },
+  };
+
   try {
-    const messages = await Message.find(baseQueryParams)
+    const messages = await Message.find(findObject)
       .sort({ sentAt: 1 })
       .limit(limit)
       .skip(offset);
+    console.log(messages);
     return res.send({ data: messages });
   } catch (e) {
     return res.status(500).send(errors.serverError);
@@ -45,9 +55,12 @@ router.get("/message/:id", async (req, res) => {
   const { id } = req.params.id;
   try {
     const message = await Message.findById(id);
+    if (!message) {
+      return res.status(404).send(errors.messageNotFound);
+    }
     return res.send({ data: message });
   } catch (e) {
-    res.status().send(errors.serverError);
+    return res.status().send(errors.serverError);
   }
 });
 
@@ -67,9 +80,9 @@ router.delete("/message/:id", async (req, res) => {
   const { id } = req.params.id;
   try {
     const message = await Message.findByIdAndDelete(id);
-    res.status(204).send({ data: message });
+    return res.status(204).send({ data: message });
   } catch (e) {
-    res.status().send(errors.serverError);
+    return res.status().send(errors.serverError);
   }
 });
 

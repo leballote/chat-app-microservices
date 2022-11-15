@@ -3,15 +3,9 @@ const User = require("../models/user.model");
 const router = require("express").Router();
 
 const errors = {
-  serverError: { message: "Server error" },
-  userNotFound: { message: "User not found" },
+  serverError: { error: { message: "Server error" } },
+  userNotFound: { error: { message: "User not found" } },
 };
-
-router.get("/", (req, res) => {
-  console.log(req.cookies);
-  res.cookie("name", "hey");
-  res.send("Cookie set");
-});
 
 router.post("/user", async (req, res) => {
   const { id, username, name, birthDate, email, phrase, avatar } = req.body;
@@ -27,7 +21,6 @@ router.post("/user", async (req, res) => {
     });
     return res.send({ data: user });
   } catch (e) {
-    return res.status(500).send(e);
     return res.status(500).send(errors.serverError);
   }
 });
@@ -94,7 +87,7 @@ router.put("/user/:id", async (req, res) => {
       { new: true }
     );
     if (!user) {
-      return res.send({ message: errors.userNotFound });
+      return res.send(errors.userNotFound);
     }
     return res.send({ data: user });
   } catch (e) {
@@ -107,7 +100,7 @@ router.delete("/user/:id", async (req, res) => {
   try {
     const user = await User.findOneAndDelete({ _id: id });
     if (!user) {
-      return res.send({ message: errors.userNotFound });
+      return res.send(errors.userNotFound);
     }
     return res.send({ data: user });
   } catch (e) {

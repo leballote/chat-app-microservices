@@ -4,8 +4,8 @@ const User = require("../models/user.model");
 const router = require("express").Router();
 
 const errors = {
-  serverError: { message: "Server error" },
-  friendshipNotFound: { message: "friendship not found" },
+  serverError: { error: { message: "Server error" } },
+  friendshipNotFound: { error: { message: "friendship not found" } },
 };
 
 router.post("/friendship", async (req, res) => {
@@ -17,7 +17,7 @@ router.post("/friendship", async (req, res) => {
     ]);
 
     if (user1.friends.includes(user2._id)) {
-      res.status(400).send({ message: "Already friends" });
+      res.status(400).send({ error: { message: "Already friends" } });
     }
 
     user1.friends.push(user2._id);

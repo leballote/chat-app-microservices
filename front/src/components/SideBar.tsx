@@ -13,6 +13,7 @@ import {
 } from "../app/features/sideBarSlice";
 import { SectionName as DrawerSection } from "../app/features/types";
 import NewGroupDrawerSection from "./NewGroupDrawerSection";
+import SettingsDrawerSection from "./SettingsDrawerSection";
 
 const drawerWidth = 400;
 
@@ -44,6 +45,8 @@ export default function ResponsiveDrawer() {
     );
   } else if (currentDrawerSection == DrawerSection.NEW_GROUP) {
     section = <NewGroupDrawerSection />;
+  } else if (currentDrawerSection == DrawerSection.SETTINGS) {
+    section = <SettingsDrawerSection />;
   } else {
     throw Error("This should be unreachable");
   }
@@ -54,7 +57,7 @@ export default function ResponsiveDrawer() {
       sx={{
         "& .MuiDrawer-paper": {
           width: drawerWidth,
-          position: "static",
+          position: "relative",
           height: "100vh",
         },
       }}

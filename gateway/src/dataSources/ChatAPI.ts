@@ -1,14 +1,24 @@
 import { RESTDataSource } from "@apollo/datasource-rest";
 import {
+  CreateGroupChatInput,
+  CreateIndividualChatInput,
+} from "../generated/graphql";
+import { isErrorResponse } from "../types/general.types";
+import {
   ChatModelResponse,
+  ChatModelSuccessResponse,
+  ChatModelType,
   MessageModelResponse,
+  MessageModelSuccessResponse,
   CreateMessageModelInput,
+  DefaultAPIResponse,
 } from "../types/servicesRest";
-import { CreateMessageResponse } from "../generated/graphql";
-
-type DataResponse<T> = {
-  data: T;
-};
+import {
+  ChatParticipantReseponse,
+  ChatParticipantSuccessResponse,
+  CreateChatModelInput,
+  isGroupChatModelInput,
+} from "../types/servicesRest/chat.types";
 
 export default class ChatAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
@@ -16,22 +26,17 @@ export default class ChatAPI extends RESTDataSource {
 
   async getChat(
     id: string,
-    options?: {
+    queryBy?: {
       userId: string;
     }
   ): Promise<ChatModelResponse> {
-    const { data } = await this.get<DataResponse<ChatModelResponse>>(
-      `chat/${encodeURIComponent(id)}`
-    );
-    if (!options) {
-      return data;
+    try {
+      return this.get<ChatModelResponse>(`chat/${encodeURIComponent(id)}`);
+    } catch (e) {
+      return { error: { message: JSON.stringify(e) } };
     }
-    const { userId } = options;
-    if (!data.participants.includes(userId)) {
-      return null;
-    }
-    return data;
   }
+
   async getChats(
     args: {
       limit?: number;
@@ -41,15 +46,22 @@ export default class ChatAPI extends RESTDataSource {
       user1Id?: string;
       user2Id?: string;
     } = {}
-  ): Promise<ChatModelResponse[]> {
+  ): Promise<DefaultAPIResponse<ChatModelSuccessResponse[]>> {
     const query = Object.entries(args)
       .map(([key, val]) => `${key}=${val}`)
       .join("&");
 
-    const { data } = await this.get<DataResponse<ChatModelResponse[]>>(
-      `chat/?${query}`
-    );
-    return data;
+    try {
+      return this.get<DefaultAPIResponse<ChatModelSuccessResponse[]>>(
+        `chat/?${query}`
+      );
+    } catch (e) {
+      return {
+        error: {
+          message: JSON.stringify(e),
+        },
+      };
+    }
   }
 
   // async getMessage() {
@@ -58,48 +70,71 @@ export default class ChatAPI extends RESTDataSource {
 
   async getMessages(
     args: {
+      afterDate?: string;
       limit?: number;
       offset?: number;
       chatId?: string;
       userId?: string;
     } = {}
-  ): Promise<MessageModelResponse[]> {
+  ): Promise<DefaultAPIResponse<MessageModelSuccessResponse[]>> {
     const query = Object.entries(args)
       .map(([key, val]) => `${key}=${val}`)
       .join("&");
 
-    const { data } = await this.get<DataResponse<MessageModelResponse[]>>(
-      `message/?${query}`
-    );
-    return data;
+    try {
+      return this.get<DefaultAPIResponse<MessageModelSuccessResponse[]>>(
+        `message/?${query}`
+      );
+    } catch (e) {
+      return { error: { message: JSON.stringify(e) } };
+    }
   }
 
-  //TODO: solve this any
-  async createMessage(input: CreateMessageModelInput): Promise<any> {
-    try {
-      const { data } = await this.post("message", { body: input });
-      //TODO: right now our APIs when something has an error, returns an object with property message, it should change to something like error, and that should imply that there was an error :p
+  async getParticipant(
+    chatId: string,
+    userId: string
+  ): Promise<ChatParticipantReseponse> {
+    const apiRes = await this.get<ChatParticipantReseponse>(
+      `participant/?chatId=${chatId}&userId=${userId}`
+    );
+    if (isErrorResponse(apiRes)) {
+      return apiRes;
+    } else {
+      return apiRes.data[0];
+    }
+  }
 
-      if (!data) {
-        return {
-          message: null,
-          success: false,
-          error: {
-            reason: "Unknown server error",
-          },
-        };
-      }
+  async getParticipants(args: {
+    chatId: string;
+  }): Promise<DefaultAPIResponse<ChatParticipantSuccessResponse[]>> {
+    const query = Object.entries(args)
+      .map(([key, val]) => `${key}=${val}`)
+      .join("&");
+    return this.get<DefaultAPIResponse<ChatParticipantSuccessResponse[]>>(
+      `participant/${query}`
+    );
+  }
+
+  async createMessage(
+    input: CreateMessageModelInput
+  ): Promise<MessageModelResponse> {
+    try {
+      return this.post("message", { body: input });
+    } catch (e) {
       return {
-        message: data,
-        success: true,
+        error: { message: JSON.stringify(e) },
       };
-    } catch {
+    }
+  }
+
+  async createChat(input: CreateChatModelInput): Promise<ChatModelResponse> {
+    try {
+      return this.post<ChatModelResponse>("chat", {
+        body: input,
+      });
+    } catch (e) {
       return {
-        message: null,
-        success: false,
-        error: {
-          reason: "Server error",
-        },
+        error: { message: JSON.stringify(e) },
       };
     }
   }

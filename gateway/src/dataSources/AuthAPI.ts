@@ -2,12 +2,10 @@ import { RESTDataSource } from "@apollo/datasource-rest";
 import {
   LogInModelResponse,
   SignUpModelResponse,
-  isSuccessLoginResponse,
+  AuthUserResponse,
+  DefaultAPIResponse,
 } from "../types/servicesRest";
-
-type DataResponse<T> = {
-  data: T;
-};
+import { AuthenticateJWTResponse } from "../types/servicesRest/auth.types";
 
 export default class AuthAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
@@ -20,38 +18,58 @@ export default class AuthAPI extends RESTDataSource {
     username: string;
     password: string;
   }): Promise<SignUpModelResponse> {
-    console.log("SIGNUP CALLED");
-    const signUpRes = await this.post<DataResponse<SignUpModelResponse>>(
-      `auth/signup`,
-      {
+    try {
+      return this.post<SignUpModelResponse>(`auth/signup`, {
         body: { username, password },
-      }
-    );
-    const { data } = signUpRes;
-    console.log("SIGN UP RES", signUpRes);
-    if (data) return data;
-    else return null;
+      });
+    } catch (e) {
+      return { error: { message: JSON.stringify(e) } };
+    }
   }
 
   async logIn({ username, password }): Promise<LogInModelResponse> {
-    const loginRes = await this.post<DataResponse<LogInModelResponse>>(
-      `auth/login`,
-      {
+    try {
+      return this.post<LogInModelResponse>(`auth/login`, {
         body: { username, password },
-      }
-    );
-    const { data } = loginRes;
-    if (data && isSuccessLoginResponse(data)) {
-      const { user, token, success } = data;
+      });
+    } catch (e) {
       return {
-        success: success,
-        token: token,
+        error: { message: JSON.stringify(e) },
       };
-    } else {
-      return {
-        success: false,
-        token: null,
-      };
+    }
+  }
+
+  async authorize(token: string): Promise<AuthenticateJWTResponse> {
+    return this.post<AuthenticateJWTResponse>(`auth/auth`, {
+      body: { token },
+    });
+  }
+
+  async deleteAuthUser(id: string): Promise<AuthUserResponse> {
+    try {
+      return this.delete(`auth/user/${id}`);
+    } catch (e) {
+      return { error: { message: JSON.stringify(e) } };
+    }
+  }
+
+  //TODO: finish this, it is not using the query params correctly
+  async getAuthUsers({
+    query,
+  }: {
+    query: {
+      username: string;
+      limit: number;
+      offset: number;
+    };
+  }): Promise<DefaultAPIResponse<AuthUserResponse[]>> {
+    try {
+      const queryString = Object.entries(query)
+        .map(([key, val]) => `${key}=${val}`)
+        .join("&");
+      return this.get(`auth/user?${queryString}`);
+    } catch (e) {
+      return { error: { message: JSON.stringify(e) } };
     }
   }
 }

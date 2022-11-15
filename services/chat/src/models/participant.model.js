@@ -1,16 +1,25 @@
 const mongoose = require("mongoose");
 
 const participantSchema = new mongoose.Schema({
-  chatId: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: "chat",
+  user: {
+    type: {
+      _id: false,
+      id: { type: String, required: true },
+      admin: { type: Boolean, required: true },
+      participantSince: { type: mongoose.SchemaTypes.Date, required: true },
+    },
+    required: true,
   },
-  userId: {
-    type: String,
+  chat: {
+    type: {
+      _id: false,
+      id: { type: mongoose.SchemaTypes.ObjectId, ref: "chat", required: true },
+    },
+    required: true,
   },
 });
 
-participantSchema.index({ userId: 1, chatId: -1 }, { unique: true });
+participantSchema.index({ "user.id": 1, "chat.id": -1 }, { unique: true });
 
 const ParticipantModel = mongoose.model("participant", participantSchema);
 

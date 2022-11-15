@@ -1,15 +1,15 @@
 import { PubSub } from "graphql-subscriptions";
 import {
-  ChatModelResponse,
-  UserModelSuccessResponse,
-  MessageModelResponse,
-  UserModelStatus,
   ChatModelType,
+  UserModelSuccessResponse,
+  DefaultAPIResponse,
 } from "./types/servicesRest";
-import { getReceiver, isStringArray } from "./utils";
+import { isErrorResponse, DataObject } from "./types/general.types";
+import { getPropertyFromReceiver, getReceiver, isStringArray } from "./utils";
 import { Resolvers, ChatType, Status } from "./generated/graphql";
 import { withFilter } from "graphql-subscriptions";
 import { CookieOptions } from "express";
+import { create } from "domain";
 
 const pubsub = new PubSub();
 const MESSAGE_CREATED = "MESSAGE_CREATED";
@@ -18,8 +18,13 @@ const resolvers: Resolvers = {
   Query: {
     chats: async (_, args = {}, context) => {
       const { dataSources } = context;
-      const data = await dataSources.chatAPI.getChats(args);
-      return data;
+      const chatRes = await dataSources.chatAPI.getChats(args);
+      if (isErrorResponse(chatRes)) {
+        //I think you are supposed to throw an error
+        throw new Error(chatRes.error.message);
+      } else {
+        return chatRes.data;
+      }
     },
 
     viewer: async (_, {}, { dataSources }) => {
@@ -35,31 +40,39 @@ const resolvers: Resolvers = {
       { input: { username, name, email, password } },
       { dataSources }
     ) => {
-      //TODO: finish this mutation
-      const authRes = await dataSources.authAPI.signUp({ username, password });
-      console.log("AUTH RES", authRes);
-      const userRes = await dataSources.userAPI.createUser({
-        id: authRes.user._id,
+      //TODO: check if there is already a user with that username in auth or userRes, we'll mock it up right now
+      //
+      const alreadyUser = false;
+      const alreadyAuthUser = false;
+      if (alreadyAuthUser || alreadyUser) {
+        throw new Error("This user already exists");
+      }
+
+      const authPostRes = await dataSources.authAPI.signUp({
+        username,
+        password,
+      });
+      if (isErrorResponse(authPostRes)) {
+        throw new Error(authPostRes.error.message);
+      }
+
+      const userPostRes = await dataSources.userAPI.createUser({
+        id: authPostRes.data.user._id,
         username,
         email,
         name,
       });
-      console.log("AUTH RES", userRes);
-      if (!userRes || !authRes) {
-        return {
-          success: false,
-        };
-      } else {
-        return {
-          success: true,
-        };
+      if (isErrorResponse(userPostRes)) {
+        dataSources.authAPI.deleteAuthUser(authPostRes.data.user._id);
+        throw new Error(userPostRes.error.message);
       }
+      return {
+        success: true,
+      };
     },
 
     login: async (_, { username, password }, { dataSources, req, res }) => {
-      const out = await dataSources.authAPI.logIn({ username, password });
-      console.log("COOKIES:", req.cookies);
-      console.log(out);
+      const authRes = await dataSources.authAPI.logIn({ username, password });
       const options: CookieOptions = {
         maxAge: 1000 * 60 * 60 * 24, //expires in a day
         httpOnly: true, // cookie is only accessible by the server
@@ -67,40 +80,124 @@ const resolvers: Resolvers = {
         secure: true,
         sameSite: "none",
       };
-      if (out.token) {
-        res.cookie("jwt_token", out.token, options);
+      if (isErrorResponse(authRes)) {
+        throw new Error(authRes.error.message);
       }
-      return out;
+      res.cookie("jwt_token", authRes.data.token, options);
+      return authRes.data;
+    },
+    //TODO: I am actually not sure if this needs to be done within the server or if I can clean the cookies directly in the browser
+    logout: async (_, __, { res, req }) => {
+      const options: CookieOptions = {
+        maxAge: 1000 * 60 * 60 * 24, //expires in a day
+        httpOnly: true, // cookie is only accessible by the server
+        // secure: process.env.NODE_ENV === "prod", // only transferred over https
+        secure: true,
+        sameSite: "none",
+      };
+      res.clearCookie("jwt_token", options);
+      return {
+        success: true,
+      };
     },
 
     createMessage: async (_, { input }, { dataSources }) => {
       const { chatId, content, sentAt, sentById } = input;
       const viewer = await dataSources.getViewer();
-      const message = await dataSources.chatAPI.createMessage({
+      if (!viewer) {
+        throw new Error("Not logged in user");
+      }
+      const createMessageRes = await dataSources.chatAPI.createMessage({
         chatId,
         userId: viewer._id,
         content,
         sentAt,
         sentBy: sentById,
       });
-      pubsub.publish(MESSAGE_CREATED, { messageCreated: message });
-      return message;
+      if (isErrorResponse(createMessageRes)) {
+        throw new Error(createMessageRes.error.message);
+      }
+      pubsub.publish(MESSAGE_CREATED, { messageCreated: createMessageRes });
+      return { ...createMessageRes.data, success: true };
+    },
+    createGroupChat: async (_, { input }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const participantsAndViewer = input.participants;
+
+      let friends = viewer.friends as UserModelSuccessResponse[];
+      const friendsIds = friends.map((friend) => friend._id);
+
+      for (const participant of participantsAndViewer) {
+        if (!friendsIds.includes(participant.id)) {
+          throw new Error("You can only chat with your friends");
+        }
+      }
+
+      if (
+        !participantsAndViewer
+          .map((participant) => participant.id)
+          .includes(viewer._id)
+      ) {
+        participantsAndViewer.push({ id: viewer._id, admin: true });
+      }
+      const createChatRes = await dataSources.chatAPI.createChat({
+        type: "group",
+        name: input.name,
+        participants: participantsAndViewer,
+        phrase: input.phrase,
+        avatar: input?.avatar,
+      });
+      if (isErrorResponse(createChatRes)) {
+        throw new Error(createChatRes.error.message);
+      }
+      return { chat: createChatRes.data };
+    },
+    createIndividualChat: async (_, { input }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+
+      let friends = viewer.friends as UserModelSuccessResponse[];
+      const friendsIds = friends.map((friend) => friend._id);
+
+      if (!friendsIds.includes(input.userId)) {
+        throw new Error("You can only chat with your friends");
+      }
+
+      const createChatRes = await dataSources.chatAPI.createChat({
+        type: "individual",
+        participants: [
+          { id: viewer._id, admin: false },
+          { id: input.userId, admin: false },
+        ],
+      });
+
+      if (isErrorResponse(createChatRes)) {
+        throw new Error(createChatRes.error.message);
+      }
+      return { chat: createChatRes.data };
     },
   },
 
   Subscription: {
     messageCreated: {
-      subscribe: async () => ({
-        [Symbol.asyncIterator]: withFilter(
-          () => pubsub.asyncIterator([MESSAGE_CREATED]),
-          //TODO: figure out where this payload comes from
-          function filterMessageCreated(payload, variables) {
-            console.log("variables:", variables);
-            console.log("payload:", payload);
-            return true;
-          }
-        ),
-      }),
+      subscribe: async () => {
+        return {
+          [Symbol.asyncIterator]: withFilter(
+            (args) => {
+              return pubsub.asyncIterator([MESSAGE_CREATED]);
+            },
+            function filterMessageCreated(payload, variables, somethingElse) {
+              console.log({ payload, variables, somethingElse });
+              return true;
+            }
+          ),
+        };
+      },
     },
   },
 
@@ -108,7 +205,7 @@ const resolvers: Resolvers = {
     id: (parent, {}, { dataSources }) => {
       return parent._id;
     },
-    type: (parent: ChatModelResponse) => {
+    type: (parent) => {
       //TODO: this is probably not correct
       if (parent.type == ChatModelType.GROUP) {
         return ChatType.Group;
@@ -116,67 +213,111 @@ const resolvers: Resolvers = {
         return ChatType.Individual;
       }
     },
-    phrase: async (parent: ChatModelResponse, _, { dataSources }) => {
+    phrase: async (parent, _, context) => {
+      const { dataSources } = context;
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not user logged in");
+      }
       if (parent.type == "group") {
         return parent.phrase ?? "";
       } else {
-        //TODO: this type should be infered
-        const participants: UserModelSuccessResponse[] = await Promise.all(
-          parent.participants.map((participantId) => {
-            return dataSources.userAPI.getUser(participantId);
-          })
-        );
-        const viewer = await dataSources.getViewer();
-        const receiver = getReceiver(participants, viewer._id);
-        return receiver.phrase ?? "";
+        const phrase = (await getPropertyFromReceiver({
+          participantsIds: parent.participants.map(
+            (participant) => participant.id
+          ),
+          propertyName: "phrase",
+          viewer: viewer,
+          context,
+        })) as UserModelSuccessResponse["phrase"];
+        return phrase ?? "";
       }
     },
-    name: async (parent, {}, { dataSources }) => {
+    name: async (parent, {}, context) => {
+      const { dataSources } = context;
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not user logged in");
+      }
       if (parent.type == "group") {
         return parent.name ?? "";
       } else {
-        //TODO: this also could be made with less roundtrips
-        const participants: UserModelSuccessResponse[] = await Promise.all(
-          parent.participants.map((participantId) => {
-            return dataSources.userAPI.getUser(participantId);
-          })
-        );
-        const viewer = await dataSources.getViewer();
-        const receiver = getReceiver(participants, viewer._id);
-        return receiver.name ?? "";
+        const name = (await getPropertyFromReceiver({
+          participantsIds: parent.participants.map(
+            (participant) => participant.id
+          ),
+          propertyName: "name",
+          viewer: viewer,
+          context,
+        })) as UserModelSuccessResponse["name"];
+        return name ?? "";
       }
     },
-    avatar: async (parent, {}, { dataSources }) => {
+    avatar: async (parent, {}, context) => {
+      const { dataSources } = context;
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not user logged in");
+      }
       if (parent.type == "group") {
-        return parent.avatar;
+        return parent.avatar ?? "";
       } else {
-        //TODO: this also could be made with less roundtrips
-        const participants: UserModelSuccessResponse[] = await Promise.all(
-          parent.participants.map((participantId) => {
-            return dataSources.userAPI.getUser(participantId);
-          })
-        );
-        const viewer = await dataSources.getViewer();
-        const receiver = getReceiver(participants, viewer._id);
-        return receiver.avatar;
+        const avatar = (await getPropertyFromReceiver({
+          participantsIds: parent.participants.map(
+            (participant) => participant.id
+          ),
+          propertyName: "avatar",
+          viewer: viewer,
+          context,
+        })) as UserModelSuccessResponse["avatar"];
+        //I don't know why this is being typed as string and not string | undefined
+        return avatar;
       }
     },
     lastMessage: async (parent, {}, { dataSources }) => {
-      const [message] = await dataSources.chatAPI.getMessages({ limit: 1 });
+      const messageRes = await dataSources.chatAPI.getMessages({ limit: 1 });
+
+      if (isErrorResponse(messageRes)) {
+        throw new Error(messageRes.error.message);
+      }
+      const [message] = messageRes.data;
       return message;
     },
     participants: async (parent, {}, { dataSources }) => {
       //TODO: maybe put a route in the users service which can query by list of ids
-      const participants_ = await Promise.all(
-        parent.participants.map(async (participantId) => {
-          return dataSources.userAPI.getUser(participantId);
+      const participantsResponses = await Promise.all(
+        parent.participants.map(async (participant) => {
+          return dataSources.userAPI.getUser(participant.id);
+        })
+      );
+      const participantsDataObjects = participantsResponses.filter(
+        (participantResponse) => !isErrorResponse(participantResponse)
+      ) as DataObject<UserModelSuccessResponse>[];
+      const participants = participantsDataObjects.map(
+        (participantDataObject, index) => ({
+          ...participantDataObject.data,
+          ...parent.participants[index],
+          status: Status.Online,
+          participants: "",
         })
       );
 
-      return participants_;
+      return participants as any;
     },
-    messages: (parent: ChatModelResponse, {}, { dataSources }) => {
-      return dataSources.chatAPI.getMessages({ chatId: parent._id });
+    messages: async (parent, {}, { dataSources }) => {
+      const viewer = dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      // const viewerParticipant = await dataSources.chatAPI.getParticipant();
+      const messagesRes = await dataSources.chatAPI.getMessages({
+        // afterDate: viewerParticipant.participantSince,
+        chatId: parent._id,
+      });
+      if (isErrorResponse(messagesRes)) {
+        throw new Error(messagesRes.error.message);
+      }
+      return messagesRes.data;
     },
   },
   Message: {
@@ -184,22 +325,53 @@ const resolvers: Resolvers = {
       return parent._id;
     },
     chat: async (parent, {}, { dataSources }) => {
-      return dataSources.chatAPI.getChat(parent.chatId);
+      const chatRes = await dataSources.chatAPI.getChat(parent.chatId);
+      if (isErrorResponse(chatRes)) {
+        throw new Error(chatRes.error.message);
+      }
+      return chatRes.data;
     },
-    sentBy: (parent, {}, { dataSources }) => {
-      return dataSources.userAPI.getUser(parent.sentBy);
+    sentBy: async (parent, {}, { dataSources }) => {
+      const [userRes, participantRes] = await Promise.all([
+        dataSources.userAPI.getUser(parent.sentBy),
+        dataSources.chatAPI.getParticipant(parent._id, parent.sentBy),
+      ]);
+      if (isErrorResponse(userRes)) {
+        throw new Error(userRes.error.message);
+      }
+      if (isErrorResponse(participantRes)) {
+        throw new Error(participantRes.error.message);
+      }
+
+      const out = {
+        ...userRes.data,
+        ...participantRes.data,
+        id: "0",
+        status: Status.Online,
+        admin: true,
+        participantSince: "",
+        chats: [],
+      };
+      return out as any;
     },
   },
   MessageCreatedSubscriptionResponse: {
-    message: async (parent, {}, { dataSources }) => {
-      console.log("called");
-      const viewer = await dataSources.getViewer();
-      const { participants } = await dataSources.chatAPI.getChat(
-        parent.message.chatId
-      );
-      console.log("participants:", participants);
-      if (participants.includes(viewer._id)) {
-        return parent.message;
+    message: async (parent, {}, context) => {
+      //TODO: change this type to the correct one
+      const { user, dataSources } = context as any;
+      if (!user) {
+        throw new Error("Not authenticated");
+      }
+      const parentTemp = parent as any;
+      const message = parentTemp.data;
+      const chatRes = await dataSources.chatAPI.getChat(message.chatId);
+      if (isErrorResponse(chatRes)) {
+        throw new Error(chatRes.error.message);
+      }
+      const { participants } = chatRes.data;
+
+      if (participants.includes(user._id)) {
+        return message;
       } else {
         return null;
       }
@@ -218,7 +390,13 @@ const resolvers: Resolvers = {
           const user = dataSources.userAPI.getUser(friendId);
           return user;
         });
-        const users = await Promise.all(usersPromises);
+        const usersResponses = await Promise.all(usersPromises);
+        const usersDataObjects = usersResponses.filter(
+          (userRespone) => !isErrorResponse(userRespone)
+        ) as DataObject<UserModelSuccessResponse>[];
+        const users = usersDataObjects.map(
+          (userDataObject) => userDataObject.data
+        );
         return users;
       } else {
         const friends = parent.friends as UserModelSuccessResponse[];
@@ -226,13 +404,26 @@ const resolvers: Resolvers = {
       }
     },
     chats: async (parent, {}, { dataSources }) => {
-      return dataSources.chatAPI.getChats({ userId: parent._id });
+      const chatRes = await dataSources.chatAPI.getChats({
+        userId: parent._id,
+      });
+      if (isErrorResponse(chatRes)) {
+        throw new Error(chatRes.error.message);
+      }
+      return chatRes.data;
     },
     chat: async (parent, { chatId }, { dataSources }) => {
-      //TODO: again, getViewer needs to do a roundtrip which may be unecessary if all queries are using it
-      return dataSources.chatAPI.getChat(chatId, {
-        userId: (await dataSources.getViewer())._id,
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not user logged in");
+      }
+      const chatRes = await dataSources.chatAPI.getChat(chatId, {
+        userId: viewer._id,
       });
+      if (isErrorResponse(chatRes)) {
+        throw new Error(chatRes.error.message);
+      }
+      return chatRes.data;
     },
     status: (parent) => {
       //TODO see how you are going to solve this

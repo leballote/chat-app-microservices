@@ -1,11 +1,12 @@
 const Chat = require("../models/chat.model");
 const Participant = require("../models/participant.model");
 const IndividualRel = require("../models/individualRel.model");
+const { default: mongoose } = require("mongoose");
 
 const router = require("express").Router();
 
 const errors = {
-  serverError: { message: "Server Error" },
+  serverError: { error: { message: "Server Error" } },
 };
 
 //TODO: I think this could have been way easier with two models for individual chats and group chats
@@ -14,24 +15,43 @@ router.post("/chat", async (req, res) => {
   const chatData = { name, type, phrase };
   const { participants } = req.body;
 
-  const user1Id =
-    participants[0] > participants[1] ? participants[0] : participants[1];
-  const user2Id =
-    participants[0] > participants[1] ? participants[1] : participants[0];
-  if (participants.length < 2) {
+  if (!participants?.length || participants.length < 2) {
     return res
       .status(400)
-      .send({ message: "Participants must be at least two" });
+      .send({ error: { message: "Participants must be at least two" } });
   }
+
+  //this is an euristic, all participants should have id
+  if (!participants[0]?.id) {
+    return res.status(400).send({
+      error: {
+        message: "Participants must have id",
+      },
+    });
+  }
+  const participantsIds = participants.map((participant) => participant.id);
+
+  const user1Id =
+    participantsIds[0] > participantsIds[1]
+      ? participantsIds[0]
+      : participantsIds[1];
+  const user2Id =
+    participantsIds[0] > participantsIds[1]
+      ? participantsIds[1]
+      : participantsIds[0];
+
   if (type == "individual") {
     if (name || phrase) {
       return res.status(400).send({
-        message: "Individual chats cannot have a name or phrase",
+        error: { message: "Individual chats cannot have a name or phrase" },
       });
     }
-    if (participants.length > 2) {
+    if (participantsIds.length > 2) {
       return res.status(400).send({
-        message: "For individual chats there must be at most two participants",
+        error: {
+          message:
+            "For individual chats there must be at most two participants",
+        },
       });
     }
 
@@ -41,15 +61,23 @@ router.post("/chat", async (req, res) => {
         user1Id,
         user2Id,
       });
+
       if (individualRel) {
         return res.status(400).send({
-          message:
-            "There can only be one individual chat between two users. There already exists one",
-          data: { chatId: individualRel.chatId },
+          error: {
+            message:
+              "There can only be one individual chat between two users. There already exists one",
+            data: { chatId: individualRel.chatId },
+          },
         });
       }
     } catch (e) {
-      return res.status(500).send(errors.serverError);
+      return (
+        res
+          .status(500)
+          //TODO: remove debug
+          .send({ ...errors.serverError, debug: { error: e.message } })
+      );
     }
   }
 
@@ -64,20 +92,24 @@ router.post("/chat", async (req, res) => {
       });
     }
     const chatRels = [];
-    for (const userId of participants) {
-      const chatRel = { userId, chatId: chat._id };
+    for (const { id, admin = false } of participants) {
+      const chatRel = {
+        user: { id, admin, participantSince: chat.createdAt },
+        chat: { id: chat._id },
+      };
       chatRels.push(chatRel);
     }
     const chatUserRels = await Participant.create(chatRels);
     return res.status(201).send({
       data: {
         ...chat.toObject(),
-        participants: chatUserRels.map((rel) => rel.userId),
+        participants: chatUserRels.map((rel) => rel.user),
       },
     });
   } catch (e) {
-    //TODO: handle correctly errors
-    return res.status(500).send({ ...errors.serverError, debugError: e });
+    return res
+      .status(500)
+      .send({ ...errors.serverError, debugError: e.message });
   }
 });
 
@@ -88,10 +120,8 @@ router.get("/chat", async (req, res) => {
   offset = Number(offset);
   limit = Number(limit);
 
-  console.log("OFFSET: ", offset);
   offset = !Number.isNaN(offset) || offset == null ? offset : 0;
   limit = !Number.isNaN(limit) || limit == null ? limit : 1000;
-  console.log("OFFSET: ", offset);
 
   let baseQueryParams = { type };
   baseQueryParams = Object.fromEntries(
@@ -101,19 +131,23 @@ router.get("/chat", async (req, res) => {
   if (type == "group") {
     if (user1Id || user2Id) {
       return res.status(400).send({
-        message: "You can't query by user1Id or user2Id when type is 'group'",
+        error: {
+          message: "You can't query by user1Id or user2Id when type is 'group'",
+        },
       });
     }
   }
-  if (userId & (user1Id | user2Id)) {
+  if (userId & (user1Id || user2Id)) {
     return res.status(400).send({
-      message: "Field userId is incompatible with [user1Id, user2Id]",
+      error: {
+        message: "Field userId is incompatible with [user1Id, user2Id]",
+      },
     });
   }
   let chatIds;
   if (userId) {
-    const chatUserRels = await Participant.find({ userId });
-    chatIds = chatUserRels.map((rel) => rel.chatId);
+    const chatUserRels = await Participant.find({ "user.id": userId });
+    chatIds = chatUserRels.map((rel) => rel.chat.id);
   }
   if (user1Id && user2Id) {
     const [queryUser1, queryUser2] =
@@ -141,12 +175,12 @@ router.get("/chat", async (req, res) => {
         $lookup: {
           from: "participants",
           localField: "_id",
-          foreignField: "chatId",
+          foreignField: "chat.id",
           pipeline: [
             {
               $project: {
                 _id: 0,
-                userId: 1,
+                user: 1,
               },
             },
           ],
@@ -154,11 +188,13 @@ router.get("/chat", async (req, res) => {
         },
       },
     ];
-    if (userId | user1Id | user2Id) {
+    if (userId || user1Id || user2Id) {
       chats = await Chat.aggregate([
         {
           $match: {
-            _id: { $in: chatIds },
+            _id: {
+              $in: chatIds.map((chatId) => mongoose.Types.ObjectId(chatId)),
+            },
             ...baseQueryParams,
           },
         },
@@ -174,16 +210,19 @@ router.get("/chat", async (req, res) => {
         ...basePipeline,
       ]);
     }
+
     chats = chats.map((el) => {
       return {
         ...el,
-        participants: el.participants.map((participant) => participant.userId),
+        participants: el.participants.map((participant) => participant.user),
+        // : el.participants.map((participant) => participant.userId),
       };
     });
     return res.send({ data: chats });
   } catch (e) {
-    console.log("ERROR: ", e);
-    return res.status(500).send({ ...errors.serverError, debugError: e });
+    return res
+      .status(500)
+      .send({ ...errors.serverError, debugError: e.message });
   }
 });
 
@@ -192,10 +231,10 @@ router.get("/chat/:id", async (req, res) => {
   try {
     const chat = await Chat.findById(id);
     if (!chat) {
-      return res.status(404).send({ message: "Chat not found" });
+      return res.status(404).send({ error: { message: "Chat not found" } });
     }
-    const participants = (await Participant.find({ chatId: id })).map(
-      (par) => par.userId
+    const participants = (await Participant.find({ "chat.id": id })).map(
+      (par) => par.user
     );
     return res.send({ data: { ...chat.toObject(), participants } });
   } catch (e) {
@@ -208,7 +247,7 @@ router.put("/chat/:id", async (req, res) => {
   try {
     const chat = await Chat.findByIdAndUpdate(id, req.body, { new: true });
     if (!chat) {
-      return res.status(404).send({ message: "Chat not founc" });
+      return res.status(404).send({ error: { message: "Chat not found" } });
     }
     return res.send({ data: chat.toObject() });
   } catch (e) {
@@ -222,57 +261,6 @@ router.delete("/chat/:id", async (req, res) => {
     const chat = await Chat.findByIdAndDelete(id);
     return res.status(204).send({ data: chat.toObject() });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
-  }
-});
-
-router.post("/participant", async (req, res) => {
-  //TODO: with this model you can add participants to non existent chats, and also add non existent participants, check if this is a problem
-  const { chatId, userId } = req.body;
-  try {
-    const chat = Chat.findOne({ _id: chatId });
-    if (!chat) {
-      return res.status(400).send({ message: "This chat doesn't exist" });
-    }
-    if (chat.type == "individual") {
-      return res.status(400).send({
-        message: "Add participant is not allowed in individual chats",
-      });
-    }
-    const chatUserRel = await Participant.create({
-      chatId,
-      userId,
-    });
-    return res.send({ data: chatUserRel });
-  } catch (e) {
-    if (e.code === 11000) {
-      return res.status(400).send({ message: "Unique key error", ...e });
-    }
-    return res.status(500).send(errors.serverError);
-  }
-});
-
-router.delete("/participant", async (req, res) => {
-  const { chatId, userId } = req.body;
-  try {
-    const chat = Chat.findOne({ _id: chatId });
-    if (!chat) {
-      return res.status(400).send({ message: "This chat doesn't exist" });
-    }
-    if (chat.type == "individual") {
-      return res.status(400).send({
-        message: "Deleting participants is not allowed in individual chats",
-      });
-    }
-    const chatUserRel = await Participant.deleteOne({
-      chatId,
-      userId,
-    });
-    return res.send({ data: chatUserRel });
-  } catch (e) {
-    if (e.code) {
-      return res.status(404).send(e);
-    }
     return res.status(500).send(errors.serverError);
   }
 });

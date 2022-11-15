@@ -32,6 +32,7 @@ authUserSchema.plugin(passportLocalMongoose, {
   limitAttempts: true,
   maxAttempts: 5,
   unlockInterval: 300_000, //5 mins
+  usernameUnique: true,
   passwordValidator(password, cb) {
     if (!validatorLib.isStrongPassword(password)) {
       const errorMessage = `password should be length 8, and contain at least one of each of the following: lowercase letter, uppercase letter, symbol and number.`;

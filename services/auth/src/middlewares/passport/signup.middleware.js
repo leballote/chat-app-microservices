@@ -26,25 +26,29 @@ passport.use(
 function signupMiddleware(req, res, next) {
   const pre = passport.authenticate("signup", function (err, user) {
     if (err?.code === 11000) {
-      return res.status(400).send({ error: "Username already exists" });
+      return res
+        .status(400)
+        .send({ error: { message: "Username already exists" } });
     }
 
     if (err?.publicMessage) {
-      return res.status(400).send({ error: err.publicMessage });
+      return res.status(400).send({ error: { message: err.publicMessage } });
     }
 
     if (err instanceof MongooseError.ValidationError) {
       if (err.errors.password) {
-        return res.status(400).send({ error: err.errors.password.message });
+        return res
+          .status(400)
+          .send({ error: { message: err.errors.password.message } });
       }
       //TODO: if there is a validation error, see what provides more information and wether it is possible tu just send the messages
       const errorValue = Object.values(err)[0];
-      return res.status.send({ error: errorValue.message });
+      return res.status.send({ error: { message: errorValue.message } });
     }
 
     if (err || !user) {
       // console.log("USER: ", err);
-      return res.status(500).send({ error: "Another error" });
+      return res.status(500).send({ error: { message: "Another error" } });
     }
     req.login(user, { session: false }, (err) => {
       if (err) next(err);

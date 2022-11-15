@@ -7,7 +7,7 @@
     "generate": "graphql-codegen --config codegen.ts",
     "compile": "npm run generate && tsc",
     "compile:watch": "npm run generate && tsc --watch",
-    "start": "npm run compile && node ./dist/src/index.js",
+    "start": "node ./dist/src/index.js",
     "dev": "npm run compile:watch & nodemon",
     "codegen": "graphql-codegen --config codegen.ts"
   },
@@ -17,6 +17,9 @@
   "dependencies": {
     "@apollo/datasource-rest": "^4.3.2",
     "@apollo/server": "^4.0.1",
+    "@graphql-tools/graphql-file-loader": "^7.5.10",
+    "@graphql-tools/load": "^7.8.5",
+    "cookie": "^0.5.0",
     "cookie-parser": "^1.4.6",
     "graphql-subscriptions": "^2.0.0",
     "graphql-tag": "^2.12.6",
@@ -27,6 +30,7 @@
     "@graphql-codegen/cli": "2.13.8",
     "@graphql-codegen/typescript": "2.8.0",
     "@graphql-codegen/typescript-resolvers": "2.7.5",
+    "@types/cookie": "^0.5.1",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.12",
     "@types/node": "^18.11.2",

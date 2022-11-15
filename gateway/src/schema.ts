@@ -1,13 +1,57 @@
 import gql from "graphql-tag";
+// import { GraphQLFileLoader } from "@graphql-tools/graphql-file-loader";
+// import { loadSchemaSync } from "@graphql-tools/load";
+
+// const typeDefs = loadSchemaSync("schema.gql", {
+//   loaders: [new GraphQLFileLoader()],
+// });
 
 const typeDefs = gql`
+  interface UserInterface {
+    id: ID!
+    username: String!
+    name: String!
+    chats: [Chat!]!
+    friends: [User!]!
+    phrase: String!
+    status: Status!
+    avatar: String
+    chat(chatId: String): Chat
+  }
+
+  type User implements UserInterface {
+    id: ID!
+    username: String!
+    name: String!
+    chats: [Chat!]!
+    friends: [User!]!
+    phrase: String!
+    status: Status!
+    avatar: String
+    chat(chatId: String): Chat
+  }
+
+  type ChatUser implements UserInterface {
+    id: ID!
+    username: String!
+    name: String!
+    chats: [Chat!]!
+    friends: [User!]!
+    phrase: String!
+    status: Status!
+    avatar: String
+    chat(chatId: String): Chat
+    admin: Boolean!
+    participantSince: String!
+  }
+
   type Chat {
     id: ID!
     name: String!
     type: ChatType!
     phrase: String!
     messages: [Message!]!
-    participants: [User!]!
+    participants: [ChatUser!]!
     lastMessage: Message
     avatar: String
   }
@@ -24,22 +68,10 @@ const typeDefs = gql`
 
   type Message {
     id: ID!
-    sentBy: User!
+    sentBy: ChatUser!
     chat: Chat!
     sentAt: String!
     content: String!
-  }
-
-  type User {
-    id: ID!
-    username: String!
-    name: String!
-    chats: [Chat!]!
-    friends: [User!]!
-    phrase: String!
-    status: Status!
-    avatar: String
-    chat(chatId: String): Chat
   }
 
   input SignUpInput {
@@ -82,10 +114,47 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    signup(input: SignUpInput): SignUpResponse
-    login(username: String, password: String): LogInResponse
-    createPost(author: String, comment: String): Post
-    createMessage(input: CreateMessageInput): CreateMessageResponse
+    signup(input: SignUpInput): SignUpResponse!
+    login(username: String, password: String): LogInResponse!
+    logout: LogOutResponse!
+    createPost(author: String, comment: String): Post!
+    createMessage(input: CreateMessageInput!): CreateMessageResponse!
+    createGroupChat(input: CreateGroupChatInput!): CreateChatResponse!
+    createIndividualChat(input: CreateIndividualChatInput!): CreateChatResponse!
+    setLanguage(input: SetLanguageInput): SetLanguageResponse!
+  }
+
+  input SetLanguageInput {
+    language: String!
+  }
+
+  type SetLanguageResponse {
+    language: String!
+    success: Boolean!
+  }
+
+  type CreateChatResponse {
+    chat: Chat!
+  }
+
+  input CreateGroupChatInput {
+    name: String!
+    phrase: String!
+    participants: [ParticipantInput!]!
+    avatar: String
+  }
+
+  input CreateIndividualChatInput {
+    userId: String!
+  }
+
+  input ParticipantInput {
+    id: String!
+    admin: Boolean!
+  }
+
+  type LogOutResponse {
+    success: Boolean!
   }
 
   type Post {

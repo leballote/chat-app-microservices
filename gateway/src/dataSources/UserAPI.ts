@@ -1,23 +1,24 @@
 import { RESTDataSource } from "@apollo/datasource-rest";
+import { isErrorResponse } from "../types/general.types";
 import {
   CreateUserModelInput,
-  CreateUserModelResponse,
   UserModelSuccessResponse,
+  UserModelResponse,
+  DefaultAPIResponse,
 } from "../types/servicesRest";
-
-type DataResponse<T> = {
-  data: T;
-};
 
 export default class UserAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
   override baseURL = "http://localhost:6001";
 
-  async getUser(id: string): Promise<UserModelSuccessResponse> {
-    const { data } = await this.get<DataResponse<UserModelSuccessResponse>>(
-      `user/${encodeURIComponent(id)}`
-    );
-    return data;
+  async getUser(id: string): Promise<UserModelResponse> {
+    try {
+      return this.get<UserModelResponse>(`user/${encodeURIComponent(id)}`);
+    } catch (e) {
+      return {
+        error: { message: JSON.stringify(e) },
+      };
+    }
   }
   async getUsers(
     args: {
@@ -28,27 +29,31 @@ export default class UserAPI extends RESTDataSource {
       email?: string;
       birthDate?: string;
     } = {}
-  ): Promise<UserModelSuccessResponse[]> {
+  ): Promise<DefaultAPIResponse<UserModelSuccessResponse[]>> {
     const query = Object.entries(args)
       .map(([key, val]) => `${key}=${val}`)
       .join("&");
 
-    const { data } = await this.get<DataResponse<UserModelSuccessResponse[]>>(
-      `user/?${query}`
-    );
-    return data;
+    try {
+      return this.get<DefaultAPIResponse<UserModelSuccessResponse[]>>(
+        `user/?${query}`
+      );
+    } catch (e) {
+      return {
+        error: {
+          message: JSON.stringify(e),
+        },
+      };
+    }
   }
 
-  async createUser(input: CreateUserModelInput): Promise<any> {
-    const { data } = await this.post<DataResponse<CreateUserModelResponse>>(
-      "user",
-      { body: input }
-    );
-
-    if (!data) {
-      return null;
-    } else {
-      return data;
+  async createUser(input: CreateUserModelInput): Promise<UserModelResponse> {
+    try {
+      return this.post<UserModelResponse>("user", { body: input });
+    } catch (e) {
+      return {
+        error: { message: JSON.stringify(e) },
+      };
     }
   }
 }

@@ -10,6 +10,7 @@ import contactsSectionDrawerReducer from "./features/contactsSectionDrawerSlice"
 import sideBarReducer from "./features/sideBarSlice";
 import newGroupSectionDrawerReducer from "./features/newGroupSectionDrawerSlice";
 import chatSectionReducer from "./features/chatSectionSlice";
+import settingsSectionReducer from "./features/settingsSectionSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
@@ -23,6 +24,7 @@ export const store = configureStore({
     sideBar: sideBarReducer,
     newGroupSectionDrawer: newGroupSectionDrawerReducer,
     chatSection: chatSectionReducer,
+    settingsSection: settingsSectionReducer,
   },
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware({ thunk: false }),

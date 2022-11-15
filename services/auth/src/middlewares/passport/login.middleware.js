@@ -11,11 +11,11 @@ function loginMiddleware(req, res, next) {
   const pre = passport.authenticate("login", (err, user, info) => {
     //TODO: I don't know if I want't to send any message info that comes from local-passport-mongoose, but I'll let it like this
     if (info?.name in passportLocalMongooseErrors) {
-      return res.send({ error: info?.message });
+      return res.send({ error: { message: info?.message } });
     }
 
     if (err || !user) {
-      return res.send({ error: "Something went wrong" });
+      return res.send({ error: { message: "Something went wrong" } });
     }
 
     req.login(user, { session: false }, async (error) => {

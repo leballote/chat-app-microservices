@@ -33,8 +33,12 @@ const userSchema = new mongoose.Schema(
       type: String,
     },
     //TODO: check if it is better to use mongoose.SchemaTypes.ObjectId
-    //TODO: make validation for uniqueness within list
+    //TODO: make validation for uniqueness within list; note, it is already being managed by the controller
     friends: [{ type: String, ref: "user" }],
+    settings: {
+      type: { language: { type: String } },
+      required: true,
+    },
   },
   { timestamps: true, _id: false }
 );

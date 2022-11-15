@@ -6,4 +6,4 @@ export type DefaultError = {
   code?: string;
 };
 
-export type DefaultAPIResponse<T> = APIResponse<T>;
+export type DefaultAPIResponse<T> = APIResponse<T, DefaultError>;
