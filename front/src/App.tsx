@@ -47,6 +47,13 @@ const App: React.FunctionComponent = function () {
     data: messageCreatedData,
   } = useSubscription(MESSAGE_CREATED);
 
+  // console.log("SUBSCRIPTION", {
+  //   messageCreatedData,
+  //   messageCreatedError,
+  //   messageCreatedLoading,
+  // });
+  // console.log("SUB_ERROR", messageCreatedError);
+
   useEffect(() => {
     if (messageCreatedData?.messageCreated.message) {
       if (

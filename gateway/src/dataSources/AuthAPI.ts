@@ -9,7 +9,7 @@ import { AuthenticateJWTResponse } from "../types/servicesRest/auth.types";
 
 export default class AuthAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
-  override baseURL = "http://localhost:6002";
+  override baseURL = process.env.AUTH_URI;
 
   async signUp({
     username,

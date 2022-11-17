@@ -1,8 +1,4 @@
 import { RESTDataSource } from "@apollo/datasource-rest";
-import {
-  CreateGroupChatInput,
-  CreateIndividualChatInput,
-} from "../generated/graphql";
 import { isErrorResponse } from "../types/general.types";
 import {
   ChatModelResponse,

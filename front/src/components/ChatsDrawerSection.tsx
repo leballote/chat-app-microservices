@@ -26,11 +26,14 @@ export default function ChatDrawerSection() {
     error,
     searchTerm: chatSearched,
   } = useAppSelector((state) => state.chatsPreviews);
+  console.log("CHATS", chats);
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
   useEffect(() => {
-    dispatch(getChatsPreviewsValue(""));
+    if (!chats || chats?.length == 0) {
+      dispatch(getChatsPreviewsValue(""));
+    }
   }, []);
 
   function handleSearch(ev: ChangeEvent<HTMLInputElement>) {

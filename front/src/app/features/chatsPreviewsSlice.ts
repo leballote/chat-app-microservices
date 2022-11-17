@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import { User } from "../../types/AppTypes";
 
@@ -47,6 +47,10 @@ export const chatsPreviewsSlice = createSlice({
       //TODO: check if this is the way to do it
       chatsPreviewsSlice.actions.getValue(payload);
     },
+    pushChat(state, { payload }: PayloadAction<ChatPreview>) {
+      //TODO: we should sort on every insertion to solve prevent race conditions
+      state.value = [payload, ...state.value];
+    },
     setValue(state, { payload }) {
       state.value = payload;
       state.loading = false;
@@ -60,8 +64,14 @@ export const chatsPreviewsSlice = createSlice({
   },
 });
 
-export const { setValue, getValue, setLoading, setError, setSearchTerm } =
-  chatsPreviewsSlice.actions;
+export const {
+  setValue,
+  getValue,
+  setLoading,
+  setError,
+  setSearchTerm,
+  pushChat,
+} = chatsPreviewsSlice.actions;
 
 export const selectChatsPreviews = (state: RootState) => state.chatsPreviews;
 

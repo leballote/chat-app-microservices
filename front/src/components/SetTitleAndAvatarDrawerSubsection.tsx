@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
 import DrawerSearchBar from "./DrawerSearchBar";
-import { ChangeEvent, useState, useEffect } from "react";
+import React, { ChangeEvent, useState, useEffect, useContext } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
@@ -25,25 +25,82 @@ import { useTranslation } from "react-i18next";
 import { setMainDrawerSection } from "../app/features/sideBarSlice";
 import {
   addParticipant,
+  resetState as resetNewGroupDrawerSectionState,
   setAddFriendsSubsection,
 } from "../app/features/newGroupSectionDrawerSlice";
 import { ParticipantsToAdd } from "./ParticipantsToAdd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import DoneIcon from "@mui/icons-material/Done";
+import { useMutation, gql } from "@apollo/client";
+import { useNavigate } from "react-router";
+import { CurrentUserContext } from "../contexts";
+import { User } from "../types/AppTypes";
+import { resetState as resetMainDrawerSectionState } from "../app/features/mainSectionDrawerSlice";
+import { pushChat } from "../app/features/chatsPreviewsSlice";
+
+const CREATE_GROUP_CHAT = gql`
+  mutation CreateGroupChat($input: CreateGroupChatInput!) {
+    createGroupChat(input: $input) {
+      chat {
+        id
+        type
+        name
+        phrase
+        avatar
+      }
+    }
+  }
+`;
 
 export default function SetTitleAndAvatarDrawerSubsection() {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const user = useContext(CurrentUserContext);
+  const [createGroupChatFn, { loading, data, error }] =
+    useMutation(CREATE_GROUP_CHAT);
+  const { participantsToAdd } = useAppSelector(
+    (state) => state.newGroupSectionDrawer
+  );
 
-  function handleBackClick() {
+  async function handleBackClick() {
     dispatch(setAddFriendsSubsection());
   }
 
-  function handleNext() {}
+  const handleFinish: React.FocusEventHandler<HTMLFormElement> = async (ev) => {
+    ev.preventDefault();
+    if (user == null) return;
+    const elements = ev.currentTarget.elements as any;
+    const {
+      name: { value: name },
+      phrase: { value: phrase },
+    } = elements;
+    const participants = participantsToAdd.map((id) => ({ id, admin: false }));
+    // .concat({ id: user.id, admin: true });
+
+    const res = await createGroupChatFn({
+      variables: {
+        input: {
+          name,
+          phrase,
+          participants,
+        },
+      },
+    });
+    dispatch(resetNewGroupDrawerSectionState());
+    dispatch(resetMainDrawerSectionState());
+    dispatch(setMainDrawerSection());
+    console.log(res.data.createGroupChat.chat);
+    dispatch(pushChat(res.data.createGroupChat.chat));
+    console.log("it got called");
+    if (!res.errors) {
+      navigate(`/app/chat/${res.data.createGroupChat.chat.id}`);
+    }
+  };
 
   return (
-    <Stack>
+    <Stack component="form" onSubmit={handleFinish}>
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography
           component="h2"
@@ -81,14 +138,27 @@ export default function SetTitleAndAvatarDrawerSubsection() {
         </Avatar>
       </Container>
       {/* //TODO: internationalize this  */}
-      <TextField sx={{ margin: "0 1em" }} label="Group Name" />
+      <TextField
+        sx={{ margin: ".5em 1em" }}
+        label="Group name"
+        name="name"
+        required
+      />
+      {/* TODO: internationalize this */}
+      <TextField
+        sx={{ margin: ".5em 1em" }}
+        label="Group phrase"
+        name="phrase"
+        size="small"
+        required
+      />
 
       <Paper
         sx={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
         elevation={3}
       >
         <Box>
-          <Button sx={{ width: "100%" }} onClick={handleNext}>
+          <Button type="submit" sx={{ width: "100%" }}>
             <DoneIcon />
           </Button>
         </Box>

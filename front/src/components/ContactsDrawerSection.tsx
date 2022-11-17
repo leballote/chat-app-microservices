@@ -5,13 +5,15 @@ import { ChangeEvent, useState, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import * as React from "react";
-import { useQuery, gql } from "@apollo/client";
+import { useQuery, gql, useMutation } from "@apollo/client";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import {
   getValue as getContactsPreviewsValue,
   setSearchTerm,
 } from "../app/features/contactsPreviewsSlice";
 import { useTranslation } from "react-i18next";
+import { pushChat } from "../app/features/chatsPreviewsSlice";
+import { useNavigate } from "react-router";
 
 interface Contact {
   id: string;
@@ -32,6 +34,20 @@ interface Props {
   onAddContactClick: (ev: React.MouseEvent<HTMLElement>) => void;
 }
 
+const GET_OR_CREATE_CHAT = gql`
+  mutation GetOrCreateChat($input: GetOrCreateIndividualChatInput!) {
+    getOrCreateIndividualChat(input: $input) {
+      chat {
+        id
+        type
+        phrase
+        name
+        avatar
+      }
+    }
+  }
+`;
+
 //TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
 export default function ContactsDrawerSection({
   onBackClick,
@@ -45,6 +61,8 @@ export default function ContactsDrawerSection({
   } = useAppSelector((state) => state.contactsPreviews);
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [getOrCreateChatFn] = useMutation(GET_OR_CREATE_CHAT);
 
   useEffect(() => {
     dispatch(getContactsPreviewsValue(""));
@@ -109,7 +127,25 @@ export default function ContactsDrawerSection({
             <ContactPreview
               {...contact}
               key={contact.id}
-              to={`contact/${contact.id}`}
+              onClick={async (ev) => {
+                const contactId = ev.currentTarget.dataset["contactId"];
+                try {
+                  const getOrCreateChatRes = await getOrCreateChatFn({
+                    variables: {
+                      input: {
+                        userId: contactId,
+                      },
+                    },
+                  });
+                  const { chat: newChat, created } =
+                    getOrCreateChatRes.data.getOrCreateIndividualChat;
+                  if (created) dispatch(pushChat(newChat));
+                  navigate(`/app/chat/${newChat.id}`);
+                } catch (e) {
+                  throw e;
+                }
+              }}
+              // to={`contact/${contact.id}`}
             />
           ))}
         </List>

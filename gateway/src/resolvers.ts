@@ -155,7 +155,7 @@ const resolvers: Resolvers = {
       }
       return { chat: createChatRes.data };
     },
-    createIndividualChat: async (_, { input }, { dataSources }) => {
+    getOrCreateIndividualChat: async (_, { input }, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       if (!viewer) {
         throw new Error("Not authenticated");
@@ -166,6 +166,17 @@ const resolvers: Resolvers = {
 
       if (!friendsIds.includes(input.userId)) {
         throw new Error("You can only chat with your friends");
+      }
+
+      const getChatRes = await dataSources.chatAPI.getChats({
+        user1Id: viewer._id,
+        user2Id: input.userId,
+      });
+
+      if (isErrorResponse(getChatRes)) {
+        throw new Error(getChatRes.error.message);
+      } else if (getChatRes.data.length > 0) {
+        return { chat: getChatRes.data[0], created: false };
       }
 
       const createChatRes = await dataSources.chatAPI.createChat({
@@ -179,7 +190,7 @@ const resolvers: Resolvers = {
       if (isErrorResponse(createChatRes)) {
         throw new Error(createChatRes.error.message);
       }
-      return { chat: createChatRes.data };
+      return { chat: createChatRes.data, created: true };
     },
   },
 

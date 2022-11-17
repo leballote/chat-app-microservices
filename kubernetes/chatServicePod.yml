@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: chatService
+  labels:
+    - service: chat
+spec:
+  containers:
+    - name: chatService
+      image: leballote/chat_service
+      resources:
+        limits:
+          memory: 512Mi
+          cpu: "1"
+        requests:
+          memory: 256Mi
+          cpu: "0.2"
+      ports:
+        #TODO: check if this is the port :p
+        - containerPort: 6001
+          name: chatServicePort
+          protocol: TCP

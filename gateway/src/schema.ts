@@ -119,8 +119,10 @@ const typeDefs = gql`
     logout: LogOutResponse!
     createPost(author: String, comment: String): Post!
     createMessage(input: CreateMessageInput!): CreateMessageResponse!
-    createGroupChat(input: CreateGroupChatInput!): CreateChatResponse!
-    createIndividualChat(input: CreateIndividualChatInput!): CreateChatResponse!
+    createGroupChat(input: CreateGroupChatInput!): GetOrCreateChatResponse!
+    getOrCreateIndividualChat(
+      input: GetOrCreateIndividualChatInput!
+    ): GetOrCreateChatResponse!
     setLanguage(input: SetLanguageInput): SetLanguageResponse!
   }
 
@@ -133,8 +135,9 @@ const typeDefs = gql`
     success: Boolean!
   }
 
-  type CreateChatResponse {
+  type GetOrCreateChatResponse {
     chat: Chat!
+    created: Boolean
   }
 
   input CreateGroupChatInput {
@@ -144,7 +147,7 @@ const typeDefs = gql`
     avatar: String
   }
 
-  input CreateIndividualChatInput {
+  input GetOrCreateIndividualChatInput {
     userId: String!
   }
 

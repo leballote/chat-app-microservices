@@ -155,10 +155,10 @@ async function start() {
   //TODO: turn this into env variables
   app.use(
     "/graphql",
-    cors<cors.CorsRequest>({
-      credentials: true,
-      origin: ["http://localhost:5173", "http://localhost:4000"],
-    }),
+    // cors<cors.CorsRequest>({
+    //   credentials: true,
+    //   origin: ["http://localhost:5173", "http://localhost:4000"],
+    // }),
     cookieParser(),
     express.json(),
     expressMiddleware(server, { context })

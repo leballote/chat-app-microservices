@@ -54,20 +54,11 @@ export type ChatUserChatArgs = {
   chatId?: InputMaybe<Scalars['String']>;
 };
 
-export type CreateChatResponse = {
-  __typename?: 'CreateChatResponse';
-  chat: Chat;
-};
-
 export type CreateGroupChatInput = {
   avatar?: InputMaybe<Scalars['String']>;
   name: Scalars['String'];
   participants: Array<ParticipantInput>;
   phrase: Scalars['String'];
-};
-
-export type CreateIndividualChatInput = {
-  userId: Scalars['String'];
 };
 
 export type CreateMessageInput = {
@@ -88,6 +79,15 @@ export type Error = {
   __typename?: 'Error';
   code?: Maybe<Scalars['Int']>;
   reason: Scalars['String'];
+};
+
+export type GetOrCreateChatResponse = {
+  __typename?: 'GetOrCreateChatResponse';
+  chat: Chat;
+};
+
+export type GetOrCreateIndividualChatInput = {
+  userId: Scalars['String'];
 };
 
 export type LogInResponse = {
@@ -117,23 +117,19 @@ export type MessageCreatedSubscriptionResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createGroupChat: CreateChatResponse;
-  createIndividualChat: CreateChatResponse;
+  createGroupChat: GetOrCreateChatResponse;
   createMessage: CreateMessageResponse;
   createPost: Post;
+  getOrCreateIndividualChat: GetOrCreateChatResponse;
   login: LogInResponse;
   logout: LogOutResponse;
+  setLanguage: SetLanguageResponse;
   signup: SignUpResponse;
 };
 
 
 export type MutationCreateGroupChatArgs = {
   input: CreateGroupChatInput;
-};
-
-
-export type MutationCreateIndividualChatArgs = {
-  input: CreateIndividualChatInput;
 };
 
 
@@ -148,9 +144,19 @@ export type MutationCreatePostArgs = {
 };
 
 
+export type MutationGetOrCreateIndividualChatArgs = {
+  input: GetOrCreateIndividualChatInput;
+};
+
+
 export type MutationLoginArgs = {
   password?: InputMaybe<Scalars['String']>;
   username?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationSetLanguageArgs = {
+  input?: InputMaybe<SetLanguageInput>;
 };
 
 
@@ -173,6 +179,16 @@ export type Query = {
   __typename?: 'Query';
   chats: Array<Chat>;
   viewer?: Maybe<User>;
+};
+
+export type SetLanguageInput = {
+  language: Scalars['String'];
+};
+
+export type SetLanguageResponse = {
+  __typename?: 'SetLanguageResponse';
+  language: Scalars['String'];
+  success: Scalars['Boolean'];
 };
 
 export type SignUpInput = {
@@ -305,12 +321,12 @@ export type ResolversTypes = {
   Chat: ResolverTypeWrapper<ChatModelSuccessResponse>;
   ChatType: ChatType;
   ChatUser: ResolverTypeWrapper<Omit<ChatUser, 'chat' | 'chats' | 'friends'> & { chat?: Maybe<ResolversTypes['Chat']>, chats: Array<ResolversTypes['Chat']>, friends: Array<ResolversTypes['User']> }>;
-  CreateChatResponse: ResolverTypeWrapper<Omit<CreateChatResponse, 'chat'> & { chat: ResolversTypes['Chat'] }>;
   CreateGroupChatInput: CreateGroupChatInput;
-  CreateIndividualChatInput: CreateIndividualChatInput;
   CreateMessageInput: CreateMessageInput;
   CreateMessageResponse: ResolverTypeWrapper<Omit<CreateMessageResponse, 'message'> & { message?: Maybe<ResolversTypes['Message']> }>;
   Error: ResolverTypeWrapper<Error>;
+  GetOrCreateChatResponse: ResolverTypeWrapper<Omit<GetOrCreateChatResponse, 'chat'> & { chat: ResolversTypes['Chat'] }>;
+  GetOrCreateIndividualChatInput: GetOrCreateIndividualChatInput;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
   LogInResponse: ResolverTypeWrapper<LogInModelSuccessResponse>;
@@ -321,6 +337,8 @@ export type ResolversTypes = {
   ParticipantInput: ParticipantInput;
   Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<{}>;
+  SetLanguageInput: SetLanguageInput;
+  SetLanguageResponse: ResolverTypeWrapper<SetLanguageResponse>;
   SignUpInput: SignUpInput;
   SignUpResponse: ResolverTypeWrapper<SignUpModelSuccessResponse>;
   Status: Status;
@@ -335,12 +353,12 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean'];
   Chat: ChatModelSuccessResponse;
   ChatUser: Omit<ChatUser, 'chat' | 'chats' | 'friends'> & { chat?: Maybe<ResolversParentTypes['Chat']>, chats: Array<ResolversParentTypes['Chat']>, friends: Array<ResolversParentTypes['User']> };
-  CreateChatResponse: Omit<CreateChatResponse, 'chat'> & { chat: ResolversParentTypes['Chat'] };
   CreateGroupChatInput: CreateGroupChatInput;
-  CreateIndividualChatInput: CreateIndividualChatInput;
   CreateMessageInput: CreateMessageInput;
   CreateMessageResponse: Omit<CreateMessageResponse, 'message'> & { message?: Maybe<ResolversParentTypes['Message']> };
   Error: Error;
+  GetOrCreateChatResponse: Omit<GetOrCreateChatResponse, 'chat'> & { chat: ResolversParentTypes['Chat'] };
+  GetOrCreateIndividualChatInput: GetOrCreateIndividualChatInput;
   ID: Scalars['ID'];
   Int: Scalars['Int'];
   LogInResponse: LogInModelSuccessResponse;
@@ -351,6 +369,8 @@ export type ResolversParentTypes = {
   ParticipantInput: ParticipantInput;
   Post: Post;
   Query: {};
+  SetLanguageInput: SetLanguageInput;
+  SetLanguageResponse: SetLanguageResponse;
   SignUpInput: SignUpInput;
   SignUpResponse: SignUpModelSuccessResponse;
   String: Scalars['String'];
@@ -386,11 +406,6 @@ export type ChatUserResolvers<ContextType = MyContext, ParentType extends Resolv
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
-export type CreateChatResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CreateChatResponse'] = ResolversParentTypes['CreateChatResponse']> = {
-  chat?: Resolver<ResolversTypes['Chat'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
-};
-
 export type CreateMessageResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['CreateMessageResponse'] = ResolversParentTypes['CreateMessageResponse']> = {
   error?: Resolver<Maybe<ResolversTypes['Error']>, ParentType, ContextType>;
   message?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType>;
@@ -401,6 +416,11 @@ export type CreateMessageResponseResolvers<ContextType = MyContext, ParentType e
 export type ErrorResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Error'] = ResolversParentTypes['Error']> = {
   code?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   reason?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type GetOrCreateChatResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['GetOrCreateChatResponse'] = ResolversParentTypes['GetOrCreateChatResponse']> = {
+  chat?: Resolver<ResolversTypes['Chat'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -430,12 +450,13 @@ export type MessageCreatedSubscriptionResponseResolvers<ContextType = MyContext,
 };
 
 export type MutationResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createGroupChat?: Resolver<ResolversTypes['CreateChatResponse'], ParentType, ContextType, RequireFields<MutationCreateGroupChatArgs, 'input'>>;
-  createIndividualChat?: Resolver<ResolversTypes['CreateChatResponse'], ParentType, ContextType, RequireFields<MutationCreateIndividualChatArgs, 'input'>>;
+  createGroupChat?: Resolver<ResolversTypes['GetOrCreateChatResponse'], ParentType, ContextType, RequireFields<MutationCreateGroupChatArgs, 'input'>>;
   createMessage?: Resolver<ResolversTypes['CreateMessageResponse'], ParentType, ContextType, RequireFields<MutationCreateMessageArgs, 'input'>>;
   createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, Partial<MutationCreatePostArgs>>;
+  getOrCreateIndividualChat?: Resolver<ResolversTypes['GetOrCreateChatResponse'], ParentType, ContextType, RequireFields<MutationGetOrCreateIndividualChatArgs, 'input'>>;
   login?: Resolver<ResolversTypes['LogInResponse'], ParentType, ContextType, Partial<MutationLoginArgs>>;
   logout?: Resolver<ResolversTypes['LogOutResponse'], ParentType, ContextType>;
+  setLanguage?: Resolver<ResolversTypes['SetLanguageResponse'], ParentType, ContextType, Partial<MutationSetLanguageArgs>>;
   signup?: Resolver<ResolversTypes['SignUpResponse'], ParentType, ContextType, Partial<MutationSignupArgs>>;
 };
 
@@ -448,6 +469,12 @@ export type PostResolvers<ContextType = MyContext, ParentType extends ResolversP
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
   viewer?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+};
+
+export type SetLanguageResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['SetLanguageResponse'] = ResolversParentTypes['SetLanguageResponse']> = {
+  language?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type SignUpResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['SignUpResponse'] = ResolversParentTypes['SignUpResponse']> = {
@@ -488,9 +515,9 @@ export type UserInterfaceResolvers<ContextType = MyContext, ParentType extends R
 export type Resolvers<ContextType = MyContext> = {
   Chat?: ChatResolvers<ContextType>;
   ChatUser?: ChatUserResolvers<ContextType>;
-  CreateChatResponse?: CreateChatResponseResolvers<ContextType>;
   CreateMessageResponse?: CreateMessageResponseResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
+  GetOrCreateChatResponse?: GetOrCreateChatResponseResolvers<ContextType>;
   LogInResponse?: LogInResponseResolvers<ContextType>;
   LogOutResponse?: LogOutResponseResolvers<ContextType>;
   Message?: MessageResolvers<ContextType>;
@@ -498,6 +525,7 @@ export type Resolvers<ContextType = MyContext> = {
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  SetLanguageResponse?: SetLanguageResponseResolvers<ContextType>;
   SignUpResponse?: SignUpResponseResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
