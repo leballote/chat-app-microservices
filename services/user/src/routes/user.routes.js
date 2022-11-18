@@ -18,6 +18,9 @@ router.post("/user", async (req, res) => {
       email,
       phrase: phrase ?? "",
       avatar,
+      settings: {
+        language: "en",
+      },
     });
     return res.send({ data: user });
   } catch (e) {
@@ -79,11 +82,13 @@ router.get("/user", async (req, res) => {
 
 router.put("/user/:id", async (req, res) => {
   const { id } = req.params;
-  const { name, birthDate, phrase, avatar } = req.body;
+  //TODO: I don't know if settings will be changed correctly example:
+  //currentSetting = {language: "en", mode: "dark"} and I pass newSettings = {language: "es"}; would remove the mode?, or just wouldn't touch it
+  const { name, birthDate, phrase, avatar, settings } = req.body;
   try {
     const user = await User.findOneAndUpdate(
       { _id: id },
-      { name, birthDate, email, phrase, avatar },
+      { name, birthDate, email, phrase, avatar, settings },
       { new: true }
     );
     if (!user) {
