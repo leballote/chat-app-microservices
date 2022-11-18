@@ -11,6 +11,15 @@ const typeDefs = gql`
     id: ID!
     username: String!
     name: String!
+    phrase: String!
+    status: Status!
+    avatar: String
+  }
+
+  type User implements UserInterface {
+    id: ID!
+    username: String!
+    name: String!
     chats: [Chat!]!
     friends: [User!]!
     phrase: String!
@@ -19,7 +28,7 @@ const typeDefs = gql`
     chat(chatId: String): Chat
   }
 
-  type User implements UserInterface {
+  type Viewer implements UserInterface {
     id: ID!
     username: String!
     name: String!
@@ -35,12 +44,9 @@ const typeDefs = gql`
     id: ID!
     username: String!
     name: String!
-    chats: [Chat!]!
-    friends: [User!]!
     phrase: String!
     status: Status!
     avatar: String
-    chat(chatId: String): Chat
     admin: Boolean!
     participantSince: String!
   }
@@ -110,6 +116,7 @@ const typeDefs = gql`
 
   type Query {
     chats: [Chat!]!
+    messages: [Message!]!
     viewer: User
   }
 
@@ -124,6 +131,24 @@ const typeDefs = gql`
       input: GetOrCreateIndividualChatInput!
     ): GetOrCreateChatResponse!
     setLanguage(input: SetLanguageInput): SetLanguageResponse!
+    requestFriendship(input: RequestFriendshipInput!): RequestFriendshipResponse!
+    acceptFriendship(input: AcceptFriendshipInput!): AcceptFriendshipResponse!
+  }
+
+  input RequestFriendshipInput {
+    userToAdd: ID
+  }
+
+  input AcceptFriendshipInput {
+    userToAccept: ID
+  }
+
+  type RequestFriendshipResponse {
+    friendAdded: User
+  }
+
+  type AcceptFriendshipResponse {
+    friendAdded: User
   }
 
   input SetLanguageInput {

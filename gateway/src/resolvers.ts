@@ -107,6 +107,7 @@ const resolvers: Resolvers = {
       if (!viewer) {
         throw new Error("Not logged in user");
       }
+      console.log("VIEWER", viewer);
       const createMessageRes = await dataSources.chatAPI.createMessage({
         chatId,
         userId: viewer._id,
@@ -118,7 +119,9 @@ const resolvers: Resolvers = {
         throw new Error(createMessageRes.error.message);
       }
       pubsub.publish(MESSAGE_CREATED, { messageCreated: createMessageRes });
-      return { ...createMessageRes.data, success: true };
+      const out = { message: createMessageRes.data, success: true };
+      console.log("OUT", out);
+      return out;
     },
     createGroupChat: async (_, { input }, { dataSources }) => {
       const viewer = await dataSources.getViewer();
@@ -192,6 +195,64 @@ const resolvers: Resolvers = {
       }
       return { chat: createChatRes.data, created: true };
     },
+    requestFriendship: async (parent, { input }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const friendRequestRes =
+        await dataSources.userAPI.createFriendshipRequest({
+          from: viewer._id,
+          to: input.userToAdd,
+        });
+      if (isErrorResponse(friendRequestRes)) {
+        throw new Error(friendRequestRes.error.message);
+      }
+      const userAddedRes = await dataSources.userAPI.getUser(
+        friendRequestRes.data.to
+      );
+      if (isErrorResponse(userAddedRes)) {
+        throw new Error(userAddedRes.error.message);
+      }
+      return {
+        friendAdded: userAddedRes.data,
+      };
+    },
+    acceptFriendship: async (parent, { input }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const friendshipRequestRes =
+        await dataSources.userAPI.getFriendshipRequest({
+          from: viewer._id,
+          to: input.userToAccept,
+        });
+
+      //TODO: handle better the case when friendship request doesn't exis. Right now it is handeled the same
+      if (isErrorResponse(friendshipRequestRes)) {
+        throw new Error(friendshipRequestRes.error.message);
+      }
+
+      const friendshipRes = await dataSources.userAPI.createFriendship({
+        user1: viewer._id,
+        user2: input.userToAccept,
+      });
+      if (isErrorResponse(friendshipRes)) {
+        throw new Error(friendshipRes.error.message);
+      }
+
+      const userAddedRes = await dataSources.userAPI.getUser(
+        input.userToAccept
+      );
+      if (isErrorResponse(userAddedRes)) {
+        throw new Error(userAddedRes.error.message);
+      }
+
+      return {
+        friendAdded: userAddedRes.data,
+      };
+    },
   },
 
   Subscription: {
@@ -203,7 +264,6 @@ const resolvers: Resolvers = {
               return pubsub.asyncIterator([MESSAGE_CREATED]);
             },
             function filterMessageCreated(payload, variables, somethingElse) {
-              console.log({ payload, variables, somethingElse });
               return true;
             }
           ),
@@ -286,7 +346,10 @@ const resolvers: Resolvers = {
       }
     },
     lastMessage: async (parent, {}, { dataSources }) => {
-      const messageRes = await dataSources.chatAPI.getMessages({ limit: 1 });
+      const messageRes = await dataSources.chatAPI.getMessages({
+        limit: 1,
+        chatId: parent._id,
+      });
 
       if (isErrorResponse(messageRes)) {
         throw new Error(messageRes.error.message);
@@ -298,7 +361,11 @@ const resolvers: Resolvers = {
       //TODO: maybe put a route in the users service which can query by list of ids
       const participantsResponses = await Promise.all(
         parent.participants.map(async (participant) => {
-          return dataSources.userAPI.getUser(participant.id);
+          try {
+            return await dataSources.userAPI.getUser(participant.id);
+          } catch (e) {
+            return Promise.resolve({ error: { message: "Something failed" } });
+          }
         })
       );
       const participantsDataObjects = participantsResponses.filter(
@@ -345,7 +412,7 @@ const resolvers: Resolvers = {
     sentBy: async (parent, {}, { dataSources }) => {
       const [userRes, participantRes] = await Promise.all([
         dataSources.userAPI.getUser(parent.sentBy),
-        dataSources.chatAPI.getParticipant(parent._id, parent.sentBy),
+        dataSources.chatAPI.getParticipant(parent.chatId, parent.sentBy),
       ]);
       if (isErrorResponse(userRes)) {
         throw new Error(userRes.error.message);
@@ -357,12 +424,9 @@ const resolvers: Resolvers = {
       const out = {
         ...userRes.data,
         ...participantRes.data,
-        id: "0",
         status: Status.Online,
-        admin: true,
-        participantSince: "",
-        chats: [],
       };
+      out.id = out._id;
       return out as any;
     },
   },
@@ -386,6 +450,12 @@ const resolvers: Resolvers = {
       } else {
         return null;
       }
+    },
+  },
+  ChatUser: {
+    status: (parent) => {
+      //TODO see how you are going to solve this
+      return Status.Online;
     },
   },
   User: {

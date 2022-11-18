@@ -1,5 +1,4 @@
 import { RESTDataSource } from "@apollo/datasource-rest";
-import { isErrorResponse } from "../types/general.types";
 import {
   CreateUserModelInput,
   UserModelSuccessResponse,
@@ -9,7 +8,7 @@ import {
 
 export default class UserAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
-  override baseURL = "http://localhost:6001";
+  override baseURL = process.env.USER_URI;
 
   async getUser(id: string): Promise<UserModelResponse> {
     try {
@@ -56,4 +55,56 @@ export default class UserAPI extends RESTDataSource {
       };
     }
   }
+
+  async createFriendshipRequest({
+    from,
+    to,
+  }: {
+    from: string;
+    to: string;
+  }): Promise<FriendshipRequestResponse> {
+    return this.post<FriendshipRequestResponse>("friendshipRequest", {
+      body: { from, to },
+    });
+  }
+
+  async getFriendshipRequest({
+    from,
+    to,
+  }: {
+    from: string;
+    to: string;
+  }): Promise<FriendshipRequestResponse> {
+    return this.get<FriendshipRequestResponse>(
+      `friendshipRequest/?from=${from}&to=${to}`
+    );
+  }
+
+  async createFriendship({
+    user1,
+    user2,
+  }: {
+    user1: string;
+    user2: string;
+  }): Promise<FriendshipResponse> {
+    return this.post<FriendshipResponse>("friendship", {
+      body: { user1, user2 },
+    });
+  }
 }
+
+//TODO: put this in the types folder
+type FriendshipRequestSuccessResponse = {
+  from: string;
+  to: string;
+};
+
+type FriendshipSuccessResponse = {
+  user1: string;
+  user2: string;
+};
+
+type FriendshipRequestResponse =
+  DefaultAPIResponse<FriendshipRequestSuccessResponse>;
+
+type FriendshipResponse = DefaultAPIResponse<FriendshipSuccessResponse>;

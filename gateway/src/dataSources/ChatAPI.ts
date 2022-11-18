@@ -18,7 +18,7 @@ import {
 
 export default class ChatAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
-  override baseURL = "http://localhost:6000";
+  override baseURL = process.env.CHAT_URI;
 
   async getChat(
     id: string,
@@ -93,6 +93,9 @@ export default class ChatAPI extends RESTDataSource {
     const apiRes = await this.get<ChatParticipantReseponse>(
       `participant/?chatId=${chatId}&userId=${userId}`
     );
+    console.log("USER_ID", userId);
+    console.log("CHAT_ID", chatId);
+    console.log("API_RES", apiRes);
     if (isErrorResponse(apiRes)) {
       return apiRes;
     } else {

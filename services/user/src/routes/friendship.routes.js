@@ -1,4 +1,5 @@
 const { Promise } = require("mongoose");
+const FriendRequestModel = require("../models/friendRequest.model");
 const User = require("../models/user.model");
 
 const router = require("express").Router();
@@ -24,7 +25,14 @@ router.post("/friendship", async (req, res) => {
     user2.friends.push(user1._id);
 
     await Promise.all([user1.save(), user2.save()]);
-    return res.send({ success: true });
+    //doesn't need to await this since is not necessary for returning
+    FriendRequestModel.deleteOne({
+      $or: [
+        { from: user1._id, to: user2._id },
+        { from: user2._id, to: user1._id },
+      ],
+    });
+    return res.send({ data: { success: true } });
   } catch (e) {
     return res.status(500).send(errors.serverError);
   }
@@ -41,7 +49,7 @@ router.delete("/friendship", async (req, res) => {
     user1.friends.pull(user2._id);
     user2.friends.pull(user1._id);
     await Promise.all([user1.save(), user2.save()]);
-    return res.send({ success: true });
+    return res.send({ data: { success: true } });
   } catch (e) {
     return res.status(500).send(errors.serverError);
   }

@@ -1,5 +1,6 @@
 const Participant = require("../models/participant.model");
 const Chat = require("../models/chat.model");
+const mongoose = require("mongoose");
 
 const router = require("express").Router();
 
@@ -73,6 +74,10 @@ router.delete("/", async (req, res) => {
 router.get("/", async (req, res) => {
   const { chatId, userId } = req.query;
   let baseQueryParams = { chatId, userId };
+  baseQueryParams["chat.id"] = baseQueryParams.chatId; //baseQueryParams.chatId;
+  baseQueryParams["user.id"] = baseQueryParams.userId;
+  baseQueryParams.chatId = undefined;
+  baseQueryParams.userId = undefined;
   baseQueryParams = Object.fromEntries(
     Object.entries(baseQueryParams).filter(([, val]) => val !== undefined)
   );

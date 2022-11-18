@@ -8,7 +8,7 @@
     "compile": "npm run generate && tsc",
     "compile:watch": "npm run generate && tsc --watch",
     "start": "node ./dist/src/index.js",
-    "dev": "npm run compile:watch & nodemon",
+    "dev": "npm run compile:watch & nodemon -r dotenv/config",
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "keywords": [],

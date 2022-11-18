@@ -7,8 +7,6 @@ import express from "express";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { WebSocketServer } from "ws";
 import { useServer } from "graphql-ws/lib/use/ws";
-import bodyParser from "body-parser";
-import cors from "cors";
 import resolvers from "./resolvers";
 import typeDefs from "./schema";
 import ChatAPI from "./dataSources/ChatAPI";
@@ -22,6 +20,8 @@ import cookieParser from "cookie-parser";
 import { Request, Response, NextFunction } from "express";
 import { isErrorResponse } from "./types/general.types";
 import cookie from "cookie";
+
+// const PORT = process.env.PORT;
 
 export interface MyContext {
   listen: { port: number };
@@ -49,7 +49,6 @@ const context: ContextFunction = async ({ req, res, ...moreContext }) => {
   // So I don't know how is this supposed to work, but it hasn't failed
   const { cache } = server;
   return {
-    //TODO: maybe define this as an environmental variable
     listen: { port: 4000 },
     // We create new instances of our data sources with each request,
     // passing in our server's cache.
@@ -75,15 +74,6 @@ const context: ContextFunction = async ({ req, res, ...moreContext }) => {
   };
 };
 
-const getDynamicContext = async (ctx, msg, args) => {
-  // ctx is the graphql-ws Context where connectionParams live
-  return {
-    ctx,
-    msg,
-    args,
-  };
-};
-
 // Create the schema, which will be used separately by ApolloServer and
 // the WebSocket server.
 const schema = makeExecutableSchema({ typeDefs, resolvers });
@@ -104,7 +94,9 @@ const serverCleanup = useServer(
     schema,
     context: async (ctx, msg, args) => {
       const { cache } = server;
-      const { jwt_token } = cookie.parse(ctx.extra.request.headers.cookie);
+      const { jwt_token } = ctx.extra.request.headers.cookie
+        ? cookie.parse(ctx.extra.request.headers.cookie)
+        : { jwt_token: null };
       let userContext = { user: null };
 
       const authRes = await new AuthAPI().authorize(jwt_token);
@@ -152,13 +144,8 @@ const server = new ApolloServer({
 async function start() {
   await server.start();
 
-  //TODO: turn this into env variables
   app.use(
     "/graphql",
-    // cors<cors.CorsRequest>({
-    //   credentials: true,
-    //   origin: ["http://localhost:5173", "http://localhost:4000"],
-    // }),
     cookieParser(),
     express.json(),
     expressMiddleware(server, { context })

@@ -13,7 +13,7 @@ export type ChatParticipantSuccessResponse = {
 };
 
 export type ChatParticipantReseponse =
-  DefaultAPIResponse<ChatModelSuccessResponse>;
+  DefaultAPIResponse<ChatParticipantSuccessResponse>;
 
 //chat
 export type ChatModelSuccessResponse = {
