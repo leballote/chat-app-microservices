@@ -6,7 +6,8 @@ const router = require("express").Router();
 
 const errors = {
   serverError: { error: { message: "Server error" } },
-  friendshipNotFound: { error: { message: "friendship not found" } },
+  friendshipNotFound: { error: { message: "Friendship not found" } },
+  friendshipNotFound: { error: { message: "User not found" } },
 };
 
 router.post("/friendship", async (req, res) => {
@@ -17,8 +18,12 @@ router.post("/friendship", async (req, res) => {
       User.findOne({ _id: user2Id }),
     ]);
 
+    if (!user1 || !user2) {
+      return res.status(404).send(errors.userNotFound);
+    }
+
     if (user1.friends.includes(user2._id)) {
-      res.status(400).send({ error: { message: "Already friends" } });
+      return res.status(400).send({ error: { message: "Already friends" } });
     }
 
     user1.friends.push(user2._id);
@@ -26,7 +31,7 @@ router.post("/friendship", async (req, res) => {
 
     await Promise.all([user1.save(), user2.save()]);
     //doesn't need to await this since is not necessary for returning
-    FriendRequestModel.deleteOne({
+    await FriendRequestModel.deleteOne({
       $or: [
         { from: user1._id, to: user2._id },
         { from: user2._id, to: user1._id },
@@ -34,7 +39,9 @@ router.post("/friendship", async (req, res) => {
     });
     return res.send({ data: { success: true } });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    return res
+      .status(500)
+      .send({ ...errors.serverError, debugError: e.message });
   }
 });
 

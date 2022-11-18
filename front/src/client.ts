@@ -3,6 +3,7 @@ import { getMainDefinition } from "@apollo/client/utilities";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
+import tokenToReplaceWsURL from "./tokenToReplaceWsURL";
 
 const httpLink = new HttpLink({
   uri: "/api",
@@ -11,7 +12,11 @@ const httpLink = new HttpLink({
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: import.meta.env.VITE_GRAPHQL_WS_URL,
+    // url: import.meta.env.VITE_GRAPHQL_WS_URL,
+    //TODO: how do we make this more kubernetes-agnostic
+    // url: import.meta.env.VITE_GRAPHQL_WS_URL ?? tokenToReplaceWsURL,
+    url: `ws://${window.location.host}/subs`,
+    // url: tokenToReplaceWsURL,
     connectionParams: {
       credentials: "same-origin",
     },

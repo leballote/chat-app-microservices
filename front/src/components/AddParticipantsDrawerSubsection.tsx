@@ -24,7 +24,7 @@ import { ParticipantsToAdd } from "./ParticipantsToAdd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionDrawerSlice";
 
-export default function AddFriendsDrawerSubsection() {
+export default function AddParticipantsDrawerSubsection() {
   //TODO: change for const
   let {
     value: contacts,

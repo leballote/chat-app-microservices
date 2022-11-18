@@ -1,7 +1,4 @@
-import { TurnedIn } from "@mui/icons-material";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import removeOne from "../../utils/removeOne";
-import { SectionName } from "./types";
 
 export type ChatSectionState = {
   onBottom: boolean;

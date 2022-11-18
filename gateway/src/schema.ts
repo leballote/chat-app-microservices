@@ -131,16 +131,22 @@ const typeDefs = gql`
       input: GetOrCreateIndividualChatInput!
     ): GetOrCreateChatResponse!
     setLanguage(input: SetLanguageInput): SetLanguageResponse!
-    requestFriendship(input: RequestFriendshipInput!): RequestFriendshipResponse!
+    requestFriendship(
+      input: RequestFriendshipInput!
+    ): RequestFriendshipResponse!
     acceptFriendship(input: AcceptFriendshipInput!): AcceptFriendshipResponse!
   }
 
   input RequestFriendshipInput {
     userToAdd: ID
+    userToAddEmail: String
+    userToAddUsername: String
   }
 
   input AcceptFriendshipInput {
     userToAccept: ID
+    userToAcceptEmail: String
+    userToAcceptUsername: String
   }
 
   type RequestFriendshipResponse {

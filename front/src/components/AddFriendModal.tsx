@@ -36,7 +36,10 @@ import { ParticipantsToAdd } from "./ParticipantsToAdd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionDrawerSlice";
 import SearchBar from "./DrawerSearchBar";
-import { closeAddFriendModal } from "../app/features/contactsSectionDrawerSlice";
+import {
+  closeAddFriendModal,
+  sendFriendRequest,
+} from "../app/features/contactsSectionDrawerSlice";
 
 export default function AddFriendModal() {
   const {
@@ -57,13 +60,16 @@ export default function AddFriendModal() {
     }
   }, []);
 
-  function handleBackClick() {
-    dispatch(setMainDrawerSection());
-  }
-
   const handleSend: FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault();
-    // dispatch(sendFriendRequest());
+    console.log();
+    const elements = ev.currentTarget.elements as any;
+    const {
+      email: { value },
+    } = elements;
+    const userToAddEmail = value as string;
+
+    dispatch(sendFriendRequest({ userToAddEmail }));
   };
 
   const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {
@@ -97,6 +103,7 @@ export default function AddFriendModal() {
             label="Friend's email"
             type="email"
             fullWidth
+            name="email"
             variant="standard"
           />
           <DialogActions>

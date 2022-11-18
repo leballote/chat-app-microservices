@@ -47,11 +47,13 @@ const App: React.FunctionComponent = function () {
     data: messageCreatedData,
   } = useSubscription(MESSAGE_CREATED);
 
-  // console.log("SUBSCRIPTION", {
-  //   data: messageCreatedData,
-  //   error: messageCreatedError,
-  //   loading: messageCreatedLoading,
-  // });
+  const debug = {
+    data: messageCreatedData,
+    error: messageCreatedError,
+    loading: messageCreatedLoading,
+    variable: import.meta.env.VITE_GRAPHQL_WS_URL,
+  };
+
   const messageId = messageCreatedData?.messageCreated?.message?.id;
 
   useEffect(() => {
@@ -79,7 +81,7 @@ const App: React.FunctionComponent = function () {
       </div>
     );
   } else if (userLoading) {
-    component = <h1>Loading...</h1>;
+    component = <h1>{JSON.stringify(debug)}</h1>;
   } else {
     component = (
       <BrowserRouter>

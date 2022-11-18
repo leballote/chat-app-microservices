@@ -9,6 +9,8 @@ import { getValue as getContactsPreviewsValue } from "../features/contactsPrevie
 import { getValue as getCurrentChatValue } from "../features/currentChatSlice";
 import { sendMessage } from "../features/currentChatSlice";
 import { handleSendMessage } from "./handlers/sendMessage";
+import { sendFriendRequest } from "../features/contactsSectionDrawerSlice";
+import { handleSendFriendRequest } from "./handlers/sendFriendRequest.handler";
 
 export function* watcherSaga() {
   yield takeLatest(getCurrentUserValue.toString(), handleGetUser);
@@ -16,4 +18,5 @@ export function* watcherSaga() {
   yield takeLatest(getContactsPreviewsValue.toString(), handleContactsPreviews);
   yield takeLatest(getCurrentChatValue.toString(), handleGetChat);
   yield takeEvery(sendMessage.toString(), handleSendMessage);
+  yield takeEvery(sendFriendRequest.toString(), handleSendFriendRequest);
 }

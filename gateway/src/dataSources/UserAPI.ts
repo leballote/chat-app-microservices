@@ -76,19 +76,19 @@ export default class UserAPI extends RESTDataSource {
     to: string;
   }): Promise<FriendshipRequestResponse> {
     return this.get<FriendshipRequestResponse>(
-      `friendshipRequest/?from=${from}&to=${to}`
+      `friendshipRequest?from=${from}&to=${to}`
     );
   }
 
   async createFriendship({
-    user1,
-    user2,
+    user1Id,
+    user2Id,
   }: {
-    user1: string;
-    user2: string;
+    user1Id: string;
+    user2Id: string;
   }): Promise<FriendshipResponse> {
     return this.post<FriendshipResponse>("friendship", {
-      body: { user1, user2 },
+      body: { user1Id, user2Id },
     });
   }
 }

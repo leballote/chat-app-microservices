@@ -10,7 +10,7 @@ import { requestGetContactsPreviews } from "../requests/contactsPreviews";
 export function* handleContactsPreviews(action: PayloadAction<string>): any {
   const { payload } = action;
   try {
-    put(setLoading());
+    put(setLoading(true));
     const response = yield call(requestGetContactsPreviews, payload);
     const { data } = response;
     const {
@@ -18,6 +18,7 @@ export function* handleContactsPreviews(action: PayloadAction<string>): any {
     } = data;
     yield put(setContactsPreviewsValue(contacts));
   } catch (error) {
+    put(setLoading(false));
     put(setError(error));
   }
 }

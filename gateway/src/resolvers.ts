@@ -107,7 +107,6 @@ const resolvers: Resolvers = {
       if (!viewer) {
         throw new Error("Not logged in user");
       }
-      console.log("VIEWER", viewer);
       const createMessageRes = await dataSources.chatAPI.createMessage({
         chatId,
         userId: viewer._id,
@@ -120,7 +119,6 @@ const resolvers: Resolvers = {
       }
       pubsub.publish(MESSAGE_CREATED, { messageCreated: createMessageRes });
       const out = { message: createMessageRes.data, success: true };
-      console.log("OUT", out);
       return out;
     },
     createGroupChat: async (_, { input }, { dataSources }) => {
@@ -196,21 +194,62 @@ const resolvers: Resolvers = {
       return { chat: createChatRes.data, created: true };
     },
     requestFriendship: async (parent, { input }, { dataSources }) => {
+      //TODO: simplify this, you made a mess!
       const viewer = await dataSources.getViewer();
       if (!viewer) {
         throw new Error("Not authenticated");
       }
+      const { userToAdd, userToAddEmail, userToAddUsername } = input;
+      let queryByFields = { userToAdd, userToAddEmail, userToAddUsername };
+      const queryByFieldsArray = Object.entries(queryByFields).filter(
+        ([, val]) => val != null
+      );
+      //if there is more than one query field specified throw error
+      if (queryByFieldsArray.length > 1) {
+        throw new Error("Please specify only one query field");
+      }
+      const queryObject = Object.fromEntries(queryByFieldsArray) as {
+        userToAdd?: string;
+        userToAddEmail?: string;
+        userToAddUsername?: string;
+      };
+
+      let userToAddId = userToAdd;
+      if (queryObject.userToAddEmail) {
+        const userToAddRes = await dataSources.userAPI.getUsers({
+          email: userToAddEmail,
+        });
+        //this should never happen, it should allways return at least an empty array
+        if (isErrorResponse(userToAddRes)) {
+          throw new Error("Unexpected error");
+        }
+        if (userToAddRes.data.length == 0) {
+          throw new Error("User with that email doesn't exist");
+        }
+        userToAddId = userToAddRes.data[0]._id;
+      } else if (queryObject.userToAddUsername) {
+        const userToAddRes = await dataSources.userAPI.getUsers({
+          username: userToAddEmail,
+        });
+        //this should never happen, it should allways return at least an empty array
+        if (isErrorResponse(userToAddRes)) {
+          throw new Error("Unexpected error");
+        }
+        if (userToAddRes.data.length == 0) {
+          throw new Error("User with that username doesn't exist");
+        }
+        userToAddId = userToAddRes.data[0]._id;
+      }
+
       const friendRequestRes =
         await dataSources.userAPI.createFriendshipRequest({
           from: viewer._id,
-          to: input.userToAdd,
+          to: userToAddId,
         });
       if (isErrorResponse(friendRequestRes)) {
         throw new Error(friendRequestRes.error.message);
       }
-      const userAddedRes = await dataSources.userAPI.getUser(
-        friendRequestRes.data.to
-      );
+      const userAddedRes = await dataSources.userAPI.getUser(userToAddId);
       if (isErrorResponse(userAddedRes)) {
         throw new Error(userAddedRes.error.message);
       }
@@ -225,18 +264,19 @@ const resolvers: Resolvers = {
       }
       const friendshipRequestRes =
         await dataSources.userAPI.getFriendshipRequest({
-          from: viewer._id,
-          to: input.userToAccept,
+          from: input.userToAccept,
+          to: viewer._id,
         });
 
-      //TODO: handle better the case when friendship request doesn't exis. Right now it is handeled the same
+      //TODO: handle better the case when friendship request doesn't exis. Right now it is handeled the same if there is a  network error or if there is not friend
+      //TODO: what happens if the requests doesn't exist but there is already a friendship?
       if (isErrorResponse(friendshipRequestRes)) {
         throw new Error(friendshipRequestRes.error.message);
       }
 
       const friendshipRes = await dataSources.userAPI.createFriendship({
-        user1: viewer._id,
-        user2: input.userToAccept,
+        user1Id: viewer._id,
+        user2Id: input.userToAccept,
       });
       if (isErrorResponse(friendshipRes)) {
         throw new Error(friendshipRes.error.message);
@@ -445,7 +485,11 @@ const resolvers: Resolvers = {
       }
       const { participants } = chatRes.data;
 
-      if (participants.includes(user._id)) {
+      //TODO: delete this line, it is only to debug the subscription
+      return message;
+      if (
+        participants.map((participant) => participant.id).includes(user._id)
+      ) {
         return message;
       } else {
         return null;

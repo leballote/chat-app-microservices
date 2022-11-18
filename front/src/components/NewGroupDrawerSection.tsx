@@ -22,7 +22,7 @@ import { setMainDrawerSection } from "../app/features/sideBarSlice";
 import { addParticipant } from "../app/features/newGroupSectionDrawerSlice";
 import { ParticipantsToAdd } from "./ParticipantsToAdd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import AddFriendsDrawerSubsection from "./AddFriendsDrawerSubsection";
+import AddParticipantsDrawerSubsection from "./AddParticipantsDrawerSubsection";
 import SetTitleAndAvatarDrawerSubsection from "./SetTitleAndAvatarDrawerSubsection";
 import { GroupSectionDrawerSubsection as DrawerSubsection } from "../app/features/types";
 
@@ -31,7 +31,7 @@ export default function NewGroupDrawerSection() {
 
   let component: React.ReactElement;
   if (subsection == DrawerSubsection.ADD_FRIENDS) {
-    component = <AddFriendsDrawerSubsection />;
+    component = <AddParticipantsDrawerSubsection />;
   } else {
     component = <SetTitleAndAvatarDrawerSubsection />;
   }

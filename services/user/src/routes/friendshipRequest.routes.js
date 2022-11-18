@@ -20,6 +20,7 @@ const errors = {
 
 router.post("/friendshipRequest", async (req, res) => {
   const { from, to } = req.body;
+  console.log("BODY", req.body);
   try {
     if (from == to) {
       return res.status(400).send(errors.cannotRequestFriendshipToYourself);
@@ -30,10 +31,11 @@ router.post("/friendshipRequest", async (req, res) => {
         { from: to, to: from },
       ],
     });
-    if (friendReq.from == from) {
+    console.log("FRIEND_REQ", friendReq);
+    if (friendReq?.from == from) {
       return res.status(400).send(errors.youAlreadyRequestedFriendship);
     }
-    if (friendReq.to == from) {
+    if (friendReq?.to == from) {
       return res.status(400).send(errors.heAlreadyRequestedFriendship);
     }
 
@@ -44,7 +46,32 @@ router.post("/friendshipRequest", async (req, res) => {
 
     return res.send({ data: { success: true, ...friendshipRequest } });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    return res
+      .status(500)
+      .send({ ...errors.serverError, debugError: e.message });
+  }
+});
+
+router.get("/friendshipRequest", async (req, res) => {
+  const { from, to } = req.query;
+  let baseQueryParams = { from, to };
+
+  baseQueryParams = Object.fromEntries(
+    Object.entries(baseQueryParams).filter(([, val]) => val != null)
+  );
+
+  try {
+    const friendshipRequest = await FriendRequestModel.findOne(baseQueryParams);
+
+    if (!friendshipRequest) {
+      return res.status(404).send(errors.friendshipRequestNotFound);
+    }
+
+    return res.send({ data: { success: true, ...friendshipRequest } });
+  } catch (e) {
+    return res
+      .status(500)
+      .send({ ...errors.serverError, debugError: e.message });
   }
 });
 

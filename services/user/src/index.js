@@ -10,10 +10,12 @@ const app = express();
 
 const userRouter = require("./routes/user.routes");
 const friendshipRouter = require("./routes/friendship.routes");
+const friendshipRequestRouter = require("./routes/friendshipRequest.routes");
 
 app.use(express.json());
 app.use(userRouter);
 app.use(friendshipRouter);
+app.use(friendshipRequestRouter);
 
 mongoose.connect(MONGODB_CONNECTION_STRING).then(
   app.listen(PORT, () => {

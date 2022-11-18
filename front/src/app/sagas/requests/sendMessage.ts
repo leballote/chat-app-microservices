@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import client from "../../../client";
-import { Message as GQLMessage } from "../../../types/ChatSectionTypes";
 
 type MessageInput = {
   content: string;

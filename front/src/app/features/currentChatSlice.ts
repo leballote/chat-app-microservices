@@ -53,8 +53,8 @@ export const currentChatSlice = createSlice({
         state.value.messages = payload;
       }
     },
-    setLoading(state) {
-      state.loading = true;
+    setLoading(state, { payload }: PayloadAction<boolean>) {
+      state.loading = payload;
     },
     setError(state, { payload }) {
       state.error = payload;

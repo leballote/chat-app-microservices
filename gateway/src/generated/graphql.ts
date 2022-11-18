@@ -19,6 +19,8 @@ export type Scalars = {
 
 export type AcceptFriendshipInput = {
   userToAccept?: InputMaybe<Scalars['ID']>;
+  userToAcceptEmail?: InputMaybe<Scalars['String']>;
+  userToAcceptUsername?: InputMaybe<Scalars['String']>;
 };
 
 export type AcceptFriendshipResponse = {
@@ -198,6 +200,8 @@ export type Query = {
 
 export type RequestFriendshipInput = {
   userToAdd?: InputMaybe<Scalars['ID']>;
+  userToAddEmail?: InputMaybe<Scalars['String']>;
+  userToAddUsername?: InputMaybe<Scalars['String']>;
 };
 
 export type RequestFriendshipResponse = {

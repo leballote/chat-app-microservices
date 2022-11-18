@@ -42,8 +42,8 @@ export const contactsPreviewsSlice = createSlice({
       state.value = payload;
       state.loading = false;
     },
-    setLoading(state) {
-      state.loading = true;
+    setLoading(state, { payload = true }: PayloadAction<boolean>) {
+      state.loading = payload;
     },
     setError(state, { payload }) {
       state.error = payload;
