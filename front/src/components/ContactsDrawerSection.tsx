@@ -14,6 +14,8 @@ import {
 import { useTranslation } from "react-i18next";
 import { pushChat } from "../app/features/chatsPreviewsSlice";
 import { useNavigate } from "react-router";
+import AddFriendModal from "./AddFriendModal";
+import { openAddFriendModal } from "../app/features/contactsSectionDrawerSlice";
 
 interface Contact {
   id: string;
@@ -49,10 +51,7 @@ const GET_OR_CREATE_CHAT = gql`
 `;
 
 //TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
-export default function ContactsDrawerSection({
-  onBackClick,
-  onAddContactClick,
-}: Props) {
+export default function ContactsDrawerSection({ onBackClick }: Props) {
   const {
     value: contacts,
     loading,
@@ -77,6 +76,12 @@ export default function ContactsDrawerSection({
     }
   }
 
+  const handleAddFriendClick: React.MouseEventHandler<
+    HTMLButtonElement
+  > = () => {
+    dispatch(openAddFriendModal());
+  };
+
   let component;
   if (loading) {
     component = <h1>Loading...</h1>;
@@ -93,6 +98,7 @@ export default function ContactsDrawerSection({
 
   return (
     <>
+      <AddFriendModal />
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Typography
           component="h2"
@@ -111,7 +117,7 @@ export default function ContactsDrawerSection({
           {t("user.friends")}
         </Typography>
 
-        <Button onClick={onAddContactClick}>
+        <Button onClick={handleAddFriendClick}>
           <PersonAddIcon fontSize="large" />
         </Button>
       </Box>

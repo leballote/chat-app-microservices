@@ -17,7 +17,7 @@ export async function requestSendMessage({
   sentAt,
 }: MessageInput): Promise<any> {
   const SEND_MESSAGE = gql`
-    mutation CreateMessage($input: CreateMessageInput) {
+    mutation CreateMessage($input: CreateMessageInput!) {
       createMessage(input: $input) {
         message {
           id

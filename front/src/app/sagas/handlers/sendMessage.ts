@@ -15,11 +15,12 @@ export function* handleSendMessage(action: PayloadAction<MessageInput>): any {
   const { payload } = action;
   try {
     const response = yield call(requestSendMessage, payload);
-    // const { data } = response;
-    // const {
-    //   createMessage: { message, success },
-    // } = data;
-    // yield put(pushMessage(message));
+    const { data } = response;
+    const {
+      createMessage: { message, success },
+    } = data;
+    console.log("RESPONSE", response);
+    yield put(pushMessage(message));
   } catch (error) {
     //TODO: see how to handle this error
   }

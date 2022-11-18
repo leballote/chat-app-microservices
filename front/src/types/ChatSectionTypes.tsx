@@ -10,7 +10,7 @@ export type ChatUser = {
   name: string;
   admin: false;
   phrase: string;
-  avatar: string;
+  avatar?: string;
   status: "ONLINE" | "OFFLINE";
 };
 

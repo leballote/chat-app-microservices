@@ -26,7 +26,6 @@ export default function ChatDrawerSection() {
     error,
     searchTerm: chatSearched,
   } = useAppSelector((state) => state.chatsPreviews);
-  console.log("CHATS", chats);
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 

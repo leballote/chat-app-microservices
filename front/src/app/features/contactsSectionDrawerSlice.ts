@@ -1,21 +1,32 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { SectionName } from "./types";
 
-export type DrawerSectionContacts = {};
+export type DrawerSectionContacts = {
+  addFriendOpen: boolean;
+};
 
 // Define the initial state using that type
-const initialState: DrawerSectionContacts = {};
+const initialState: DrawerSectionContacts = {
+  addFriendOpen: false,
+};
 
-export const mainDrawerSlice = createSlice({
+export const contactsDrawerSectionSlice = createSlice({
   name: "mainDrawerSection",
   initialState,
   reducers: {
+    openAddFriendModal(state) {
+      state.addFriendOpen = true;
+    },
+    closeAddFriendModal(state) {
+      state.addFriendOpen = false;
+    },
     resetState() {
       return initialState;
     },
   },
 });
 
-export const { resetState } = mainDrawerSlice.actions;
+export const { resetState, openAddFriendModal, closeAddFriendModal } =
+  contactsDrawerSectionSlice.actions;
 
-export default mainDrawerSlice.reducer;
+export default contactsDrawerSectionSlice.reducer;

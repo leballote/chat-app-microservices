@@ -37,24 +37,6 @@ import {
 import { setOnBottom } from "../app/features/chatSectionSlice";
 import getScrollHeightGap from "../utils/getScrollHeightGap";
 
-const defaultChat: Chat = {
-  id: "",
-  name: "",
-  type: "INDIVIDUAL",
-  phrase: "",
-  participants: [
-    {
-      id: "",
-      status: "ONLINE",
-      name: "",
-      phrase: "",
-      admin: false,
-      avatar: "",
-    },
-  ],
-  messages: [],
-};
-
 interface Props extends WithHeight {
   messages: Message[];
   chatAreaRef: React.RefObject<HTMLElement>;
@@ -74,7 +56,6 @@ function ChatBody({ messages, height, chatAreaRef }: Props) {
   const currentUser = useContext(CurrentUserContext);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const { onBottom } = useAppSelector((state) => state.chatSection);
-  console.log(onBottom);
 
   useEffect(() => {
     // const element = chatAreaRef.current;
@@ -87,62 +68,64 @@ function ChatBody({ messages, height, chatAreaRef }: Props) {
   return (
     <Box sx={{ height, overflowY: "auto" }} ref={chatAreaRef}>
       <List sx={{ display: "flex", flexFlow: "column" }}>
-        {messages.map((message, index: number) => (
-          <Box
-            sx={{
-              bgcolor:
-                message.sentBy.id == currentUser?.id ? "#999999" : "#579977",
-              borderRadius: "5px",
-              margin: ".1em",
-              display: "flex",
-              flexBasis: "50%",
-              flex: "1",
-              alignSelf:
-                message.sentBy.id == currentUser?.id
-                  ? "flex-end"
-                  : "flex-start",
-              maxWidth: "70%",
-            }}
-            key={message.id}
-          >
-            <ListItem>
-              {index == 0 ||
-              messages[index - 1].sentBy.id != message.sentBy.id ? (
-                <ListItemAvatar>
-                  <Avatar src={participants[message.sentBy.id].avatar} />
-                </ListItemAvatar>
-              ) : null}
-
-              <ListItemText sx={{ overflowWrap: "break-word" }}>
+        {messages.map((message, index: number) => {
+          return (
+            <Box
+              sx={{
+                bgcolor:
+                  message.sentBy.id == currentUser?.id ? "#999999" : "#579977",
+                borderRadius: "5px",
+                margin: ".1em",
+                display: "flex",
+                flexBasis: "50%",
+                flex: "1",
+                alignSelf:
+                  message.sentBy.id == currentUser?.id
+                    ? "flex-end"
+                    : "flex-start",
+                maxWidth: "70%",
+              }}
+              key={message.id}
+            >
+              <ListItem>
                 {index == 0 ||
                 messages[index - 1].sentBy.id != message.sentBy.id ? (
-                  <Typography
-                    component="h3"
-                    sx={{ fontSize: "1.1em" }}
-                    fontWeight="bold"
-                  >
-                    {participants[message.sentBy.id].name}
-                  </Typography>
+                  <ListItemAvatar>
+                    <Avatar src={participants[message.sentBy.id]?.avatar} />
+                  </ListItemAvatar>
                 ) : null}
-                {index == 0 ||
-                messages[index - 1].sentBy.id != message.sentBy.id ||
-                Math.abs(
-                  Date.parse(messages[index - 1].sentAt) -
-                    Date.parse(message.sentAt)
-                ) > 18000 ? (
-                  <Typography
-                    component="h3"
-                    sx={{ fontSize: "1.1em" }}
-                    fontWeight="light"
-                  >
-                    {formatDate(message.sentAt)}
-                  </Typography>
-                ) : null}
-                <Typography variant="body1">{message.content}</Typography>
-              </ListItemText>
-            </ListItem>
-          </Box>
-        ))}
+
+                <ListItemText sx={{ overflowWrap: "break-word" }}>
+                  {index == 0 ||
+                  messages[index - 1].sentBy.id != message.sentBy.id ? (
+                    <Typography
+                      component="h3"
+                      sx={{ fontSize: "1.1em" }}
+                      fontWeight="bold"
+                    >
+                      {participants[message.sentBy.id].name}
+                    </Typography>
+                  ) : null}
+                  {index == 0 ||
+                  messages[index - 1].sentBy.id != message.sentBy.id ||
+                  Math.abs(
+                    Date.parse(messages[index - 1].sentAt) -
+                      Date.parse(message.sentAt)
+                  ) > 18000 ? (
+                    <Typography
+                      component="h3"
+                      sx={{ fontSize: "1.1em" }}
+                      fontWeight="light"
+                    >
+                      {formatDate(message.sentAt)}
+                    </Typography>
+                  ) : null}
+                  <Typography variant="body1">{message.content}</Typography>
+                </ListItemText>
+              </ListItem>
+            </Box>
+          );
+        })}
       </List>
       <Box ref={chatBottomRef}></Box>
     </Box>
