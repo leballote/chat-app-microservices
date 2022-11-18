@@ -19,8 +19,7 @@ export function* handleSendMessage(action: PayloadAction<MessageInput>): any {
     const {
       createMessage: { message, success },
     } = data;
-    console.log("RESPONSE", response);
-    yield put(pushMessage(message));
+    // yield put(pushMessage(message));
   } catch (error) {
     //TODO: see how to handle this error
   }

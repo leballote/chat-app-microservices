@@ -48,11 +48,11 @@ const App: React.FunctionComponent = function () {
   } = useSubscription(MESSAGE_CREATED);
 
   // console.log("SUBSCRIPTION", {
-  //   messageCreatedData,
-  //   messageCreatedError,
-  //   messageCreatedLoading,
+  //   data: messageCreatedData,
+  //   error: messageCreatedError,
+  //   loading: messageCreatedLoading,
   // });
-  // console.log("SUB_ERROR", messageCreatedError);
+  const messageId = messageCreatedData?.messageCreated?.message?.id;
 
   useEffect(() => {
     if (messageCreatedData?.messageCreated.message) {
@@ -64,7 +64,7 @@ const App: React.FunctionComponent = function () {
         dispatch(pushMessage(messageCreatedData.messageCreated.message));
       }
     }
-  }, [messageCreatedData]);
+  }, [messageId]);
 
   useEffect(() => {
     dispatch(getCurrentUserValue());

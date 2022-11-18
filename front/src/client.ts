@@ -5,14 +5,13 @@ import { createClient } from "graphql-ws";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 
 const httpLink = new HttpLink({
-  // uri: "http://localhost:4000/graphql",
   uri: "/api",
   credentials: "same-origin",
 });
 
 const wsLink = new GraphQLWsLink(
   createClient({
-    url: "ws://localhost:5173/subs",
+    url: import.meta.env.VITE_GRAPHQL_WS_URL,
     connectionParams: {
       credentials: "same-origin",
     },
