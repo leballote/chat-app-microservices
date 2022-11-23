@@ -11,7 +11,7 @@ import { CurrentUserContext } from "./contexts";
 import { useQuery, gql, useSubscription } from "@apollo/client";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { getValue as getCurrentUserValue } from "./app/features/currentUserSlice";
-import { pushMessage } from "./app/features/currentChatSlice";
+import { unshiftMessage } from "./app/features/currentChatSlice";
 import { current } from "@reduxjs/toolkit";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
@@ -51,7 +51,6 @@ const App: React.FunctionComponent = function () {
     data: messageCreatedData,
     error: messageCreatedError,
     loading: messageCreatedLoading,
-    variable: import.meta.env.VITE_GRAPHQL_WS_URL,
   };
 
   const messageId = messageCreatedData?.messageCreated?.message?.id;
@@ -63,7 +62,7 @@ const App: React.FunctionComponent = function () {
           currentChatState.value?.id &&
         currentChatState.value
       ) {
-        dispatch(pushMessage(messageCreatedData.messageCreated.message));
+        dispatch(unshiftMessage(messageCreatedData.messageCreated.message));
       }
     }
   }, [messageId]);

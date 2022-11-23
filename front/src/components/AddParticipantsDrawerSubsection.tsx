@@ -19,7 +19,10 @@ import {
 } from "../app/features/contactsPreviewsSlice";
 import { useTranslation } from "react-i18next";
 import { setMainDrawerSection } from "../app/features/sideBarSlice";
-import { addParticipant } from "../app/features/newGroupSectionDrawerSlice";
+import {
+  addParticipant,
+  resetState,
+} from "../app/features/newGroupSectionDrawerSlice";
 import { ParticipantsToAdd } from "./ParticipantsToAdd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionDrawerSlice";
@@ -52,6 +55,7 @@ export default function AddParticipantsDrawerSubsection() {
   }
 
   function handleBackClick() {
+    dispatch(resetState());
     dispatch(setMainDrawerSection());
   }
 

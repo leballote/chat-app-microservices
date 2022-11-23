@@ -56,6 +56,9 @@ export const contactsDrawerSectionSlice = createSlice({
     closeAddFriendModal(state) {
       state.addFriendOpen = false;
     },
+    resetSendFriendRequest(state) {
+      state.sendFriendRequest = initialState.sendFriendRequest;
+    },
     resetState() {
       return initialState;
     },
@@ -70,6 +73,7 @@ export const {
   setSendFriendRequestLoading,
   setSendFriendRequestError,
   sendFriendRequest,
+  resetSendFriendRequest,
 } = contactsDrawerSectionSlice.actions;
 
 export default contactsDrawerSectionSlice.reducer;

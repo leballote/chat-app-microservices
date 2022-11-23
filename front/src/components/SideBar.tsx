@@ -14,6 +14,7 @@ import {
 import { SectionName as DrawerSection } from "../app/features/types";
 import NewGroupDrawerSection from "./NewGroupDrawerSection";
 import SettingsDrawerSection from "./SettingsDrawerSection";
+import { setMainDrawerSectionAndReset } from "../app/utils";
 
 const drawerWidth = 400;
 
@@ -28,10 +29,8 @@ export default function ResponsiveDrawer() {
   if (currentDrawerSection == DrawerSection.MAIN) {
     section = (
       <MainDrawerView
-        //TODO: this doesn't work anymore
-        onMoreClick={() => {
-          console.log("clicked more");
-        }}
+        //TODO: onMoreClick doesn't work anymore, remove it:
+        onMoreClick={() => {}}
         onContactsClick={() => dispatch(setContactsDrawerSection())}
       />
     );

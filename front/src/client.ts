@@ -3,7 +3,6 @@ import { getMainDefinition } from "@apollo/client/utilities";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
 import { createClient } from "graphql-ws";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
-import tokenToReplaceWsURL from "./tokenToReplaceWsURL";
 
 const httpLink = new HttpLink({
   uri: "/api",

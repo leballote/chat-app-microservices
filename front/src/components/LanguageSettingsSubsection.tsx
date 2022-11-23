@@ -38,9 +38,7 @@ const LngAbbreviationMapping: { [code: string]: string } = {
   de: "German",
 };
 
-console.log(i18next.languages);
-
-const languageCodeNamePairs = (i18next.languages ?? [])
+const languageCodeNamePairs = (["de", "en", "es"] ?? [])
   .flatMap((code) =>
     LngAbbreviationMapping[code] != null
       ? [[code, LngAbbreviationMapping[code]]]
@@ -50,10 +48,14 @@ const languageCodeNamePairs = (i18next.languages ?? [])
     return language1 > language2 ? 1 : -1;
   });
 
+// console.log(i18next.languages);
+
 const SET_LANGUAGE = gql`
   mutation SetLanguage($input: SetLanguageInput) {
-    language
-    success
+    setLanguage(input: $input) {
+      language
+      success
+    }
   }
 `;
 
@@ -86,7 +88,7 @@ export default function LanguageSettingsSubsection() {
             <ArrowBackIcon />
           </Button>
           {/* //TODO: internationalize*/}
-          Language
+          {t("settingsSection.languageSubsection.title")}
         </Typography>
       </Box>
       <List>

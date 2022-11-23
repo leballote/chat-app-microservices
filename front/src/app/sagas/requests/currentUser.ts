@@ -10,6 +10,9 @@ const GET_USER_DATA = gql`
       phrase
       status
       avatar
+      settings {
+        language
+      }
     }
   }
 `;

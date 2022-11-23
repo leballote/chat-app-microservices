@@ -15,7 +15,6 @@ export const mainDrawerSlice = createSlice({
     //TODO: maybe set payload as the section we want, but we would have to get the reset functions into an object indexed by enum
     setMainDrawerSection(state) {
       if (state.name != SectionName.MAIN) {
-        resetMainDrawerSectionState();
         state.name = SectionName.MAIN;
       }
     },

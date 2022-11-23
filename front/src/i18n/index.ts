@@ -40,6 +40,11 @@ type Translation = {
       confirmPassword: string;
       login: string;
     };
+    settingsSection: {
+      languageSubsection: {
+        title: string;
+      };
+    };
   };
 };
 
@@ -82,6 +87,11 @@ const resources: { [language: string]: Translation } = {
         confirmPassword: "Confirmar contraseña",
         login: "Inicia sesión",
       },
+      settingsSection: {
+        languageSubsection: {
+          title: "Idioma",
+        },
+      },
     },
   },
   en: {
@@ -122,6 +132,11 @@ const resources: { [language: string]: Translation } = {
         confirmPassword: "Confirm password",
         login: "Log in",
       },
+      settingsSection: {
+        languageSubsection: {
+          title: "Language",
+        },
+      },
     },
   },
   de: {
@@ -161,6 +176,11 @@ const resources: { [language: string]: Translation } = {
         signupButton: "Registrieren",
         confirmPassword: "Passwort bestätigen",
         login: "Anmelden",
+      },
+      settingsSection: {
+        languageSubsection: {
+          title: "Sparchen",
+        },
       },
     },
   },

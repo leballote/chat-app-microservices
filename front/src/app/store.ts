@@ -11,6 +11,7 @@ import sideBarReducer from "./features/sideBarSlice";
 import newGroupSectionDrawerReducer from "./features/newGroupSectionDrawerSlice";
 import chatSectionReducer from "./features/chatSectionSlice";
 import settingsSectionReducer from "./features/settingsSectionSlice";
+import friendRequestsPreviewsReducer from "./features/friendRequestsPreviewsSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
@@ -25,6 +26,7 @@ export const store = configureStore({
     newGroupSectionDrawer: newGroupSectionDrawerReducer,
     chatSection: chatSectionReducer,
     settingsSection: settingsSectionReducer,
+    friendRequestsPreviews: friendRequestsPreviewsReducer,
   },
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware({ thunk: false }),

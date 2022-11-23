@@ -5,4 +5,9 @@ export type User = {
   phrase: string;
   avatar: string;
   status: "online" | "offline";
+  settings: UserSettings;
 } | null;
+
+export type UserSettings = {
+  language: string;
+};

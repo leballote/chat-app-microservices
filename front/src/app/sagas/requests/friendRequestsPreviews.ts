@@ -4,26 +4,24 @@ import client from "../../../client";
 //this should include a searcht term
 
 //TODO: solve this any
-export async function requestGetContactsPreviews(
-  searchTerm: string
-): Promise<any> {
+export async function requestGetFriendRequestsPreviews(): Promise<any> {
   //in the query should be a search term
-  const GET_CONTACTS_PREVIEWS_DATA = gql`
-    query GetChatPreviews {
-      viewer {
-        id
-        friends {
+  const GET_FRIENDS_REQUESTS_PREVIEWS = gql`
+    query GetFriendRequests {
+      friendshipRequestsReceived {
+        user {
           id
+          username
           name
-          avatar
           phrase
-          status
+          avatar
         }
+        sentAt
       }
     }
   `;
   return client.query({
-    query: GET_CONTACTS_PREVIEWS_DATA,
+    query: GET_FRIENDS_REQUESTS_PREVIEWS,
     fetchPolicy: "no-cache",
   });
 }

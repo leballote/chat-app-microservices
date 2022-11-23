@@ -11,10 +11,11 @@ import { CurrentUserContext } from "../contexts";
 import { useQuery, gql, useSubscription } from "@apollo/client";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { getValue as getCurrentUserValue } from "../app/features/currentUserSlice";
-import { pushMessage } from "../app/features/currentChatSlice";
+import { unshiftMessage } from "../app/features/currentChatSlice";
 import { current } from "@reduxjs/toolkit";
 import LoginPage from "./LoginPage";
 import SignupPage from "./SignupPage";
+import i18next from "i18next";
 
 //TODO: this component will be removed
 const Placeholder = ({ text }: any) => {
@@ -30,9 +31,16 @@ export default function ChatAppPage() {
   const navigate = useNavigate();
   useEffect(() => {
     if (!user) {
-      navigate("/auth/login");
+      return navigate("/auth/login");
     }
   }, [user]);
+
+  const settings = user?.settings;
+
+  useEffect(() => {
+    i18next.changeLanguage(settings?.language);
+  }, [settings]);
+
   return user ? (
     <Box sx={{ display: "flex" }}>
       <SideBar />

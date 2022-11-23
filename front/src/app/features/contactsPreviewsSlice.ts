@@ -7,6 +7,7 @@ type ContactsPreviewsState = {
   loading: boolean;
   error: Error | null;
   searchTerm: string;
+  firstFetch: boolean;
 };
 
 //TODO: maybe define this in the types directory?
@@ -24,6 +25,7 @@ const initialState: ContactsPreviewsState = {
   searchTerm: "",
   loading: true,
   error: null,
+  firstFetch: false,
 };
 
 export const contactsPreviewsSlice = createSlice({
@@ -40,7 +42,18 @@ export const contactsPreviewsSlice = createSlice({
     },
     setValue(state, { payload }) {
       state.value = payload;
+      state.firstFetch = true;
       state.loading = false;
+    },
+    addContact(state, { payload }: PayloadAction<ContactPreview>) {
+      if (state.value != null) {
+        console.log("VALUE EXISTS");
+        console.log(state.value);
+        state.value.push(payload);
+        // state.value.sort((a, b) => {
+        //   return a.name > b.name ? 1 : -1;
+        // });
+      }
     },
     setLoading(state, { payload = true }: PayloadAction<boolean>) {
       state.loading = payload;
@@ -48,11 +61,21 @@ export const contactsPreviewsSlice = createSlice({
     setError(state, { payload }) {
       state.error = payload;
     },
+    resetState(state) {
+      return initialState;
+    },
   },
 });
 
-export const { setValue, getValue, setLoading, setError, setSearchTerm } =
-  contactsPreviewsSlice.actions;
+export const {
+  setValue,
+  getValue,
+  setLoading,
+  setError,
+  setSearchTerm,
+  resetState,
+  addContact,
+} = contactsPreviewsSlice.actions;
 
 export const selectContactsPreviews = (state: RootState) =>
   state.contactsPreviews;

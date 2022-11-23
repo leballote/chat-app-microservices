@@ -1,4 +1,14 @@
-import { Box, Typography, List, Button, Grid } from "@mui/material";
+import {
+  Box,
+  Typography,
+  List,
+  Button,
+  Grid,
+  Tab,
+  Tabs,
+  Container,
+  Badge,
+} from "@mui/material";
 import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
 import DrawerSearchBar from "./DrawerSearchBar";
 import { ChangeEvent, useState, useEffect } from "react";
@@ -16,6 +26,8 @@ import { pushChat } from "../app/features/chatsPreviewsSlice";
 import { useNavigate } from "react-router";
 import AddFriendModal from "./AddFriendModal";
 import { openAddFriendModal } from "../app/features/contactsSectionDrawerSlice";
+import MainContactsSubsection from "./MainContactsSubsection";
+import FriendRequestsContactsDrawerSubsection from "./FriendRequestsContactsSubsection";
 
 interface Contact {
   id: string;
@@ -25,56 +37,45 @@ interface Contact {
   avatar: string;
 }
 
-interface ContactsResponse {
-  data: {
-    contacts: Contact[];
-  };
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: Subsection;
+  value: Subsection;
+}
+
+function TabPanel(props: TabPanelProps) {
+  const { children, value, index, ...other } = props;
+
+  return (
+    <div
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>
+        {value === index && children}
+      </Box>
+    </div>
+  );
 }
 
 interface Props {
   onBackClick: (ev: React.MouseEvent<HTMLElement>) => void;
-  onAddContactClick: (ev: React.MouseEvent<HTMLElement>) => void;
+  onAddContactClick?: (ev: React.MouseEvent<HTMLElement>) => void;
 }
 
-const GET_OR_CREATE_CHAT = gql`
-  mutation GetOrCreateChat($input: GetOrCreateIndividualChatInput!) {
-    getOrCreateIndividualChat(input: $input) {
-      chat {
-        id
-        type
-        phrase
-        name
-        avatar
-      }
-    }
-  }
-`;
+enum Subsection {
+  MAIN,
+  FRIEND_REQUESTS,
+}
 
-//TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
 export default function ContactsDrawerSection({ onBackClick }: Props) {
-  const {
-    value: contacts,
-    loading,
-    error,
-    searchTerm: contactSearched,
-  } = useAppSelector((state) => state.contactsPreviews);
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [getOrCreateChatFn] = useMutation(GET_OR_CREATE_CHAT);
-
-  useEffect(() => {
-    dispatch(getContactsPreviewsValue(""));
-  }, []);
-
-  function handleSearch(ev: ChangeEvent<HTMLInputElement>) {
-    dispatch(setSearchTerm(ev.target.value));
-  }
-  function handleEscapeOnSearch(ev: KeyboardEvent) {
-    if (ev.key === "Escape") {
-      dispatch(setSearchTerm(""));
-    }
-  }
+  //TODO: put this into redux
+  const [tabValue, setTabValue] = useState(Subsection.MAIN);
 
   const handleAddFriendClick: React.MouseEventHandler<
     HTMLButtonElement
@@ -82,19 +83,12 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
     dispatch(openAddFriendModal());
   };
 
-  let component;
-  if (loading) {
-    component = <h1>Loading...</h1>;
-    return component;
-  } else if (error) {
-    component = (
-      <div>
-        <h1>Error</h1>
-        <p>{error.message}</p>
-      </div>
-    );
-    return component;
-  }
+  const handleChangeTab = (
+    event: React.SyntheticEvent,
+    newValue: Subsection
+  ) => {
+    setTabValue(newValue);
+  };
 
   return (
     <>
@@ -121,41 +115,25 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
           <PersonAddIcon fontSize="large" />
         </Button>
       </Box>
+      <Tabs onChange={handleChangeTab} value={tabValue}>
+        {/* //TODO :  internationalize */}
+        <Tab label="Friends" value={Subsection.MAIN} />
+        <Tab
+          // TODO:  internationalize
+          label="Friend Requests"
+          //TODO: change for the actual number of friend requests
+          icon={<Box color="ButtonText">4</Box>}
+          iconPosition="end"
+          value={Subsection.FRIEND_REQUESTS}
+        />
+      </Tabs>
 
-      <DrawerSearchBar
-        value={contactSearched}
-        onSearch={handleSearch}
-        onKeyDown={handleEscapeOnSearch}
-      />
-      <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>
-        <List>
-          {contacts.map((contact: ContactPreviewProps) => (
-            <ContactPreview
-              {...contact}
-              key={contact.id}
-              onClick={async (ev) => {
-                const contactId = ev.currentTarget.dataset["contactId"];
-                try {
-                  const getOrCreateChatRes = await getOrCreateChatFn({
-                    variables: {
-                      input: {
-                        userId: contactId,
-                      },
-                    },
-                  });
-                  const { chat: newChat, created } =
-                    getOrCreateChatRes.data.getOrCreateIndividualChat;
-                  if (created) dispatch(pushChat(newChat));
-                  navigate(`/app/chat/${newChat.id}`);
-                } catch (e) {
-                  throw e;
-                }
-              }}
-              // to={`contact/${contact.id}`}
-            />
-          ))}
-        </List>
-      </Box>
+      <TabPanel value={tabValue} index={Subsection.MAIN}>
+        <MainContactsSubsection onBackClick={onBackClick} />
+      </TabPanel>
+      <TabPanel value={tabValue} index={Subsection.FRIEND_REQUESTS}>
+        <FriendRequestsContactsDrawerSubsection />
+      </TabPanel>
     </>
   );
 }

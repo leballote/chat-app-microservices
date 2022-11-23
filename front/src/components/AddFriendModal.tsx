@@ -13,6 +13,7 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  CircularProgress,
 } from "@mui/material";
 import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
 import DrawerSearchBar from "./DrawerSearchBar";
@@ -38,31 +39,47 @@ import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionD
 import SearchBar from "./DrawerSearchBar";
 import {
   closeAddFriendModal,
+  resetSendFriendRequest,
   sendFriendRequest,
+  setSendFriendRequestLoading,
 } from "../app/features/contactsSectionDrawerSlice";
+import { green } from "@mui/material/colors";
+import DoneIcon from "@mui/icons-material/Done";
 
 export default function AddFriendModal() {
   const {
-    value: contacts,
-    loading,
-    error,
-    searchTerm: contactSearched,
-  } = useAppSelector((state) => state.contactsPreviews);
-  const { addFriendOpen } = useAppSelector(
-    (state) => state.contactsSectionDrawer
-  );
+    addFriendOpen,
+    sendFriendRequest: {
+      value: sendFriendRequestValue,
+      loading: sendFriendRequestLoading,
+      error: sendFriendRequestError,
+    },
+  } = useAppSelector((state) => state.contactsSectionDrawer);
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
-  useEffect(() => {
-    if (!contacts) {
-      dispatch(getContactsPreviewsValue(""));
-    }
-  }, []);
+  const buttonSx = {
+    ...(sendFriendRequestValue != null && {
+      bgcolor: green[500],
+      "&:hover": {
+        bgcolor: green[700],
+      },
+    }),
+  };
+
+  function closeModal() {
+    dispatch(closeAddFriendModal());
+    dispatch(resetSendFriendRequest());
+  }
 
   const handleSend: FormEventHandler<HTMLFormElement> = (ev) => {
     ev.preventDefault();
-    console.log();
+
+    if (sendFriendRequestValue) {
+      closeModal();
+      return;
+    }
+
     const elements = ev.currentTarget.elements as any;
     const {
       email: { value },
@@ -73,22 +90,8 @@ export default function AddFriendModal() {
   };
 
   const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {
-    dispatch(closeAddFriendModal());
+    closeModal();
   };
-
-  let component;
-  if (loading) {
-    component = <h1>Loading...</h1>;
-    return component;
-  } else if (error) {
-    component = (
-      <div>
-        <h1>Error</h1>
-        <p>{error.message}</p>
-      </div>
-    );
-    return component;
-  }
 
   return (
     <Dialog open={addFriendOpen} onClose={handleClose}>
@@ -108,12 +111,38 @@ export default function AddFriendModal() {
           />
           <DialogActions>
             {/* // TODO: internationalize */}
-            <Button autoFocus onClick={handleClose}>
+            <Button
+              autoFocus
+              onClick={handleClose}
+              disabled={sendFriendRequestLoading}
+            >
               Cancel
             </Button>
-            <Button autoFocus type="submit">
-              Send
-            </Button>
+
+            <Box sx={{ m: 1, position: "relative" }}>
+              <Button
+                autoFocus
+                type="submit"
+                sx={buttonSx}
+                disabled={sendFriendRequestLoading}
+                variant="contained"
+              >
+                {sendFriendRequestValue ? <DoneIcon /> : "Send"}
+              </Button>
+              {sendFriendRequestLoading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    color: green[500],
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    marginTop: "-12px",
+                    marginLeft: "-12px",
+                  }}
+                />
+              )}
+            </Box>
           </DialogActions>
         </Box>
       </DialogContent>

@@ -3,7 +3,15 @@ import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { useParams } from "react-router-dom";
-import { useState, useEffect, useContext, createContext, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useContext,
+  createContext,
+  useRef,
+  useLayoutEffect,
+  useInsertionEffect,
+} from "react";
 import {
   List,
   ListItem,
@@ -33,9 +41,11 @@ import { User } from "../types/AppTypes";
 import {
   getValue as getCurrentChatValue,
   sendMessage,
+  loadMessages,
 } from "../app/features/currentChatSlice";
 import { setOnBottom } from "../app/features/chatSectionSlice";
 import getScrollHeightGap from "../utils/getScrollHeightGap";
+import { useDispatch } from "react-redux";
 
 interface Props extends WithHeight {
   messages: Message[];
@@ -48,26 +58,54 @@ function formatDate(dateString: string) {
   // return `${formatedDate}`;
 }
 
-function ChatBody({ messages, height, chatAreaRef }: Props) {
+function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
   let { participants: participantList, ...otherChatInfo } =
     useContext(ChatContext);
   const participants = indexArrayByField(participantList, "id");
+  const dispatch = useDispatch();
 
   const currentUser = useContext(CurrentUserContext);
   const chatBottomRef = useRef<HTMLDivElement>(null);
-  const { onBottom } = useAppSelector((state) => state.chatSection);
+  const [scrollInfo, setScrollInfo] = useState<{
+    top: number | undefined | null;
+    bottom: number | undefined | null;
+  }>({
+    top: 0,
+    bottom: 0,
+  });
+  const [messages, setMessages] = useState([] as typeof preMessages);
 
   useEffect(() => {
-    // const element = chatAreaRef.current;
-    // if (element == null) return;
-    if (onBottom) {
+    setScrollInfo({
+      top: chatAreaRef.current?.scrollTop,
+      bottom: chatAreaRef?.current && getScrollHeightGap(chatAreaRef.current),
+    });
+    setMessages(preMessages);
+  }, [preMessages]);
+
+  useEffect(() => {
+    if (scrollInfo.bottom == null) {
+      return;
+    }
+    if (scrollInfo.bottom < 2) {
       chatBottomRef.current?.scrollIntoView();
     }
-  }, [messages]);
+  }, [scrollInfo]);
+
+  const handleScroll: React.UIEventHandler<HTMLDivElement> = (ev) => {
+    if (chatAreaRef.current && chatAreaRef.current?.scrollTop < 1) {
+      dispatch(loadMessages({}));
+      chatAreaRef.current?.scrollTo({ top: 1 });
+    }
+  };
 
   return (
-    <Box sx={{ height, overflowY: "auto" }} ref={chatAreaRef}>
-      <List sx={{ display: "flex", flexFlow: "column" }}>
+    <Box
+      sx={{ height, overflowY: "auto" }}
+      ref={chatAreaRef}
+      onScroll={handleScroll}
+    >
+      <List sx={{ display: "flex", flexFlow: "column-reverse" }}>
         {messages.map((message, index: number) => {
           return (
             <Box
@@ -88,16 +126,16 @@ function ChatBody({ messages, height, chatAreaRef }: Props) {
               key={message.id}
             >
               <ListItem>
-                {index == 0 ||
-                messages[index - 1].sentBy.id != message.sentBy.id ? (
+                {index == messages.length - 1 ||
+                messages[index + 1].sentBy.id != message.sentBy.id ? (
                   <ListItemAvatar>
                     <Avatar src={participants[message.sentBy.id]?.avatar} />
                   </ListItemAvatar>
                 ) : null}
 
                 <ListItemText sx={{ overflowWrap: "break-word" }}>
-                  {index == 0 ||
-                  messages[index - 1].sentBy.id != message.sentBy.id ? (
+                  {index == messages.length - 1 ||
+                  messages[index + 1].sentBy.id != message.sentBy.id ? (
                     <Typography
                       component="h3"
                       sx={{ fontSize: "1.1em" }}
@@ -106,10 +144,10 @@ function ChatBody({ messages, height, chatAreaRef }: Props) {
                       {participants[message.sentBy.id].name}
                     </Typography>
                   ) : null}
-                  {index == 0 ||
-                  messages[index - 1].sentBy.id != message.sentBy.id ||
+                  {index == messages.length - 1 ||
+                  messages[index + 1].sentBy.id != message.sentBy.id ||
                   Math.abs(
-                    Date.parse(messages[index - 1].sentAt) -
+                    Date.parse(messages[index + 1].sentAt) -
                       Date.parse(message.sentAt)
                   ) > 18000 ? (
                     <Typography

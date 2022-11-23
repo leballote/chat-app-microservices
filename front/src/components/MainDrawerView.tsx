@@ -13,6 +13,7 @@ import { CurrentUserContext } from "../contexts";
 import { useAppSelector } from "../app/hooks";
 import { useDispatch } from "react-redux";
 import {
+  resetState as resetMainDrawerState,
   turnOffMoreMenu,
   turnOnMoreMenu,
 } from "../app/features/mainSectionDrawerSlice";
@@ -24,6 +25,8 @@ import {
   setNewGroupDrawerSection,
   setSettingsDrawerSection,
 } from "../app/features/sideBarSlice";
+import { resetState as resetNewGroupState } from "../app/features/newGroupSectionDrawerSlice";
+import { resetState as resetSettingsDrawerSectionState } from "../app/features/settingsSectionSlice";
 
 interface Props {
   onContactsClick: (ev: React.MouseEvent<HTMLElement>) => void;
@@ -65,14 +68,17 @@ export default function MainDrawerView(props: Props) {
 
   async function handleLogOut() {
     await logoutMutationFn();
+    dispatch(resetMainDrawerState());
     dispatch(getCurrentUserValue());
   }
 
   function handleNewGroup() {
+    dispatch(resetMainDrawerState());
     dispatch(setNewGroupDrawerSection());
   }
 
   function handleSettings() {
+    dispatch(resetMainDrawerState());
     dispatch(setSettingsDrawerSection());
   }
 

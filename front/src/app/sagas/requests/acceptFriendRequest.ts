@@ -6,7 +6,7 @@ type AcceptFriendRequestInput = {
 };
 
 //TODO: solve this any
-export async function requestSendMessage({
+export async function acceptFriendRequest({
   userToAccept,
 }: AcceptFriendRequestInput): Promise<any> {
   const ACCEPT_FRIEND_REQUEST = gql`
@@ -15,6 +15,9 @@ export async function requestSendMessage({
         friendAdded {
           id
           username
+          avatar
+          phrase
+          status
         }
       }
     }

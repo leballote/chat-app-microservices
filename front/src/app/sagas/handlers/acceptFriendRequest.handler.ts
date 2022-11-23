@@ -1,24 +1,20 @@
 import { call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { requestSendMessage } from "../requests/sendMessage";
+import { acceptFriendRequest } from "../requests/acceptFriendRequest";
+import { removeFriendRequest } from "../../features/friendRequestsPreviewsSlice";
+import { addContact } from "../../features/contactsPreviewsSlice";
 
-//TODO: this should be in types folder
-type MessageInput = {
-  content: string;
-  chatId: string;
-  sentBy: string;
-  sentAt: string;
-};
-
-export function* handleSendMessage(action: PayloadAction<MessageInput>): any {
+export function* handleAcceptFriend(action: PayloadAction<string>): any {
   const { payload } = action;
   try {
-    const response = yield call(requestSendMessage, payload);
+    const response = yield call(acceptFriendRequest, { userToAccept: payload });
     const { data } = response;
-    const {
-      createMessage: { message, success },
-    } = data;
-    // yield put(pushMessage(message));
+    const { acceptFriendship } = data;
+    yield put(removeFriendRequest(payload));
+    console.log("removed");
+    console.log("friendAdded", acceptFriendship.friendAdded);
+    yield put(addContact(acceptFriendship.friendAdded));
+    console.log("added?");
   } catch (error) {
     //TODO: see how to handle this error
   }

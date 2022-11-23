@@ -24,14 +24,19 @@ export async function requestSendFriendRequest({
     }
   `;
 
+  const variables: {
+    input: SendFriendRequestInput;
+  } = {
+    input: {},
+  };
+
+  if (userToAdd) variables.input.userToAdd = userToAdd;
+  if (userToAddEmail) variables.input.userToAddEmail = userToAddEmail;
+  if (userToAddUsername) variables.input.userToAddUsername = userToAddUsername;
+
+  console.log("VARIABLES", variables);
   return await client.mutate({
     mutation: SEND_FRIEND_REQUEST,
-    variables: {
-      input: {
-        userToAdd,
-        userToAddEmail,
-        userToAddUsername,
-      },
-    },
+    variables,
   });
 }
