@@ -26,6 +26,7 @@ import {
 import { ParticipantsToAdd } from "./ParticipantsToAdd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionDrawerSlice";
+import GenericPeopleLoading from "./GenericPeopleLoading";
 
 export default function AddParticipantsDrawerSubsection() {
   //TODO: change for const
@@ -70,8 +71,7 @@ export default function AddParticipantsDrawerSubsection() {
 
   let component;
   if (loading) {
-    component = <h1>Loading...</h1>;
-    return component;
+    component = <GenericPeopleLoading numberOfPeople={5} />;
   } else if (error) {
     component = (
       <div>
@@ -79,7 +79,18 @@ export default function AddParticipantsDrawerSubsection() {
         <p>{error.message}</p>
       </div>
     );
-    return component;
+  } else {
+    component = (
+      <List>
+        {contacts.map((contact: ContactPreviewProps) => (
+          <ContactPreview
+            {...contact}
+            key={contact.id}
+            onClick={handleAddParticipant}
+          />
+        ))}
+      </List>
+    );
   }
 
   return (
@@ -110,17 +121,7 @@ export default function AddParticipantsDrawerSubsection() {
         onKeyDown={handleEscapeOnSearch}
       />
       <ParticipantsToAdd />
-      <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>
-        <List>
-          {contacts.map((contact: ContactPreviewProps) => (
-            <ContactPreview
-              {...contact}
-              key={contact.id}
-              onClick={handleAddParticipant}
-            />
-          ))}
-        </List>
-      </Box>
+      <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>{component}</Box>
       {participants.length > 0 ? (
         <Paper
           sx={{ position: "absolute", bottom: 0, left: 0, right: 0 }}

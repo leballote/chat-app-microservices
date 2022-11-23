@@ -115,6 +115,7 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
           <PersonAddIcon fontSize="large" />
         </Button>
       </Box>
+
       <Tabs onChange={handleChangeTab} value={tabValue}>
         {/* //TODO :  internationalize */}
         <Tab label="Friends" value={Subsection.MAIN} />

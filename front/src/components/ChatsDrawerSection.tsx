@@ -17,6 +17,7 @@ import {
 } from "../app/features/chatsPreviewsSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { useTranslation } from "react-i18next";
+import GenericPeopleLoading from "./GenericPeopleLoading";
 
 //TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
 export default function ChatDrawerSection() {
@@ -46,7 +47,7 @@ export default function ChatDrawerSection() {
 
   let component: React.ReactElement;
   if (loading) {
-    component = <h1>Loading...</h1>;
+    component = <GenericPeopleLoading numberOfPeople={8} />;
   } else if (error) {
     component = (
       <div>
@@ -56,31 +57,31 @@ export default function ChatDrawerSection() {
     );
   } else {
     component = (
-      <>
-        <Typography
-          component="h2"
-          fontSize="1.2em"
-          fontWeight="light"
-          color="MenuText"
-          sx={{ margin: "1em .2em .2em .5em" }}
-        >
-          {t("user.chats")}
-        </Typography>
-        <DrawerSearchBar
-          value={chatSearched}
-          onSearch={handleSearch}
-          onKeyDown={handleEscapeOnSearch}
-        />
-        <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>
-          <List>
-            {chats.map((props: ChatPreviewProps) => (
-              <ChatPreview {...props} key={props.id} />
-            ))}
-          </List>
-        </Box>
-      </>
+      <List>
+        {chats.map((props: ChatPreviewProps) => (
+          <ChatPreview {...props} key={props.id} />
+        ))}
+      </List>
     );
   }
 
-  return component;
+  return (
+    <>
+      <Typography
+        component="h2"
+        fontSize="1.2em"
+        fontWeight="light"
+        color="MenuText"
+        sx={{ margin: "1em .2em .2em .5em" }}
+      >
+        {t("user.chats")}
+      </Typography>
+      <DrawerSearchBar
+        value={chatSearched}
+        onSearch={handleSearch}
+        onKeyDown={handleEscapeOnSearch}
+      />
+      <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>{component}</Box>
+    </>
+  );
 }
