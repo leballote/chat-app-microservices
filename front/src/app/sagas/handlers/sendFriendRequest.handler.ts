@@ -17,18 +17,14 @@ export function* handleSendFriendRequest(
   const { payload } = action;
   try {
     yield put(setSendFriendRequestLoading(true));
-    console.log("before response");
     const response = yield call(requestSendFriendRequest, payload);
-    console.log("after response");
     const { data } = response;
-    console.log("DATA", data);
     const {
       requestFriendship: { friendAdded },
     } = data;
     yield put(setSendFriendRequestValue(friendAdded));
     yield put(setSendFriendRequestLoading(false));
   } catch (error) {
-    console.log("error", error);
     yield put(setSendFriendRequestLoading(false));
     yield put(setSendFriendRequestError(error as Error));
   }

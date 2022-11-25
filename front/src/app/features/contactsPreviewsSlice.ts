@@ -47,10 +47,8 @@ export const contactsPreviewsSlice = createSlice({
     },
     addContact(state, { payload }: PayloadAction<ContactPreview>) {
       if (state.value != null) {
-        console.log("VALUE EXISTS");
-        console.log(state.value);
         state.value.push(payload);
-        // state.value.sort((a, b) => {
+        // return state.value.sort((a, b) => {
         //   return a.name > b.name ? 1 : -1;
         // });
       }

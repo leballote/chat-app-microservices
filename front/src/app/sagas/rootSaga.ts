@@ -6,7 +6,11 @@ import { handleContactsPreviews } from "./handlers/contactsPreviews";
 import { getValue as getCurrentUserValue } from "../features/currentUserSlice";
 import { getValue as getChatsPreviewsValue } from "../features/chatsPreviewsSlice";
 import { getValue as getContactsPreviewsValue } from "../features/contactsPreviewsSlice";
-import { getValue as getCurrentChatValue } from "../features/currentChatSlice";
+import {
+  getValue as getCurrentChatValue,
+  requestLeaveGroup,
+  requestRemoveParticipant,
+} from "../features/currentChatSlice";
 import { sendMessage } from "../features/currentChatSlice";
 import { handleSendMessage } from "./handlers/sendMessage";
 import { sendFriendRequest } from "../features/contactsSectionDrawerSlice";
@@ -17,6 +21,8 @@ import { getValue as getFriendRequestsPreviewsValue } from "../features/friendRe
 import { handleFriendRequestsPreviews } from "./handlers/friendRequestsPreviews.handler";
 import { handleAcceptFriend } from "./handlers/acceptFriendRequest.handler";
 import { acceptFriendRequest } from "../features/friendRequestsPreviewsSlice";
+import { handleRemoveParticipant } from "./handlers/removeParticipant.handler";
+import { handleLeaveGroup } from "./handlers/leaveGroup.handler";
 
 export function* watcherSaga() {
   yield takeLatest(getCurrentUserValue.toString(), handleGetUser);
@@ -31,4 +37,6 @@ export function* watcherSaga() {
     handleFriendRequestsPreviews
   );
   yield takeEvery(acceptFriendRequest.toString(), handleAcceptFriend);
+  yield takeEvery(requestRemoveParticipant.toString(), handleRemoveParticipant);
+  yield takeEvery(requestLeaveGroup.toString(), handleLeaveGroup);
 }

@@ -61,6 +61,12 @@ export const chatsPreviewsSlice = createSlice({
     setError(state, { payload }) {
       state.error = payload;
     },
+    removeChat(state, { payload }: PayloadAction<{ chatId: string }>) {
+      state.value = state.value.filter((chat) => chat.id != payload.chatId);
+    },
+    resetState() {
+      return initialState;
+    },
   },
 });
 
@@ -71,6 +77,8 @@ export const {
   setError,
   setSearchTerm,
   pushChat,
+  removeChat,
+  resetState,
 } = chatsPreviewsSlice.actions;
 
 export const selectChatsPreviews = (state: RootState) => state.chatsPreviews;

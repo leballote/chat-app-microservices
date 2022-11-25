@@ -15,19 +15,21 @@ import {
   CssBaseline,
   Button,
 } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import ImageIcon from "@mui/icons-material/Image";
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+import React from "react";
 import { ChatContext, CurrentUserContext } from "../../contexts";
 import { WithHeight } from "../../types/utilTypes";
 import FormatedAvatar from "../../utils/FormatedAvatar";
+import { openDetails } from "../../app/features/chatSectionSlice";
+import { useAppDispatch } from "../../app/hooks";
 
 interface Props {
   height: string | number;
 }
 
 export default function ChatHeader({ height }: Props) {
-  const { participants, ...chatInfo } = useContext(ChatContext);
+  const chat = useContext(ChatContext);
+  if (!chat) return null;
+  const { participants, ...chatInfo } = chat;
 
   return chatInfo.type == "INDIVIDUAL" ? (
     <IndividualChatHeader height={height} />
@@ -37,7 +39,9 @@ export default function ChatHeader({ height }: Props) {
 }
 
 function IndividualChatHeader({ height }: WithHeight) {
-  const { participants, ...chatInfo } = useContext(ChatContext);
+  const chat = useContext(ChatContext);
+  if (!chat) return null;
+  const { participants, ...chatInfo } = chat;
   const currentUser = useContext(CurrentUserContext);
   //TODO: handle this more elegantly "currentUser?.id, how to be sure that it is already loaded";
   const receiver = participants.filter(({ id }) => id != currentUser?.id)[0];
@@ -56,7 +60,9 @@ function IndividualChatHeader({ height }: WithHeight) {
 }
 
 function GroupChatHeader({ height }: WithHeight) {
-  const { participants, ...chatInfo } = useContext(ChatContext);
+  const chat = useContext(ChatContext);
+  if (!chat) return null;
+  const { participants, ...chatInfo } = chat;
 
   const props: BaseChatHeaderProps = {
     name: chatInfo.name,
@@ -82,6 +88,10 @@ type BaseChatHeaderProps = {
 
 function BaseChatHeader(props: BaseChatHeaderProps) {
   const { name, status, phrase, height, to } = props;
+  const dispatch = useAppDispatch();
+  const hanldeDetailsClick: React.MouseEventHandler<HTMLDivElement> = (ev) => {
+    return dispatch(openDetails());
+  };
 
   return (
     <Box
@@ -92,6 +102,7 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
       }}
     >
       <Box
+        onClick={hanldeDetailsClick}
         sx={{
           display: "flex",
           textDecoration: "none",
@@ -104,16 +115,12 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
             color: "inherit",
           },
         }}
-        component={RouterLink}
-        to={to}
       >
         <FormatedAvatar {...props} />
-        {/* <Link to={to} component={RouterLink} sx={{ textDecoration: "none" }}> */}
         <Container>
           <Typography component="h1" fontWeight="bold">
             {name}
           </Typography>
-          {/* </Link> */}
           <Typography component="h2">{phrase}</Typography>
         </Container>
       </Box>

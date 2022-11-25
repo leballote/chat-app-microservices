@@ -16,56 +16,15 @@ import { current } from "@reduxjs/toolkit";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ChatAppPage from "./pages/ChatAppPage";
-
-const MESSAGE_CREATED = gql`
-  subscription {
-    messageCreated {
-      message {
-        id
-        content
-        sentAt
-        sentBy {
-          id
-        }
-        chat {
-          id
-        }
-      }
-    }
-  }
-`;
+import LinearDeterminate from "./components/LinearDeterminate";
+import Typograhpy from "@mui/material/Typography";
 
 const App: React.FunctionComponent = function () {
   const currentUserState = useAppSelector((state) => state.currentUser);
-  const currentChatState = useAppSelector((state) => state.currentChat);
 
   const { value: currentUser, loading: userLoading, error } = currentUserState;
+
   const dispatch = useAppDispatch();
-  const {
-    loading: messageCreatedLoading,
-    error: messageCreatedError,
-    data: messageCreatedData,
-  } = useSubscription(MESSAGE_CREATED);
-
-  const debug = {
-    data: messageCreatedData,
-    error: messageCreatedError,
-    loading: messageCreatedLoading,
-  };
-
-  const messageId = messageCreatedData?.messageCreated?.message?.id;
-
-  useEffect(() => {
-    if (messageCreatedData?.messageCreated.message) {
-      if (
-        messageCreatedData.messageCreated.message.chat.id ==
-          currentChatState.value?.id &&
-        currentChatState.value
-      ) {
-        dispatch(unshiftMessage(messageCreatedData.messageCreated.message));
-      }
-    }
-  }, [messageId]);
 
   useEffect(() => {
     dispatch(getCurrentUserValue());
@@ -80,7 +39,24 @@ const App: React.FunctionComponent = function () {
       </div>
     );
   } else if (userLoading) {
-    component = <h1>{JSON.stringify(debug)}</h1>;
+    component = (
+      <Container
+        sx={{
+          alignItems: "center",
+          height: "100vh",
+          justifyContent: "center",
+          display: "flex",
+        }}
+      >
+        <Box width={"80%"}>
+          <CssBaseline />
+          <LinearDeterminate />
+          <Typograhpy textAlign={"right"} variant={"h5"}>
+            Please wait...
+          </Typograhpy>
+        </Box>
+      </Container>
+    );
   } else {
     component = (
       <BrowserRouter>

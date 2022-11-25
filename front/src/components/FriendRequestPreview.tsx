@@ -25,8 +25,8 @@ export interface Props {
     phrase: string;
     avatar: string;
   };
-  accepting: boolean;
-  rejecting: boolean;
+  accepting?: boolean;
+  rejecting?: boolean;
   onAccept: any;
   onReject: any;
   sentAt: string;

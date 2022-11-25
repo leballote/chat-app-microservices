@@ -14,7 +14,10 @@ const wsLink = new GraphQLWsLink(
     // url: import.meta.env.VITE_GRAPHQL_WS_URL,
     //TODO: how do we make this more kubernetes-agnostic
     // url: import.meta.env.VITE_GRAPHQL_WS_URL ?? tokenToReplaceWsURL,
-    url: `ws://${window.location.host}/subs`,
+    url:
+      window.location.protocol == "http:"
+        ? `ws://${window.location.host}/subs`
+        : `wss://${window.location.host}/subs`,
     // url: tokenToReplaceWsURL,
     connectionParams: {
       credentials: "same-origin",

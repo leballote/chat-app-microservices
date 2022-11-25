@@ -60,8 +60,7 @@ export default function LanguageSettingsSubsection() {
           >
             <ArrowBackIcon />
           </Button>
-          {/* //TODO: internationalize*/}
-          Settings
+          {t("app.drawer.settings.title")}
         </Typography>
       </Box>
       <List>
@@ -70,7 +69,7 @@ export default function LanguageSettingsSubsection() {
             <ListItemIcon>
               <LanguageIcon />
             </ListItemIcon>
-            <ListItemText primary="Language" />
+            <ListItemText primary={t("app.drawer.settings.language")} />
           </ListItemButton>
         </ListItem>
       </List>

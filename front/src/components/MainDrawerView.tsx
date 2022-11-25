@@ -116,8 +116,7 @@ export default function MainDrawerView(props: Props) {
             {t("app.drawer.main.newGroup")}
           </MenuItem>
           <MenuItem onClick={handleSettings}>
-            {/* //TODO: internationalize */}
-            Settings
+            {t("app.drawer.main.settings")}
           </MenuItem>
           <MenuItem onClick={handleLogOut}>
             {t("app.drawer.main.logout")}

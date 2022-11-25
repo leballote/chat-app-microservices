@@ -10,6 +10,11 @@ type Translation = {
         main: {
           newGroup: string;
           logout: string;
+          settings: string;
+        };
+        settings: {
+          title: string;
+          language: string;
         };
         contacts: {};
       };
@@ -57,6 +62,11 @@ const resources: { [language: string]: Translation } = {
           main: {
             newGroup: "Nuevo grupo",
             logout: "Cerrar sesión",
+            settings: "Ajustes",
+          },
+          settings: {
+            title: "Ajustes",
+            language: "Idioma",
           },
           contacts: {},
         },
@@ -102,6 +112,11 @@ const resources: { [language: string]: Translation } = {
           main: {
             newGroup: "New group",
             logout: "Log out",
+            settings: "Settings",
+          },
+          settings: {
+            title: "Settings",
+            language: "Language",
           },
           contacts: {},
         },
@@ -147,6 +162,11 @@ const resources: { [language: string]: Translation } = {
           main: {
             newGroup: "Neue Gruppe",
             logout: "Abmelden",
+            settings: "Einstellungen",
+          },
+          settings: {
+            title: "Einstellungen",
+            language: "Sprachen",
           },
           contacts: {},
         },

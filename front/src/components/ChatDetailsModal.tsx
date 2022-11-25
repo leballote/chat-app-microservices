@@ -13,64 +13,45 @@ import {
   DialogContent,
   DialogActions,
   TextField,
+  Avatar,
+  Container,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
 } from "@mui/material";
-import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "./DrawerSearchBar";
-import {
-  ChangeEvent,
-  useState,
-  useEffect,
-  FormEventHandler,
-  MouseEventHandler,
-} from "react";
+import { MouseEventHandler } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../app/features/contactsPreviewsSlice";
 import { useTranslation } from "react-i18next";
+import { Chat } from "../types/ChatSectionTypes";
+import ParticipantPreview from "./ParticipantPreview";
+import { red, blue } from "@mui/material/colors";
+import ExitToAppIcon from "@mui/icons-material/ExitToApp";
+import AddIcon from "@mui/icons-material/Add";
 import {
-  closeAddFriendModal,
-  sendFriendRequest,
-} from "../app/features/contactsSectionDrawerSlice";
+  removeParticipant,
+  requestLeaveGroup,
+  requestRemoveParticipant,
+} from "../app/features/currentChatSlice";
+import { closeDetails } from "../app/features/chatSectionSlice";
+import { useNavigate } from "react-router";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 
 export default function ChatDetailsModal() {
+  const dispatch = useAppDispatch();
+  const { detailsOpen } = useAppSelector((state) => state.chatSection);
+  const { t } = useTranslation();
   const {
-    value: contacts,
     loading,
     error,
-    searchTerm: contactSearched,
-  } = useAppSelector((state) => state.contactsPreviews);
-  const { addFriendOpen } = useAppSelector(
-    (state) => state.contactsSectionDrawer
-  );
-  const dispatch = useAppDispatch();
-  const { t } = useTranslation();
-
-  useEffect(() => {
-    if (!contacts) {
-      dispatch(getContactsPreviewsValue(""));
-    }
-  }, []);
-
-  const handleSend: FormEventHandler<HTMLFormElement> = (ev) => {
-    ev.preventDefault();
-    console.log();
-    const elements = ev.currentTarget.elements as any;
-    const {
-      email: { value },
-    } = elements;
-    const userToAddEmail = value as string;
-
-    dispatch(sendFriendRequest({ userToAddEmail }));
-  };
+    value: currentChat,
+  } = useAppSelector((state) => state.currentChat);
 
   const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {
-    dispatch(closeAddFriendModal());
+    dispatch(closeDetails());
   };
 
-  let component;
+  let component = null;
   if (loading) {
     component = <h1>Loading...</h1>;
     return component;
@@ -81,36 +62,197 @@ export default function ChatDetailsModal() {
         <p>{error.message}</p>
       </div>
     );
-    return component;
+  } else if (currentChat != null) {
+    const { type, ...chatDetailsProps } = currentChat;
+    let dialogContent = null;
+    if (type == "GROUP") {
+      dialogContent = <GroupChatDetails {...chatDetailsProps} />;
+    } else if (type == "INDIVIDUAL") {
+      dialogContent = <IndividualChatDetails {...chatDetailsProps} />;
+    }
+    component = (
+      <Dialog
+        data-chat-id={currentChat.id}
+        open={detailsOpen}
+        onClose={handleClose}
+        PaperProps={{ sx: { padding: "1em" } }}
+      >
+        {dialogContent}
+      </Dialog>
+    );
   }
 
+  return component;
+}
+
+function GroupChatDetails({
+  id,
+  messages,
+  name,
+  phrase,
+  avatar,
+  status,
+  participants,
+  viewerAsChatUser,
+}: Omit<Chat, "type">) {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { value: currentUser } = useAppSelector((state) => state.currentUser);
+  const handleRemoveClick: React.MouseEventHandler<HTMLButtonElement> = (
+    ev
+  ) => {
+    const participantId = (
+      ev.currentTarget.closest("[data-user-id]") as HTMLElement | null
+    )?.dataset["userId"];
+    const chatId = (
+      ev.currentTarget.closest("[data-chat-id]") as HTMLElement | null
+    )?.dataset["chatId"];
+    console.log(participantId, chatId);
+    if (participantId && chatId && participantId != currentUser?.id) {
+      dispatch(requestRemoveParticipant({ chatId, participantId }));
+    }
+  };
+
+  const handleLeaveGroupClick: React.MouseEventHandler<HTMLButtonElement> = (
+    ev
+  ) => {
+    const chatId = (
+      ev.currentTarget.closest("[data-chat-id]") as HTMLElement | null
+    )?.dataset["chatId"];
+    if (chatId) {
+      dispatch(requestLeaveGroup({ chatId }));
+    }
+  };
+
   return (
-    <Dialog open={addFriendOpen} onClose={handleClose}>
-      <DialogTitle>Add friend</DialogTitle>
-      <DialogContent>
-        <Box component="form" onSubmit={handleSend}>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            //  TODO: internationalize
-            label="Friend's email"
-            type="email"
-            fullWidth
-            name="email"
-            variant="standard"
-          />
-          <DialogActions>
-            {/* // TODO: internationalize */}
-            <Button autoFocus onClick={handleClose}>
-              Cancel
-            </Button>
-            <Button autoFocus type="submit">
-              Send
-            </Button>
-          </DialogActions>
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          margin: "1em",
+        }}
+      >
+        <Avatar src={avatar} sx={{ width: 100, height: 100 }} />
+        <Box>
+          <DialogTitle
+            component={"h3"}
+            sx={{ fontSize: "1.8em", textAlign: "left", minWidth: "10em" }}
+          >
+            {name}
+          </DialogTitle>
+          <Typography>{phrase}</Typography>
         </Box>
+      </Box>
+      <DialogContent sx={{ padding: 0 }}>
+        <List>
+          <ListItem key={"addItem"} button>
+            <ListItemAvatar>
+              <Avatar
+                sx={{
+                  width: 60,
+                  height: 60,
+                  backgroundColor: "inherit",
+                  border: "solid 2px",
+                  borderColor: blue[500],
+                }}
+              >
+                <AddIcon sx={{ color: blue[400] }} />
+              </Avatar>
+            </ListItemAvatar>
+            <ListItemText
+              sx={{
+                marginLeft: ".6em",
+                color: blue[500],
+              }}
+            >
+              <Typography
+                component="h3"
+                fontSize={"1.1em"}
+                // fontWeight="bold"
+                color={blue[400]}
+              >
+                {/* TODO: internationalize  */}
+                Add participant
+              </Typography>
+            </ListItemText>
+          </ListItem>
+          {participants.map((participant) => (
+            <ParticipantPreview
+              {...participant}
+              isViewerAdmin={viewerAsChatUser.admin}
+              onRemove={handleRemoveClick}
+              key={participant.id}
+            />
+          ))}
+        </List>
+
+        <Button
+          variant="outlined"
+          sx={{
+            width: "100%",
+            color: red[500],
+            borderColor: red[300],
+            "&:hover": {
+              borderColor: red[400],
+            },
+          }}
+          onClick={handleLeaveGroupClick}
+        >
+          Leave Group &nbsp;
+          <ExitToAppIcon />
+        </Button>
       </DialogContent>
-    </Dialog>
+    </>
+  );
+}
+
+function IndividualChatDetails({
+  id,
+  messages,
+  name,
+  phrase,
+  avatar,
+  status,
+  viewerAsChatUser,
+}: Omit<Chat, "type">) {
+  return (
+    <>
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          margin: "1em",
+        }}
+      >
+        <Avatar src={avatar} sx={{ width: 100, height: 100 }} />
+        <Box>
+          <DialogTitle
+            component={"h3"}
+            sx={{ fontSize: "1.8em", textAlign: "left", minWidth: "10em" }}
+          >
+            {name}
+          </DialogTitle>
+          <Typography>{phrase}</Typography>
+        </Box>
+      </Box>
+      <DialogContent sx={{ padding: 0 }}>
+        <Button
+          variant="outlined"
+          sx={{
+            width: "100%",
+            color: red[500],
+            borderColor: red[300],
+            "&:hover": {
+              borderColor: red[400],
+            },
+          }}
+          onClick={() => {}}
+        >
+          Remove friend &nbsp;
+          <PersonRemoveIcon />
+        </Button>
+      </DialogContent>
+    </>
   );
 }

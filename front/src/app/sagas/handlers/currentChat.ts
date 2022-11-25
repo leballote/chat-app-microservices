@@ -12,7 +12,8 @@ import {
 export function* handleGetChat(action: PayloadAction<{ chatId: string }>): any {
   const { payload } = action;
   try {
-    put(setLoading(true));
+    yield put(setError(null));
+    yield put(setLoading(true));
     //TODO: look how to turn off this error
     const requestGetChat2 = requestGetChat as any;
     //TODO: solve this any
@@ -24,7 +25,8 @@ export function* handleGetChat(action: PayloadAction<{ chatId: string }>): any {
     } = response;
     yield put(setCurrentChatValue(chat));
   } catch (error) {
-    put(setLoading(false));
-    put(setError(error));
+    const e = error as Error;
+    yield put(setError(e.message));
+    yield put(setLoading(false));
   }
 }

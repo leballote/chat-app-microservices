@@ -8,9 +8,10 @@ import {
   Paper,
   Typography,
 } from "@mui/material";
-import { useRef } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { CurrentUserContext } from "../contexts";
 
 const SIGNUP = gql`
   mutation Signup($input: SignUpInput) {
@@ -29,7 +30,23 @@ export default function SignupPage() {
   const { t } = useTranslation();
   //TODO: move this into a saga
   const [mutationFunction, { data, loading, error }] = useMutation(SIGNUP);
-  console.log("ERROR", error);
+  console.log({
+    SIGNUP_DATA: data,
+    SIGNUP_LOADING: loading,
+    SIGNUP_ERROR: error,
+  });
+  const user = useContext(CurrentUserContext);
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (data) {
+      navigate("/auth/login");
+    }
+  }, [data]);
+  useEffect(() => {
+    if (user) {
+      navigate("/app");
+    }
+  }, [user]);
 
   //TODO client side validation
   function handleSubmit(ev: React.FormEvent<HTMLInputElement>) {
@@ -39,7 +56,6 @@ export default function SignupPage() {
     const email = emailInput.current?.value;
     const password = passwordInput.current?.value;
     const confirmPassword = passwordInput.current?.value;
-    //TODO: Maybe this is not needed with the validations
     //TODO: Validate email
     if (password !== confirmPassword) return;
 

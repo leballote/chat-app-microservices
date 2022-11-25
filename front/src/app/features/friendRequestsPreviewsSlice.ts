@@ -17,13 +17,12 @@ type FriendRequestPreview = {
     id: string;
     name: string;
     username: string;
-    requestSentAt: string; //date
     avatar: string;
     phrase: string;
   };
   sentAt: string;
-  accepting: boolean;
-  rejecting: boolean;
+  accepting?: boolean;
+  rejecting?: boolean;
   error: Error | null;
 };
 

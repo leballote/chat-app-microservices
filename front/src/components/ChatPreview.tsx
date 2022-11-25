@@ -43,7 +43,7 @@ export default function ChatPreview({
   if (lastMessage) {
     previewSection = (
       <Typography component="p" fontSize={".8em"} color="textSecondary">
-        {content}
+        {content.slice(1, 50)}
       </Typography>
     );
   } else {
@@ -60,7 +60,12 @@ export default function ChatPreview({
   }
 
   return (
-    <ListItem button component={RouterLink} to={`chat/${id}`}>
+    <ListItem
+      button
+      component={RouterLink}
+      to={`chat/${id}`}
+      sx={{ overflowWrap: "break-word" }}
+    >
       <ListItemAvatar>
         <Avatar
           alt={`avatar of ${name}`}

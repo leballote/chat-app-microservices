@@ -29,6 +29,7 @@ export default function LoginPage() {
   const passwordInput = useRef<HTMLInputElement>(null);
   //TODO: move this into a saga
   const [mutationFunction, { data, loading, error }] = useMutation(LOGIN);
+  console.log({ LOGIN_DATA: data, LOGIN_LOADING: loading, LOGIN_ERROR: error });
   // const user = useContext(CurrentUserContext);
   const user = useAppSelector((state) => state.currentUser.value);
   const dispatch = useAppDispatch();

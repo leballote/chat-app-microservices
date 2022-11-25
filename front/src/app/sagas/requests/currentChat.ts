@@ -8,12 +8,19 @@ export async function requestGetChat(chatId: string): Promise<any> {
       viewer {
         id
         chat(chatId: "${chatId}") {
+          viewerAsChatUser {
+            id
+            admin
+            participantSince
+          }
           id
           name
           type
           phrase
           avatar
           participants {
+            participantSince
+            admin
             id
             name
             phrase

@@ -2,7 +2,7 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import { useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import {
   useState,
   useEffect,
@@ -42,10 +42,18 @@ import {
   getValue as getCurrentChatValue,
   sendMessage,
   loadMessages,
+  setError,
+  setValue,
+  setLoading,
+  resetState as resetCurrentChatState,
 } from "../app/features/currentChatSlice";
-import { setOnBottom } from "../app/features/chatSectionSlice";
+import {
+  resetState as resetChatSectionState,
+  setOnBottom,
+} from "../app/features/chatSectionSlice";
 import getScrollHeightGap from "../utils/getScrollHeightGap";
 import { useDispatch } from "react-redux";
+import ChatDetailsModal from "../components/ChatDetailsModal";
 
 interface Props extends WithHeight {
   messages: Message[];
@@ -59,8 +67,9 @@ function formatDate(dateString: string) {
 }
 
 function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
-  let { participants: participantList, ...otherChatInfo } =
-    useContext(ChatContext);
+  const chat = useContext(ChatContext);
+  if (!chat) return null;
+  let { participants: participantList, ...otherChatInfo } = chat;
   const participants = indexArrayByField(participantList, "id");
   const dispatch = useDispatch();
 
@@ -179,7 +188,9 @@ function ChatsFooter({
   onSend: any;
 }) {
   const dispatch = useAppDispatch();
-  const { id: chatId } = useContext(ChatContext);
+  const chat = useContext(ChatContext);
+  if (!chat) return null;
+  const { id: chatId } = chat;
   const user = useContext(CurrentUserContext);
   const messageTextInput = useRef<HTMLInputElement>(null);
 
@@ -269,9 +280,9 @@ export default function ChatSection() {
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const chatAreaRef = useRef<HTMLElement>(null);
+  const navigate = useNavigate();
 
   let chatId = id;
-  let nonExistingChat = false;
   let {
     error,
     loading,
@@ -282,15 +293,24 @@ export default function ChatSection() {
     error = new Error("Chat not defined");
   }
 
-  //TODO: try to handle better the fact that chat could be null
-
   useEffect(() => {
     if (chatId) {
       dispatch(getCurrentChatValue(chatId));
     }
-  }, [id]);
+  }, [chatId]);
+
+  useEffect(() => {
+    if (error) {
+      navigate("/app");
+      dispatch(resetCurrentChatState());
+      dispatch(resetChatSectionState());
+    }
+  }, [error, chat, loading]);
 
   let component;
+  // if (!chat) {
+  //   component = <h1>Loading...</h1>;
+  // }
   if (loading) {
     component = <h1>Loading...</h1>;
   } else if (error) {
@@ -303,12 +323,13 @@ export default function ChatSection() {
   } else if (chat != null) {
     const { messages, participants, ...chatInfo } = chat;
     component = (
-      <Container
+      <Box
         sx={{
           position: "relative",
           height: "100vh",
           marginTop: "0",
           marginBottom: "0",
+          width: "calc(100% - 400px)",
         }}
       >
         <ChatContext.Provider value={{ participants, ...chatInfo }}>
@@ -328,10 +349,11 @@ export default function ChatSection() {
             }}
           />
         </ChatContext.Provider>
-      </Container>
+        <ChatDetailsModal />
+      </Box>
     );
   } else {
-    return <h1>This should not be possible</h1>;
+    return null;
   }
 
   return component;

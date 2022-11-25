@@ -1,6 +1,8 @@
 import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
 import type { Chat, Message } from "../../types/ChatSectionTypes";
+import removeOne from "../../utils/removeOne";
+import { NavigateFunction } from "react-router";
 
 //TODO: handle loading sent messages and errored sent messages
 // Define a type for the slice state
@@ -33,7 +35,7 @@ export type GetMessagesInput = {
 // Define the initial state using that type
 const initialState: CurrentChatState = {
   value: null,
-  loading: true,
+  loading: false,
   error: null,
   messagesBatchSize: INITIAL_MESSAGES_BATCH_SIZE,
   messagesNoBatch: 0,
@@ -42,16 +44,31 @@ const initialState: CurrentChatState = {
 };
 
 export const currentChatSlice = createSlice({
-  name: "chatSlice",
+  name: "currentChat",
   initialState,
   reducers: {
     getValue(state, _action: PayloadAction<string>) {
       state.loading = true;
     },
     sendMessage(_, _action: PayloadAction<SendMessageInput>) {},
-    // getInitialMessages(state) {
-    //   state.messagesNoBatch = 1;
-    // },
+    removeParticipant(
+      state,
+      { payload }: PayloadAction<{ chatId: string; participantId: string }>
+    ) {
+      if (
+        Array.isArray(state.value?.participants) &&
+        state.value?.id == payload.chatId
+      ) {
+        state.value.participants = state.value.participants.filter(
+          (participant) => participant.id != payload.participantId
+        );
+      }
+    },
+    requestRemoveParticipant(
+      _,
+      { payload }: PayloadAction<{ chatId: string; participantId: string }>
+    ) {},
+    requestLeaveGroup(_, action: PayloadAction<{ chatId: string }>) {},
     loadMessages(state, action?: PayloadAction<GetMessagesInput>) {},
     setMessagesNoBatch(state, { payload }: PayloadAction<number>) {
       state.messagesNoBatch = payload;
@@ -85,6 +102,9 @@ export const currentChatSlice = createSlice({
     setError(state, { payload }) {
       state.error = payload;
     },
+    resetState(state) {
+      return initialState;
+    },
   },
 });
 
@@ -102,6 +122,10 @@ export const {
   loadMessages,
   setMessagesNoBatch,
   appendMessages,
+  removeParticipant,
+  requestRemoveParticipant,
+  requestLeaveGroup,
+  resetState,
 } = currentChatSlice.actions;
 
 export const selectCurrentChat = (state: RootState) => state.currentChat;

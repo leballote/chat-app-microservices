@@ -23,6 +23,7 @@ export type Chat = {
   type: "INDIVIDUAL" | "GROUP";
   participants: ChatUser[];
   messages: Message[];
+  viewerAsChatUser: ChatUser;
 };
 
 export type ChatContextType = Omit<Chat, "messages">;

@@ -91,9 +91,7 @@ export default function SetTitleAndAvatarDrawerSubsection() {
     dispatch(resetNewGroupDrawerSectionState());
     dispatch(resetMainDrawerSectionState());
     dispatch(setMainDrawerSection());
-    console.log(res.data.createGroupChat.chat);
     dispatch(pushChat(res.data.createGroupChat.chat));
-    console.log("it got called");
     if (!res.errors) {
       navigate(`/app/chat/${res.data.createGroupChat.chat.id}`);
     }

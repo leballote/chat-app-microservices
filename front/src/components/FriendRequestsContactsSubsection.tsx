@@ -27,6 +27,7 @@ import {
   getValue as getFriendsRequestsPreviewsValue,
 } from "../app/features/friendRequestsPreviewsSlice";
 import FriendRequestPreview from "./FriendRequestPreview";
+import GenericPeopleLoading from "./GenericPeopleLoading";
 interface Contact {
   id: string;
   name: string;
@@ -45,7 +46,7 @@ export default function FriendRequestsContactsDrawerSubsection() {
   } = useAppSelector((state) => state.friendRequestsPreviews);
   const friendRequestsList = Object.values(friendRequests).sort(
     (friendReq1, friendReq2) => {
-      return friendReq1.sentAt > friendReq2.sentAt ? 1 : -1;
+      return friendReq1.sentAt > friendReq2.sentAt ? -1 : 1;
     }
   );
   const dispatch = useAppDispatch();
@@ -58,7 +59,7 @@ export default function FriendRequestsContactsDrawerSubsection() {
 
   let component;
   if (!firstFetch && loading) {
-    component = <h1>Loading...</h1>;
+    component = <GenericPeopleLoading numberOfPeople={4} />;
     return component;
   } else if (error) {
     component = (
