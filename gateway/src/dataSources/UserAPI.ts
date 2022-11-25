@@ -68,15 +68,20 @@ export default class UserAPI extends RESTDataSource {
     });
   }
 
-  async getFriendshipRequest({
+  async getFriendshipRequests({
     from,
     to,
   }: {
-    from: string;
-    to: string;
-  }): Promise<FriendshipRequestResponse> {
-    return this.get<FriendshipRequestResponse>(
-      `friendshipRequest?from=${from}&to=${to}`
+    from?: string;
+    to?: string;
+  }): Promise<DefaultAPIResponse<FriendshipRequestSuccessResponse[]>> {
+    const query = Object.entries({ from, to })
+      .filter(([, val]) => val != undefined)
+      .map(([key, val]) => `${key}=${val}`)
+      .join("&");
+
+    return this.get<DefaultAPIResponse<FriendshipRequestSuccessResponse[]>>(
+      `friendshipRequest?${query}`
     );
   }
 
@@ -91,12 +96,31 @@ export default class UserAPI extends RESTDataSource {
       body: { user1Id, user2Id },
     });
   }
+
+  async updateUser(
+    userId: string,
+    options: UpdateUserInput
+  ): Promise<UserModelResponse> {
+    console.log(options);
+    return this.put<UserModelResponse>(`user/${userId}`, {
+      body: options,
+    });
+  }
 }
+
+type UpdateUserInput = {
+  name?: string;
+  avatar?: string;
+  settings?: {
+    language?: string;
+  };
+};
 
 //TODO: put this in the types folder
 type FriendshipRequestSuccessResponse = {
   from: string;
   to: string;
+  createdAt: string;
 };
 
 type FriendshipSuccessResponse = {

@@ -88,15 +88,18 @@ router.put("/user/:id", async (req, res) => {
   try {
     const user = await User.findOneAndUpdate(
       { _id: id },
-      { name, birthDate, email, phrase, avatar, settings },
+      { name, birthDate, phrase, avatar, settings },
       { new: true }
     );
+    console.log(user);
     if (!user) {
       return res.send(errors.userNotFound);
     }
     return res.send({ data: user });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    return res
+      .status(500)
+      .send({ ...errors.serverError, debugError: e.message });
   }
 });
 

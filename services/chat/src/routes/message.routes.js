@@ -26,33 +26,69 @@ router.post("/message", async (req, res) => {
 });
 
 router.get("/message", async (req, res) => {
-  const { chatId, userId, afterDate = 0, limit = 1000, offset = 0 } = req.query;
+  const { chatId, userId, start, afterDate = 0, limit = 1000 } = req.query;
+  let { offset } = req.query;
   const afterDate_ = new Date(afterDate);
+
+  if (start != null && offset != null) {
+    return res.send({
+      error: {
+        message: "Can only paginate by one of the following: offset, start",
+      },
+    });
+  }
+  offset = 0;
 
   let baseQueryParams = { chatId, userId };
   baseQueryParams = Object.fromEntries(
-    Object.entries(baseQueryParams).filter(([key, val]) => val != null)
+    Object.entries(baseQueryParams).filter(([, val]) => val != null)
   );
 
-  const findObject = {
+  let findObject = {
     ...baseQueryParams,
     sentAt: { $gt: new Date(afterDate_) },
   };
 
   try {
-    const messages = await Message.find(findObject)
-      .sort({ sentAt: 1 })
-      .limit(limit)
-      .skip(offset);
-    console.log(messages);
+    let messages;
+    if (start != null) {
+      const startMessage = await Message.findById(start);
+      if (!startMessage) {
+        return res
+          .status(400)
+          .send({ error: { message: "Cursor 'start' not found" } });
+      }
+      messages = await Message.find({
+        ...baseQueryParams,
+        $or: [
+          { sentAt: { $lt: new Date(startMessage.sentAt) } },
+          {
+            sentAt: new Date(startMessage.sentAt),
+            _id: { $gt: new mongoose.Types.ObjectId(startMessage._id) },
+          },
+        ],
+        _id: { $ne: mongoose.Types.ObjectId(start) },
+        sentAt: { $gt: new Date(afterDate_) },
+      })
+        .sort({ sentAt: -1, _id: 1 })
+        .limit(limit);
+    } else {
+      messages = await Message.find(findObject)
+        .sort({ sentAt: -1, _id: 1 })
+        .limit(limit)
+        .skip(offset);
+    }
+
     return res.send({ data: messages });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    return res
+      .status(500)
+      .send({ ...errors.serverError, debugError: e.message });
   }
 });
 
 router.get("/message/:id", async (req, res) => {
-  const { id } = req.params.id;
+  const { id } = req.params;
   try {
     const message = await Message.findById(id);
     if (!message) {
@@ -60,7 +96,9 @@ router.get("/message/:id", async (req, res) => {
     }
     return res.send({ data: message });
   } catch (e) {
-    return res.status().send(errors.serverError);
+    return res
+      .status(500)
+      .send({ error: errors.serverError, debugError: e.message });
   }
 });
 

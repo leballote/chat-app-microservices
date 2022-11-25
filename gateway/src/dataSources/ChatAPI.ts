@@ -60,14 +60,11 @@ export default class ChatAPI extends RESTDataSource {
     }
   }
 
-  // async getMessage() {
-
-  // }
-
   async getMessages(
     args: {
       afterDate?: string;
       limit?: number;
+      start?: string;
       offset?: number;
       chatId?: string;
       userId?: string;
@@ -90,16 +87,15 @@ export default class ChatAPI extends RESTDataSource {
     chatId: string,
     userId: string
   ): Promise<ChatParticipantReseponse> {
-    const apiRes = await this.get<ChatParticipantReseponse>(
-      `participant/?chatId=${chatId}&userId=${userId}`
-    );
-    console.log("USER_ID", userId);
-    console.log("CHAT_ID", chatId);
-    console.log("API_RES", apiRes);
+    const apiRes = await this.get<
+      DefaultAPIResponse<ChatParticipantSuccessResponse[]>
+    >(`participant/?chatId=${chatId}&userId=${userId}`);
     if (isErrorResponse(apiRes)) {
       return apiRes;
+    } else if (apiRes.data.length == 0) {
+      return { error: { message: "User not member of the chat" } };
     } else {
-      return apiRes.data[0];
+      return { data: apiRes.data[0] };
     }
   }
 
@@ -112,6 +108,18 @@ export default class ChatAPI extends RESTDataSource {
     return this.get<DefaultAPIResponse<ChatParticipantSuccessResponse[]>>(
       `participant/${query}`
     );
+  }
+
+  async deleteParticipant(
+    chatId: string,
+    userId: string
+  ): Promise<ChatParticipantReseponse> {
+    return this.delete<ChatParticipantReseponse>("participant", {
+      body: {
+        chatId,
+        userId,
+      },
+    });
   }
 
   async createMessage(

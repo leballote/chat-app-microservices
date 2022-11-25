@@ -57,10 +57,13 @@ router.delete("/", async (req, res) => {
         },
       });
     }
-    const chatUserRel = await Participant.deleteOne({
-      chatId,
-      userId,
+    const chatUserRel = await Participant.findOneAndDelete({
+      "chat.id": chatId,
+      "user.id": userId,
     });
+    if (!chatUserRel) {
+      return res.send(errors.participantNotFound);
+    }
     return res.send({ data: chatUserRel });
   } catch (e) {
     if (e.code) {

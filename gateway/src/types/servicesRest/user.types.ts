@@ -11,6 +11,9 @@ export type UserModelSuccessResponse = {
   friends: string[] | UserModelSuccessResponse[];
   createdAt: string;
   updatedAt: string;
+  settings: {
+    language: string;
+  };
 };
 
 export type CreateUserModelInput = {

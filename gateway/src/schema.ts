@@ -26,6 +26,7 @@ const typeDefs = gql`
     status: Status!
     avatar: String
     chat(chatId: String): Chat
+    settings: UserSettings
   }
 
   type Viewer implements UserInterface {
@@ -38,6 +39,11 @@ const typeDefs = gql`
     status: Status!
     avatar: String
     chat(chatId: String): Chat
+    settings: UserSettings
+  }
+
+  type UserSettings {
+    language: String
   }
 
   type ChatUser implements UserInterface {
@@ -60,6 +66,7 @@ const typeDefs = gql`
     participants: [ChatUser!]!
     lastMessage: Message
     avatar: String
+    viewerAsChatUser: ChatUser!
   }
 
   enum ChatType {
@@ -114,9 +121,15 @@ const typeDefs = gql`
     code: Int
   }
 
+  type FriendRequest {
+    user: User!
+    sentAt: String!
+  }
+
   type Query {
     chats: [Chat!]!
-    messages: [Message!]!
+    messages(input: GetMessagesInput!): [Message!]!
+    friendshipRequestsReceived: [FriendRequest!]!
     viewer: User
   }
 
@@ -135,6 +148,35 @@ const typeDefs = gql`
       input: RequestFriendshipInput!
     ): RequestFriendshipResponse!
     acceptFriendship(input: AcceptFriendshipInput!): AcceptFriendshipResponse!
+    leaveGroupChat(input: LeaveGroupChatInput!): LeaveGroupChatResponse!
+    removeParticipant(input: RemoveParticipantInput): RemoveParticipantResponse!
+  }
+
+  input RemoveParticipantInput {
+    chatId: ID!
+    participantId: ID!
+  }
+
+  type RemoveParticipantResponse {
+    chatId: ID!
+    participantId: ID!
+    success: Boolean!
+  }
+
+  input LeaveGroupChatInput {
+    chatId: ID!
+  }
+
+  type LeaveGroupChatResponse {
+    chatId: String!
+    success: Boolean!
+  }
+
+  input GetMessagesInput {
+    chatId: ID
+    limit: Int
+    offset: Int
+    start: ID
   }
 
   input RequestFriendshipInput {
@@ -202,6 +244,18 @@ const typeDefs = gql`
 
   type Subscription {
     messageCreated: MessageCreatedSubscriptionResponse
+    friendshipRequestReceived: FriendshipRequestReceivedSubscriptionResponse
+    friendshipRequestAccepted: FriendshipRequestAcceptedSubscriptionResponse
+  }
+
+  type FriendshipRequestReceivedSubscriptionResponse {
+    requesterUser: User!
+    accepterUser: User!
+  }
+
+  type FriendshipRequestAcceptedSubscriptionResponse {
+    requesterUser: User!
+    accepterUser: User!
   }
 `;
 export default typeDefs;

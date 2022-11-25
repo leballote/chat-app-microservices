@@ -31,7 +31,6 @@ router.post("/friendshipRequest", async (req, res) => {
         { from: to, to: from },
       ],
     });
-    console.log("FRIEND_REQ", friendReq);
     if (friendReq?.from == from) {
       return res.status(400).send(errors.youAlreadyRequestedFriendship);
     }
@@ -60,14 +59,15 @@ router.get("/friendshipRequest", async (req, res) => {
     Object.entries(baseQueryParams).filter(([, val]) => val != null)
   );
 
+  console.log("BASE QUERY PARAMS", baseQueryParams);
+
   try {
-    const friendshipRequest = await FriendRequestModel.findOne(baseQueryParams);
+    const friendshipRequest = await FriendRequestModel.find(baseQueryParams);
+    console.log(friendshipRequest);
 
-    if (!friendshipRequest) {
-      return res.status(404).send(errors.friendshipRequestNotFound);
-    }
-
-    return res.send({ data: { success: true, ...friendshipRequest } });
+    return res.send({
+      data: friendshipRequest,
+    });
   } catch (e) {
     return res
       .status(500)

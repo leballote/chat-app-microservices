@@ -38,6 +38,7 @@ export type Chat = {
   participants: Array<ChatUser>;
   phrase: Scalars['String'];
   type: ChatType;
+  viewerAsChatUser: ChatUser;
 };
 
 export enum ChatType {
@@ -84,6 +85,31 @@ export type Error = {
   reason: Scalars['String'];
 };
 
+export type FriendRequest = {
+  __typename?: 'FriendRequest';
+  sentAt: Scalars['String'];
+  user: User;
+};
+
+export type FriendshipRequestAcceptedSubscriptionResponse = {
+  __typename?: 'FriendshipRequestAcceptedSubscriptionResponse';
+  accepterUser: User;
+  requesterUser: User;
+};
+
+export type FriendshipRequestReceivedSubscriptionResponse = {
+  __typename?: 'FriendshipRequestReceivedSubscriptionResponse';
+  accepterUser: User;
+  requesterUser: User;
+};
+
+export type GetMessagesInput = {
+  chatId?: InputMaybe<Scalars['ID']>;
+  limit?: InputMaybe<Scalars['Int']>;
+  offset?: InputMaybe<Scalars['Int']>;
+  start?: InputMaybe<Scalars['ID']>;
+};
+
 export type GetOrCreateChatResponse = {
   __typename?: 'GetOrCreateChatResponse';
   chat: Chat;
@@ -92,6 +118,16 @@ export type GetOrCreateChatResponse = {
 
 export type GetOrCreateIndividualChatInput = {
   userId: Scalars['String'];
+};
+
+export type LeaveGroupChatInput = {
+  chatId: Scalars['ID'];
+};
+
+export type LeaveGroupChatResponse = {
+  __typename?: 'LeaveGroupChatResponse';
+  chatId: Scalars['String'];
+  success: Scalars['Boolean'];
 };
 
 export type LogInResponse = {
@@ -126,8 +162,10 @@ export type Mutation = {
   createMessage: CreateMessageResponse;
   createPost: Post;
   getOrCreateIndividualChat: GetOrCreateChatResponse;
+  leaveGroupChat: LeaveGroupChatResponse;
   login: LogInResponse;
   logout: LogOutResponse;
+  removeParticipant: RemoveParticipantResponse;
   requestFriendship: RequestFriendshipResponse;
   setLanguage: SetLanguageResponse;
   signup: SignUpResponse;
@@ -160,9 +198,19 @@ export type MutationGetOrCreateIndividualChatArgs = {
 };
 
 
+export type MutationLeaveGroupChatArgs = {
+  input: LeaveGroupChatInput;
+};
+
+
 export type MutationLoginArgs = {
   password?: InputMaybe<Scalars['String']>;
   username?: InputMaybe<Scalars['String']>;
+};
+
+
+export type MutationRemoveParticipantArgs = {
+  input?: InputMaybe<RemoveParticipantInput>;
 };
 
 
@@ -194,8 +242,26 @@ export type Post = {
 export type Query = {
   __typename?: 'Query';
   chats: Array<Chat>;
+  friendshipRequestsReceived: Array<FriendRequest>;
   messages: Array<Message>;
   viewer?: Maybe<User>;
+};
+
+
+export type QueryMessagesArgs = {
+  input: GetMessagesInput;
+};
+
+export type RemoveParticipantInput = {
+  chatId: Scalars['ID'];
+  participantId: Scalars['ID'];
+};
+
+export type RemoveParticipantResponse = {
+  __typename?: 'RemoveParticipantResponse';
+  chatId: Scalars['ID'];
+  participantId: Scalars['ID'];
+  success: Scalars['Boolean'];
 };
 
 export type RequestFriendshipInput = {
@@ -238,6 +304,8 @@ export enum Status {
 
 export type Subscription = {
   __typename?: 'Subscription';
+  friendshipRequestAccepted?: Maybe<FriendshipRequestAcceptedSubscriptionResponse>;
+  friendshipRequestReceived?: Maybe<FriendshipRequestReceivedSubscriptionResponse>;
   messageCreated?: Maybe<MessageCreatedSubscriptionResponse>;
 };
 
@@ -250,6 +318,7 @@ export type User = UserInterface & {
   id: Scalars['ID'];
   name: Scalars['String'];
   phrase: Scalars['String'];
+  settings?: Maybe<UserSettings>;
   status: Status;
   username: Scalars['String'];
 };
@@ -268,6 +337,11 @@ export type UserInterface = {
   username: Scalars['String'];
 };
 
+export type UserSettings = {
+  __typename?: 'UserSettings';
+  language?: Maybe<Scalars['String']>;
+};
+
 export type Viewer = UserInterface & {
   __typename?: 'Viewer';
   avatar?: Maybe<Scalars['String']>;
@@ -277,6 +351,7 @@ export type Viewer = UserInterface & {
   id: Scalars['ID'];
   name: Scalars['String'];
   phrase: Scalars['String'];
+  settings?: Maybe<UserSettings>;
   status: Status;
   username: Scalars['String'];
 };
@@ -365,10 +440,16 @@ export type ResolversTypes = {
   CreateMessageInput: CreateMessageInput;
   CreateMessageResponse: ResolverTypeWrapper<Omit<CreateMessageResponse, 'message'> & { message?: Maybe<ResolversTypes['Message']> }>;
   Error: ResolverTypeWrapper<Error>;
+  FriendRequest: ResolverTypeWrapper<Omit<FriendRequest, 'user'> & { user: ResolversTypes['User'] }>;
+  FriendshipRequestAcceptedSubscriptionResponse: ResolverTypeWrapper<Omit<FriendshipRequestAcceptedSubscriptionResponse, 'accepterUser' | 'requesterUser'> & { accepterUser: ResolversTypes['User'], requesterUser: ResolversTypes['User'] }>;
+  FriendshipRequestReceivedSubscriptionResponse: ResolverTypeWrapper<Omit<FriendshipRequestReceivedSubscriptionResponse, 'accepterUser' | 'requesterUser'> & { accepterUser: ResolversTypes['User'], requesterUser: ResolversTypes['User'] }>;
+  GetMessagesInput: GetMessagesInput;
   GetOrCreateChatResponse: ResolverTypeWrapper<Omit<GetOrCreateChatResponse, 'chat'> & { chat: ResolversTypes['Chat'] }>;
   GetOrCreateIndividualChatInput: GetOrCreateIndividualChatInput;
   ID: ResolverTypeWrapper<Scalars['ID']>;
   Int: ResolverTypeWrapper<Scalars['Int']>;
+  LeaveGroupChatInput: LeaveGroupChatInput;
+  LeaveGroupChatResponse: ResolverTypeWrapper<LeaveGroupChatResponse>;
   LogInResponse: ResolverTypeWrapper<LogInModelSuccessResponse>;
   LogOutResponse: ResolverTypeWrapper<LogOutResponse>;
   Message: ResolverTypeWrapper<MessageModelSuccessResponse>;
@@ -377,6 +458,8 @@ export type ResolversTypes = {
   ParticipantInput: ParticipantInput;
   Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<{}>;
+  RemoveParticipantInput: RemoveParticipantInput;
+  RemoveParticipantResponse: ResolverTypeWrapper<RemoveParticipantResponse>;
   RequestFriendshipInput: RequestFriendshipInput;
   RequestFriendshipResponse: ResolverTypeWrapper<Omit<RequestFriendshipResponse, 'friendAdded'> & { friendAdded?: Maybe<ResolversTypes['User']> }>;
   SetLanguageInput: SetLanguageInput;
@@ -388,6 +471,7 @@ export type ResolversTypes = {
   Subscription: ResolverTypeWrapper<{}>;
   User: ResolverTypeWrapper<UserModelSuccessResponse>;
   UserInterface: ResolversTypes['ChatUser'] | ResolversTypes['User'] | ResolversTypes['Viewer'];
+  UserSettings: ResolverTypeWrapper<UserSettings>;
   Viewer: ResolverTypeWrapper<Omit<Viewer, 'chat' | 'chats' | 'friends'> & { chat?: Maybe<ResolversTypes['Chat']>, chats: Array<ResolversTypes['Chat']>, friends: Array<ResolversTypes['User']> }>;
 };
 
@@ -402,10 +486,16 @@ export type ResolversParentTypes = {
   CreateMessageInput: CreateMessageInput;
   CreateMessageResponse: Omit<CreateMessageResponse, 'message'> & { message?: Maybe<ResolversParentTypes['Message']> };
   Error: Error;
+  FriendRequest: Omit<FriendRequest, 'user'> & { user: ResolversParentTypes['User'] };
+  FriendshipRequestAcceptedSubscriptionResponse: Omit<FriendshipRequestAcceptedSubscriptionResponse, 'accepterUser' | 'requesterUser'> & { accepterUser: ResolversParentTypes['User'], requesterUser: ResolversParentTypes['User'] };
+  FriendshipRequestReceivedSubscriptionResponse: Omit<FriendshipRequestReceivedSubscriptionResponse, 'accepterUser' | 'requesterUser'> & { accepterUser: ResolversParentTypes['User'], requesterUser: ResolversParentTypes['User'] };
+  GetMessagesInput: GetMessagesInput;
   GetOrCreateChatResponse: Omit<GetOrCreateChatResponse, 'chat'> & { chat: ResolversParentTypes['Chat'] };
   GetOrCreateIndividualChatInput: GetOrCreateIndividualChatInput;
   ID: Scalars['ID'];
   Int: Scalars['Int'];
+  LeaveGroupChatInput: LeaveGroupChatInput;
+  LeaveGroupChatResponse: LeaveGroupChatResponse;
   LogInResponse: LogInModelSuccessResponse;
   LogOutResponse: LogOutResponse;
   Message: MessageModelSuccessResponse;
@@ -414,6 +504,8 @@ export type ResolversParentTypes = {
   ParticipantInput: ParticipantInput;
   Post: Post;
   Query: {};
+  RemoveParticipantInput: RemoveParticipantInput;
+  RemoveParticipantResponse: RemoveParticipantResponse;
   RequestFriendshipInput: RequestFriendshipInput;
   RequestFriendshipResponse: Omit<RequestFriendshipResponse, 'friendAdded'> & { friendAdded?: Maybe<ResolversParentTypes['User']> };
   SetLanguageInput: SetLanguageInput;
@@ -424,6 +516,7 @@ export type ResolversParentTypes = {
   Subscription: {};
   User: UserModelSuccessResponse;
   UserInterface: ResolversParentTypes['ChatUser'] | ResolversParentTypes['User'] | ResolversParentTypes['Viewer'];
+  UserSettings: UserSettings;
   Viewer: Omit<Viewer, 'chat' | 'chats' | 'friends'> & { chat?: Maybe<ResolversParentTypes['Chat']>, chats: Array<ResolversParentTypes['Chat']>, friends: Array<ResolversParentTypes['User']> };
 };
 
@@ -441,6 +534,7 @@ export type ChatResolvers<ContextType = MyContext, ParentType extends ResolversP
   participants?: Resolver<Array<ResolversTypes['ChatUser']>, ParentType, ContextType>;
   phrase?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   type?: Resolver<ResolversTypes['ChatType'], ParentType, ContextType>;
+  viewerAsChatUser?: Resolver<ResolversTypes['ChatUser'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -469,9 +563,33 @@ export type ErrorResolvers<ContextType = MyContext, ParentType extends Resolvers
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type FriendRequestResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['FriendRequest'] = ResolversParentTypes['FriendRequest']> = {
+  sentAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FriendshipRequestAcceptedSubscriptionResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['FriendshipRequestAcceptedSubscriptionResponse'] = ResolversParentTypes['FriendshipRequestAcceptedSubscriptionResponse']> = {
+  accepterUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  requesterUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FriendshipRequestReceivedSubscriptionResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['FriendshipRequestReceivedSubscriptionResponse'] = ResolversParentTypes['FriendshipRequestReceivedSubscriptionResponse']> = {
+  accepterUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  requesterUser?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type GetOrCreateChatResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['GetOrCreateChatResponse'] = ResolversParentTypes['GetOrCreateChatResponse']> = {
   chat?: Resolver<ResolversTypes['Chat'], ParentType, ContextType>;
   created?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type LeaveGroupChatResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['LeaveGroupChatResponse'] = ResolversParentTypes['LeaveGroupChatResponse']> = {
+  chatId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -506,8 +624,10 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   createMessage?: Resolver<ResolversTypes['CreateMessageResponse'], ParentType, ContextType, RequireFields<MutationCreateMessageArgs, 'input'>>;
   createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, Partial<MutationCreatePostArgs>>;
   getOrCreateIndividualChat?: Resolver<ResolversTypes['GetOrCreateChatResponse'], ParentType, ContextType, RequireFields<MutationGetOrCreateIndividualChatArgs, 'input'>>;
+  leaveGroupChat?: Resolver<ResolversTypes['LeaveGroupChatResponse'], ParentType, ContextType, RequireFields<MutationLeaveGroupChatArgs, 'input'>>;
   login?: Resolver<ResolversTypes['LogInResponse'], ParentType, ContextType, Partial<MutationLoginArgs>>;
   logout?: Resolver<ResolversTypes['LogOutResponse'], ParentType, ContextType>;
+  removeParticipant?: Resolver<ResolversTypes['RemoveParticipantResponse'], ParentType, ContextType, Partial<MutationRemoveParticipantArgs>>;
   requestFriendship?: Resolver<ResolversTypes['RequestFriendshipResponse'], ParentType, ContextType, RequireFields<MutationRequestFriendshipArgs, 'input'>>;
   setLanguage?: Resolver<ResolversTypes['SetLanguageResponse'], ParentType, ContextType, Partial<MutationSetLanguageArgs>>;
   signup?: Resolver<ResolversTypes['SignUpResponse'], ParentType, ContextType, Partial<MutationSignupArgs>>;
@@ -521,8 +641,16 @@ export type PostResolvers<ContextType = MyContext, ParentType extends ResolversP
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
-  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
+  friendshipRequestsReceived?: Resolver<Array<ResolversTypes['FriendRequest']>, ParentType, ContextType>;
+  messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessagesArgs, 'input'>>;
   viewer?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+};
+
+export type RemoveParticipantResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['RemoveParticipantResponse'] = ResolversParentTypes['RemoveParticipantResponse']> = {
+  chatId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  participantId?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type RequestFriendshipResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['RequestFriendshipResponse'] = ResolversParentTypes['RequestFriendshipResponse']> = {
@@ -542,6 +670,8 @@ export type SignUpResponseResolvers<ContextType = MyContext, ParentType extends 
 };
 
 export type SubscriptionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
+  friendshipRequestAccepted?: SubscriptionResolver<Maybe<ResolversTypes['FriendshipRequestAcceptedSubscriptionResponse']>, "friendshipRequestAccepted", ParentType, ContextType>;
+  friendshipRequestReceived?: SubscriptionResolver<Maybe<ResolversTypes['FriendshipRequestReceivedSubscriptionResponse']>, "friendshipRequestReceived", ParentType, ContextType>;
   messageCreated?: SubscriptionResolver<Maybe<ResolversTypes['MessageCreatedSubscriptionResponse']>, "messageCreated", ParentType, ContextType>;
 };
 
@@ -553,6 +683,7 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   phrase?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  settings?: Resolver<Maybe<ResolversTypes['UserSettings']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -568,6 +699,11 @@ export type UserInterfaceResolvers<ContextType = MyContext, ParentType extends R
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
 };
 
+export type UserSettingsResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['UserSettings'] = ResolversParentTypes['UserSettings']> = {
+  language?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type ViewerResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Viewer'] = ResolversParentTypes['Viewer']> = {
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   chat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType, Partial<ViewerChatArgs>>;
@@ -576,6 +712,7 @@ export type ViewerResolvers<ContextType = MyContext, ParentType extends Resolver
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   phrase?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  settings?: Resolver<Maybe<ResolversTypes['UserSettings']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -587,7 +724,11 @@ export type Resolvers<ContextType = MyContext> = {
   ChatUser?: ChatUserResolvers<ContextType>;
   CreateMessageResponse?: CreateMessageResponseResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
+  FriendRequest?: FriendRequestResolvers<ContextType>;
+  FriendshipRequestAcceptedSubscriptionResponse?: FriendshipRequestAcceptedSubscriptionResponseResolvers<ContextType>;
+  FriendshipRequestReceivedSubscriptionResponse?: FriendshipRequestReceivedSubscriptionResponseResolvers<ContextType>;
   GetOrCreateChatResponse?: GetOrCreateChatResponseResolvers<ContextType>;
+  LeaveGroupChatResponse?: LeaveGroupChatResponseResolvers<ContextType>;
   LogInResponse?: LogInResponseResolvers<ContextType>;
   LogOutResponse?: LogOutResponseResolvers<ContextType>;
   Message?: MessageResolvers<ContextType>;
@@ -595,12 +736,14 @@ export type Resolvers<ContextType = MyContext> = {
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  RemoveParticipantResponse?: RemoveParticipantResponseResolvers<ContextType>;
   RequestFriendshipResponse?: RequestFriendshipResponseResolvers<ContextType>;
   SetLanguageResponse?: SetLanguageResponseResolvers<ContextType>;
   SignUpResponse?: SignUpResponseResolvers<ContextType>;
   Subscription?: SubscriptionResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
   UserInterface?: UserInterfaceResolvers<ContextType>;
+  UserSettings?: UserSettingsResolvers<ContextType>;
   Viewer?: ViewerResolvers<ContextType>;
 };
 

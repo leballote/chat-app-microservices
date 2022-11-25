@@ -10,9 +10,12 @@ import { Resolvers, ChatType, Status } from "./generated/graphql";
 import { withFilter } from "graphql-subscriptions";
 import { CookieOptions } from "express";
 import { create } from "domain";
+import { isIndividualChatInput } from "./types/servicesRest/chat.types";
 
 const pubsub = new PubSub();
 const MESSAGE_CREATED = "MESSAGE_CREATED";
+const FRIENDSHIP_REQUEST_RECEIVED = "FRIENDSHIP_REQUEST_RECEIVED";
+const FRIENDSHIP_REQUEST_ACCEPTED = "FRIENDSHIP_REQUEST_ACCEPTED";
 
 const resolvers: Resolvers = {
   Query: {
@@ -27,10 +30,54 @@ const resolvers: Resolvers = {
       }
     },
 
+    messages: async (_, { input }, { dataSources, req, res }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const messagesRes = await dataSources.chatAPI.getMessages({
+        userId: viewer._id,
+        ...input,
+      });
+      if (isErrorResponse(messagesRes)) {
+        throw new Error(messagesRes.error.message);
+      }
+      return messagesRes.data;
+    },
+
     viewer: async (_, {}, { dataSources }) => {
-      //TODO: here must be the authentication and the getting of the user, so theorethically we count with the user id
       const viewer_ = await dataSources.getViewer();
       return viewer_;
+    },
+    friendshipRequestsReceived: async (_parent, _input, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const friendRes = await dataSources.userAPI.getFriendshipRequests({
+        to: viewer._id,
+      });
+      if (isErrorResponse(friendRes)) {
+        throw new Error(friendRes.error.message);
+      }
+
+      const promises = friendRes.data.map(async (friendReq) =>
+        dataSources.userAPI.getUser(friendReq.from)
+      );
+      const promisesRes = await Promise.all(promises);
+      const mergedRes = friendRes.data.map((friendReq, index) => ({
+        friendReq,
+        userRes: promisesRes[index],
+      }));
+      const notErroredRes = mergedRes.filter(
+        ({ userRes }) => !isErrorResponse(userRes)
+      ) as {
+        userRes: DataObject<UserModelSuccessResponse>;
+        friendReq: { from: string; createdAt: string };
+      }[];
+      return notErroredRes.map(({ userRes, friendReq }) => {
+        return { user: userRes.data, sentAt: friendReq.createdAt };
+      });
     },
   },
 
@@ -253,6 +300,13 @@ const resolvers: Resolvers = {
       if (isErrorResponse(userAddedRes)) {
         throw new Error(userAddedRes.error.message);
       }
+
+      pubsub.publish(FRIENDSHIP_REQUEST_RECEIVED, {
+        friendshipRequestReceived: {
+          sender: viewer,
+          receiver: userAddedRes.data,
+        },
+      });
       return {
         friendAdded: userAddedRes.data,
       };
@@ -263,15 +317,17 @@ const resolvers: Resolvers = {
         throw new Error("Not authenticated");
       }
       const friendshipRequestRes =
-        await dataSources.userAPI.getFriendshipRequest({
+        await dataSources.userAPI.getFriendshipRequests({
           from: input.userToAccept,
           to: viewer._id,
         });
 
-      //TODO: handle better the case when friendship request doesn't exis. Right now it is handeled the same if there is a  network error or if there is not friend
-      //TODO: what happens if the requests doesn't exist but there is already a friendship?
       if (isErrorResponse(friendshipRequestRes)) {
         throw new Error(friendshipRequestRes.error.message);
+      }
+
+      if (friendshipRequestRes.data.length == 0) {
+        throw new Error("Friendship request not available");
       }
 
       const friendshipRes = await dataSources.userAPI.createFriendship({
@@ -285,12 +341,85 @@ const resolvers: Resolvers = {
       const userAddedRes = await dataSources.userAPI.getUser(
         input.userToAccept
       );
+
       if (isErrorResponse(userAddedRes)) {
         throw new Error(userAddedRes.error.message);
       }
 
+      pubsub.publish(FRIENDSHIP_REQUEST_ACCEPTED, {
+        friendshipRequestAccepted: {
+          sender: viewer,
+          receiver: userAddedRes.data,
+        },
+      });
+
       return {
         friendAdded: userAddedRes.data,
+      };
+    },
+
+    setLanguage: async (parent, { input: { language } }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const userRes = await dataSources.userAPI.updateUser(viewer._id, {
+        settings: {
+          language,
+        },
+      });
+      if (isErrorResponse(userRes)) {
+        throw new Error(userRes.error.message);
+      }
+      return { language: userRes.data.settings.language, success: true };
+    },
+    removeParticipant: async (parent, { input }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const viewerParticipantRes = await dataSources.chatAPI.getParticipant(
+        input.chatId,
+        viewer._id
+      );
+      if (isErrorResponse(viewerParticipantRes)) {
+        throw new Error(viewerParticipantRes.error.message);
+      }
+      if (!viewerParticipantRes.data.admin) {
+        throw new Error("Only admins can remove participants");
+      }
+
+      const delParticipantRes = await dataSources.chatAPI.deleteParticipant(
+        input.chatId,
+        input.participantId
+      );
+
+      if (isErrorResponse(delParticipantRes)) {
+        throw new Error(delParticipantRes.error.message);
+      }
+      return {
+        chatId: input.chatId,
+        participantId: input.participantId,
+        success: true,
+      };
+    },
+    leaveGroupChat: async (parent, { input }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const delParticipantRes = await dataSources.chatAPI.deleteParticipant(
+        input.chatId,
+        viewer._id
+      );
+
+      if (isErrorResponse(delParticipantRes)) {
+        throw new Error(delParticipantRes.error.message);
+      }
+      console.log(delParticipantRes);
+      return {
+        chatId: input.chatId,
+        success: true,
       };
     },
   },
@@ -303,7 +432,35 @@ const resolvers: Resolvers = {
             (args) => {
               return pubsub.asyncIterator([MESSAGE_CREATED]);
             },
-            function filterMessageCreated(payload, variables, somethingElse) {
+            function filterMessageCreated() {
+              return true;
+            }
+          ),
+        };
+      },
+    },
+    friendshipRequestAccepted: {
+      subscribe: async () => {
+        return {
+          [Symbol.asyncIterator]: withFilter(
+            (args) => {
+              return pubsub.asyncIterator([FRIENDSHIP_REQUEST_ACCEPTED]);
+            },
+            function filterMessageCreated() {
+              return true;
+            }
+          ),
+        };
+      },
+    },
+    friendshipRequestReceived: {
+      subscribe: async () => {
+        return {
+          [Symbol.asyncIterator]: withFilter(
+            (args) => {
+              return pubsub.asyncIterator([FRIENDSHIP_REQUEST_RECEIVED]);
+            },
+            function filterMessageCreated() {
               return true;
             }
           ),
@@ -423,19 +580,45 @@ const resolvers: Resolvers = {
       return participants as any;
     },
     messages: async (parent, {}, { dataSources }) => {
-      const viewer = dataSources.getViewer();
+      const viewer = await dataSources.getViewer();
       if (!viewer) {
         throw new Error("Not authenticated");
       }
-      // const viewerParticipant = await dataSources.chatAPI.getParticipant();
+      const viewerParticipantRes = await dataSources.chatAPI.getParticipant(
+        parent._id,
+        viewer._id
+      );
+      if (isErrorResponse(viewerParticipantRes)) {
+        throw new Error(viewerParticipantRes.error.message);
+      }
       const messagesRes = await dataSources.chatAPI.getMessages({
-        // afterDate: viewerParticipant.participantSince,
+        afterDate: viewerParticipantRes.data.participantSince,
         chatId: parent._id,
+        limit: 15,
       });
       if (isErrorResponse(messagesRes)) {
         throw new Error(messagesRes.error.message);
       }
       return messagesRes.data;
+    },
+    viewerAsChatUser: async (parent, {}, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const participantRes = await dataSources.chatAPI.getParticipant(
+        parent._id,
+        viewer._id
+      );
+      if (isErrorResponse(participantRes)) {
+        throw new Error(participantRes.error.message);
+      }
+      return {
+        ...viewer,
+        ...participantRes.data,
+        status: null,
+        id: viewer._id,
+      };
     },
   },
   Message: {
@@ -485,12 +668,94 @@ const resolvers: Resolvers = {
       }
       const { participants } = chatRes.data;
 
-      //TODO: delete this line, it is only to debug the subscription
-      return message;
+      // //TODO: delete this line, it is only to debug the subscription
+      // return message;
       if (
         participants.map((participant) => participant.id).includes(user._id)
       ) {
         return message;
+      } else {
+        return null;
+      }
+    },
+  },
+  FriendshipRequestAcceptedSubscriptionResponse: {
+    accepterUser: async (parent, {}, context) => {
+      const { user, dataSources } = context as unknown as {
+        user: UserModelSuccessResponse;
+        dataSources: typeof context.dataSources;
+      };
+      if (!user) {
+        throw new Error("Not authenticated");
+      }
+
+      const parent_ = parent as unknown as {
+        sender: UserModelSuccessResponse;
+        receiver: UserModelSuccessResponse;
+      };
+
+      if (user._id == parent_.receiver._id) {
+        return parent_.sender;
+      } else {
+        return null;
+      }
+    },
+    requesterUser: async (parent, {}, context) => {
+      const { user, dataSources } = context as unknown as {
+        user: UserModelSuccessResponse;
+        dataSources: typeof context.dataSources;
+      };
+      if (!user) {
+        throw new Error("Not authenticated");
+      }
+
+      const parent_ = parent as unknown as {
+        sender: UserModelSuccessResponse;
+        receiver: UserModelSuccessResponse;
+      };
+
+      if (user._id == parent_.receiver._id) {
+        return parent_.receiver;
+      } else {
+        return null;
+      }
+    },
+  },
+  FriendshipRequestReceivedSubscriptionResponse: {
+    requesterUser: async (parent, {}, context) => {
+      const { user, dataSources } = context as unknown as {
+        user: UserModelSuccessResponse;
+        dataSources: typeof context.dataSources;
+      };
+      if (!user) {
+        throw new Error("Not authenticated");
+      }
+
+      const parent_ = parent as unknown as {
+        sender: UserModelSuccessResponse;
+        receiver: UserModelSuccessResponse;
+      };
+      if (user._id == parent_.receiver._id) {
+        return parent_.sender;
+      } else {
+        return null;
+      }
+    },
+    accepterUser: async (parent, {}, context) => {
+      const { user, dataSources } = context as unknown as {
+        user: UserModelSuccessResponse;
+        dataSources: typeof context.dataSources;
+      };
+      if (!user) {
+        throw new Error("Not authenticated");
+      }
+
+      const parent_ = parent as unknown as {
+        sender: UserModelSuccessResponse;
+        receiver: UserModelSuccessResponse;
+      };
+      if (user._id == parent_.receiver._id) {
+        return parent_.receiver;
       } else {
         return null;
       }
