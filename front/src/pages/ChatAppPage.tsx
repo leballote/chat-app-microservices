@@ -21,6 +21,8 @@ import {
   removeFriendRequest,
 } from "../app/features/friendRequestsPreviewsSlice";
 import { addContact } from "../app/features/contactsPreviewsSlice";
+import { requestGetChat } from "../app/sagas/requests/currentChat";
+import { getChatPreview } from "../app/features/chatsPreviewsSlice";
 
 //TODO: this component will be removed
 const Placeholder = ({ text }: any) => {
@@ -69,9 +71,9 @@ const FRIENDSHIP_REQUEST_RECEIVED = gql`
     }
   }
 `;
-const FRIENDSHIP_REQUEST_ACCEPTED = gql`
-  subscription FriendshipRequestAccepted {
-    friendshipRequestAccepted {
+const FRIENDSHIP_RESPONSE_RECEIVED = gql`
+  subscription FriendshipResponseRecevied {
+    friendshipResponseReceived {
       accepterUser {
         id
         name
@@ -86,12 +88,14 @@ const FRIENDSHIP_REQUEST_ACCEPTED = gql`
         avatar
         phrase
       }
+      accept
     }
   }
 `;
 
 export default function ChatAppPage() {
   const user = useContext(CurrentUserContext);
+  const { value: chats } = useAppSelector((state) => state.chatsPreviews);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -104,7 +108,7 @@ export default function ChatAppPage() {
   // } =
   useSubscription(MESSAGE_CREATED, {
     onData: ({ data }) => {
-      console.log(data);
+      const chatId = data.data?.messageCreated.message.chat.id;
       if (data.data?.messageCreated.message) {
         if (
           data.data?.messageCreated.message.chat.id ==
@@ -112,6 +116,9 @@ export default function ChatAppPage() {
           currentChatState.value
         ) {
           dispatch(unshiftMessage(data.data.messageCreated.message));
+        }
+        if (chatId && !chats.map((chat) => chat.id).includes(chatId)) {
+          dispatch(getChatPreview(chatId));
         }
       }
     },
@@ -123,7 +130,6 @@ export default function ChatAppPage() {
     onData: ({ data }) => {
       const friendshipRequestReceived = data.data?.friendshipRequestReceived;
       const { accepterUser, requesterUser } = friendshipRequestReceived;
-      console.log(friendshipRequestReceived);
       if (accepterUser && accepterUser.id == user?.id) {
         dispatch(
           addFriendRequest({
@@ -137,16 +143,26 @@ export default function ChatAppPage() {
     },
   });
 
-  useSubscription(FRIENDSHIP_REQUEST_ACCEPTED, {
+  useSubscription(FRIENDSHIP_RESPONSE_RECEIVED, {
     onData: ({ data }) => {
-      const friendshipAccepted = data.data?.friendshipRequestAccepted;
-      const { accepterUser, requesterUser } = friendshipAccepted;
-      if (accepterUser && accepterUser.id == user?.id) {
-        dispatch(addContact(requesterUser));
-        dispatch(removeFriendRequest(requesterUser.id));
-      }
-      if (requesterUser && requesterUser.id == user?.id) {
-        dispatch(addContact(accepterUser));
+      const friendshipResponseReceived = data.data?.friendshipResponseReceived;
+      const { accepterUser, requesterUser, accept } =
+        friendshipResponseReceived;
+      console.log("FRIENDSHIP RESPONSE", friendshipResponseReceived);
+      console.log("DATA", data.data);
+      if (accept) {
+        if (accepterUser && accepterUser.id == user?.id) {
+          dispatch(addContact(requesterUser));
+          dispatch(removeFriendRequest(requesterUser.id));
+        }
+        if (requesterUser && requesterUser.id == user?.id) {
+          console.log(requesterUser);
+          dispatch(addContact(accepterUser));
+        }
+      } else {
+        if (accepterUser && accepterUser.id == user?.id) {
+          dispatch(removeFriendRequest(requesterUser.id));
+        }
       }
     },
   });

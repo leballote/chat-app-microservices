@@ -10,7 +10,11 @@ import * as React from "react";
 import { ChatUser } from "../types/ChatSectionTypes";
 import { IconButton } from "@mui/material";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import { useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useNavigate } from "react-router";
+import { useMutation, gql } from "@apollo/client";
+import { pushChat } from "../app/features/chatsPreviewsSlice";
+import { closeDetails } from "../app/features/chatSectionSlice";
 
 export interface Props {
   id: string;
@@ -24,6 +28,20 @@ export interface Props {
   onRemove?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
+const GET_OR_CREATE_CHAT = gql`
+  mutation GetOrCreateChat($input: GetOrCreateIndividualChatInput!) {
+    getOrCreateIndividualChat(input: $input) {
+      chat {
+        id
+        type
+        phrase
+        name
+        avatar
+      }
+    }
+  }
+`;
+
 export default function ({
   name,
   phrase,
@@ -35,12 +53,37 @@ export default function ({
   isViewerAdmin,
 }: Props) {
   const { value: currentUser } = useAppSelector((state) => state.currentUser);
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const [getOrCreateChatFn] = useMutation(GET_OR_CREATE_CHAT);
   return (
     <ListItem
       key={id}
       button
       component={"li"}
-      // onClick={onClick}
+      onClick={async (ev) => {
+        if (id && currentUser?.id == id) return;
+        const contactId = ev.currentTarget.dataset["userId"];
+        try {
+          const getOrCreateChatRes = await getOrCreateChatFn({
+            variables: {
+              input: {
+                userId: contactId,
+              },
+            },
+          });
+          const { chat: newChat, created } =
+            getOrCreateChatRes.data.getOrCreateIndividualChat;
+          if (created) {
+            dispatch(pushChat(newChat));
+          }
+          dispatch(closeDetails());
+
+          navigate(`/app/chat/${newChat.id}`);
+        } catch (e) {
+          throw e;
+        }
+      }}
       data-user-id={`${id}`}
       secondaryAction={
         isViewerAdmin && id && currentUser?.id != id ? (

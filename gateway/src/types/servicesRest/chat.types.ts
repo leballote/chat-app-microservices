@@ -25,6 +25,7 @@ export type ChatModelSuccessResponse = {
   updatedAt: string;
   participants: ChatParticipantSuccessResponse[];
   avatar?: string;
+  lastActionDate: string;
 };
 
 export type ChatModelResponse = DefaultAPIResponse<ChatModelSuccessResponse>;

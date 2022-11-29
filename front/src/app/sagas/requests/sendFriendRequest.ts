@@ -34,7 +34,6 @@ export async function requestSendFriendRequest({
   if (userToAddEmail) variables.input.userToAddEmail = userToAddEmail;
   if (userToAddUsername) variables.input.userToAddUsername = userToAddUsername;
 
-  console.log("VARIABLES", variables);
   return await client.mutate({
     mutation: SEND_FRIEND_REQUEST,
     variables,

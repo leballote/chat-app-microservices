@@ -15,20 +15,28 @@ import { isIndividualChatInput } from "./types/servicesRest/chat.types";
 const pubsub = new PubSub();
 const MESSAGE_CREATED = "MESSAGE_CREATED";
 const FRIENDSHIP_REQUEST_RECEIVED = "FRIENDSHIP_REQUEST_RECEIVED";
-const FRIENDSHIP_REQUEST_ACCEPTED = "FRIENDSHIP_REQUEST_ACCEPTED";
+const FRIENDSHIP_RESPONSE_RECEIVED = "FRIENDSHIP_RESPONSE_RECEIVED";
 
 const resolvers: Resolvers = {
   Query: {
-    chats: async (_, args = {}, context) => {
-      const { dataSources } = context;
-      const chatRes = await dataSources.chatAPI.getChats(args);
-      if (isErrorResponse(chatRes)) {
-        //I think you are supposed to throw an error
-        throw new Error(chatRes.error.message);
-      } else {
-        return chatRes.data;
+    user: async (_, { input }, { dataSources }) => {
+      const { userId } = input;
+      const userRes = await dataSources.userAPI.getUser(userId);
+      if (isErrorResponse(userRes)) {
+        throw new Error(userRes.error.message);
       }
+      return userRes.data;
     },
+    // chats: async (_, args = {}, context) => {
+    //   const { dataSources } = context;
+    //   const chatRes = await dataSources.chatAPI.getChats(args);
+    //   if (isErrorResponse(chatRes)) {
+    //     //I think you are supposed to throw an error
+    //     throw new Error(chatRes.error.message);
+    //   } else {
+    //     return chatRes.data;
+    //   }
+    // },
 
     messages: async (_, { input }, { dataSources, req, res }) => {
       const viewer = await dataSources.getViewer();
@@ -133,7 +141,6 @@ const resolvers: Resolvers = {
       res.cookie("jwt_token", authRes.data.token, options);
       return authRes.data;
     },
-    //TODO: I am actually not sure if this needs to be done within the server or if I can clean the cookies directly in the browser
     logout: async (_, __, { res, req }) => {
       const options: CookieOptions = {
         maxAge: 1000 * 60 * 60 * 24, //expires in a day
@@ -209,12 +216,12 @@ const resolvers: Resolvers = {
         throw new Error("Not authenticated");
       }
 
-      let friends = viewer.friends as UserModelSuccessResponse[];
-      const friendsIds = friends.map((friend) => friend._id);
+      // let friends = viewer.friends as UserModelSuccessResponse[];
+      // const friendsIds = friends.map((friend) => friend._id);
 
-      if (!friendsIds.includes(input.userId)) {
-        throw new Error("You can only chat with your friends");
-      }
+      // if (!friendsIds.includes(input.userId)) {
+      //   throw new Error("You can only chat with your friends");
+      // }
 
       const getChatRes = await dataSources.chatAPI.getChats({
         user1Id: viewer._id,
@@ -346,10 +353,11 @@ const resolvers: Resolvers = {
         throw new Error(userAddedRes.error.message);
       }
 
-      pubsub.publish(FRIENDSHIP_REQUEST_ACCEPTED, {
-        friendshipRequestAccepted: {
+      pubsub.publish(FRIENDSHIP_RESPONSE_RECEIVED, {
+        friendshipResponseReceived: {
           sender: viewer,
           receiver: userAddedRes.data,
+          accept: true,
         },
       });
 
@@ -357,7 +365,54 @@ const resolvers: Resolvers = {
         friendAdded: userAddedRes.data,
       };
     },
+    rejectFriendship: async (parent, { input }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const friendshipRequestRes =
+        await dataSources.userAPI.getFriendshipRequests({
+          from: input.userToReject,
+          to: viewer._id,
+        });
 
+      if (isErrorResponse(friendshipRequestRes)) {
+        throw new Error(friendshipRequestRes.error.message);
+      }
+
+      if (friendshipRequestRes.data.length == 0) {
+        throw new Error("Friendship request not available");
+      }
+
+      const friendshipRes = await dataSources.userAPI.deleteFriendshipRequest({
+        from: input.userToReject,
+        to: viewer._id,
+      });
+
+      if (isErrorResponse(friendshipRes)) {
+        throw new Error(friendshipRes.error.message);
+      }
+
+      const userRejectedRes = await dataSources.userAPI.getUser(
+        input.userToReject
+      );
+
+      if (isErrorResponse(userRejectedRes)) {
+        throw new Error(userRejectedRes.error.message);
+      }
+
+      pubsub.publish(FRIENDSHIP_RESPONSE_RECEIVED, {
+        friendshipResponseReceived: {
+          sender: viewer,
+          receiver: userRejectedRes.data,
+          accept: false,
+        },
+      });
+
+      return {
+        friendRejected: userRejectedRes.data,
+      };
+    },
     setLanguage: async (parent, { input: { language } }, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       if (!viewer) {
@@ -422,6 +477,53 @@ const resolvers: Resolvers = {
         success: true,
       };
     },
+    removeFriendship: async (parent, { input }, { dataSources }) => {
+      console.log("called");
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      console.log("first");
+      const friendhipRemoveRes = await dataSources.userAPI.deleteFriendship({
+        user1Id: viewer._id,
+        user2Id: input.userToRemoveId,
+      });
+      console.log("real sescond", friendhipRemoveRes);
+
+      if (isErrorResponse(friendhipRemoveRes)) {
+        throw new Error(friendhipRemoveRes.error.message);
+      }
+      console.log("second");
+
+      const userToRemoveRes = await dataSources.userAPI.getUser(
+        input.userToRemoveId
+      );
+      console.log("third", userToRemoveRes);
+
+      if (isErrorResponse(userToRemoveRes)) {
+        throw new Error(userToRemoveRes.error.message);
+      }
+
+      return { userRemoved: userToRemoveRes.data };
+    },
+    addParticipants: async (parent, { input }, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not authenticated");
+      }
+      const chatRes = await dataSources.chatAPI.addParticipants({
+        chatId: input.chatId,
+        participants: input.participants,
+      });
+
+      if (isErrorResponse(chatRes)) {
+        throw new Error(chatRes.error.message);
+      }
+
+      return {
+        chatModified: chatRes.data,
+      };
+    },
   },
 
   Subscription: {
@@ -439,12 +541,12 @@ const resolvers: Resolvers = {
         };
       },
     },
-    friendshipRequestAccepted: {
+    friendshipResponseReceived: {
       subscribe: async () => {
         return {
           [Symbol.asyncIterator]: withFilter(
             (args) => {
-              return pubsub.asyncIterator([FRIENDSHIP_REQUEST_ACCEPTED]);
+              return pubsub.asyncIterator([FRIENDSHIP_RESPONSE_RECEIVED]);
             },
             function filterMessageCreated() {
               return true;
@@ -613,12 +715,14 @@ const resolvers: Resolvers = {
       if (isErrorResponse(participantRes)) {
         throw new Error(participantRes.error.message);
       }
+      //TODO: for some reason it is not allowing individualChat = null
       return {
         ...viewer,
         ...participantRes.data,
         status: null,
         id: viewer._id,
-      };
+        individualChat: null,
+      } as any;
     },
   },
   Message: {
@@ -679,7 +783,7 @@ const resolvers: Resolvers = {
       }
     },
   },
-  FriendshipRequestAcceptedSubscriptionResponse: {
+  FriendshipResponseReceivedSubscriptionResponse: {
     accepterUser: async (parent, {}, context) => {
       const { user, dataSources } = context as unknown as {
         user: UserModelSuccessResponse;
@@ -694,7 +798,7 @@ const resolvers: Resolvers = {
         receiver: UserModelSuccessResponse;
       };
 
-      if (user._id == parent_.receiver._id) {
+      if (user._id == parent_.receiver._id || user._id == parent_.sender._id) {
         return parent_.sender;
       } else {
         return null;
@@ -714,7 +818,7 @@ const resolvers: Resolvers = {
         receiver: UserModelSuccessResponse;
       };
 
-      if (user._id == parent_.receiver._id) {
+      if (user._id == parent_.receiver._id || user._id == parent_.sender._id) {
         return parent_.receiver;
       } else {
         return null;
@@ -762,6 +866,21 @@ const resolvers: Resolvers = {
     },
   },
   ChatUser: {
+    individualChat: async (parent, _input, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not user logged in");
+      }
+      const chatRes = await dataSources.chatAPI.getChats({
+        user1Id: viewer._id,
+        user2Id: parent._id,
+      });
+
+      if (isErrorResponse(chatRes)) {
+        throw new Error(chatRes.error.message);
+      }
+      return chatRes.data[0] ?? null;
+    },
     status: (parent) => {
       //TODO see how you are going to solve this
       return Status.Online;
@@ -814,6 +933,21 @@ const resolvers: Resolvers = {
         throw new Error(chatRes.error.message);
       }
       return chatRes.data;
+    },
+    individualChat: async (parent, _input, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
+      if (!viewer) {
+        throw new Error("Not user logged in");
+      }
+      const chatRes = await dataSources.chatAPI.getChats({
+        user1Id: viewer._id,
+        user2Id: parent._id,
+      });
+
+      if (isErrorResponse(chatRes)) {
+        throw new Error(chatRes.error.message);
+      }
+      return chatRes.data[0] ?? null;
     },
     status: (parent) => {
       //TODO see how you are going to solve this

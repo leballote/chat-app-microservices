@@ -10,15 +10,16 @@ import { requestGetChatsPreviews } from "../requests/chatsPreviews";
 export function* handleChatsPreviews(action: PayloadAction<string>): any {
   const { payload } = action;
   try {
-    put(setLoading(true));
+    yield put(setLoading(true));
     const response = yield call(requestGetChatsPreviews, payload);
+    console.log(response);
     const { data } = response;
     const {
       viewer: { chats },
     } = data;
     yield put(setChatsPreviews(chats));
   } catch (error) {
-    put(setLoading(false));
-    put(setError(error));
+    yield put(setLoading(false));
+    yield put(setError(error));
   }
 }

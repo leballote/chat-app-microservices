@@ -7,10 +7,12 @@ import {
   Button,
   Paper,
   Typography,
+  Alert,
 } from "@mui/material";
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
+import { setError } from "../app/features/chatsPreviewsSlice";
 import { CurrentUserContext } from "../contexts";
 
 const SIGNUP = gql`
@@ -30,11 +32,13 @@ export default function SignupPage() {
   const { t } = useTranslation();
   //TODO: move this into a saga
   const [mutationFunction, { data, loading, error }] = useMutation(SIGNUP);
-  console.log({
-    SIGNUP_DATA: data,
-    SIGNUP_LOADING: loading,
-    SIGNUP_ERROR: error,
-  });
+  console.log("GRAPHQL", error?.graphQLErrors);
+  // const errorMessages = error?.graphQLErrors.map();
+
+  const [clientError, setClientError] = useState<{ message: string } | null>(
+    null
+  );
+
   const user = useContext(CurrentUserContext);
   const navigate = useNavigate();
   useEffect(() => {
@@ -55,9 +59,15 @@ export default function SignupPage() {
     const name = nameInput.current?.value;
     const email = emailInput.current?.value;
     const password = passwordInput.current?.value;
-    const confirmPassword = passwordInput.current?.value;
+    const confirmPassword = confirmPasswordInput.current?.value;
     //TODO: Validate email
-    if (password !== confirmPassword) return;
+    if (password !== confirmPassword) {
+      setClientError({ message: "Passwords don't match" });
+      setError(undefined);
+      return;
+    } else {
+      setClientError(null);
+    }
 
     const requiredInputs = {
       username,
@@ -123,6 +133,12 @@ export default function SignupPage() {
           <Button type="submit" variant="outlined">
             {t("signupPage.signupButton")}
           </Button>
+          {clientError ? (
+            <Alert severity="error">{clientError.message}</Alert>
+          ) : null}
+          {error && !clientError ? (
+            <Alert severity="error">{error.message}</Alert>
+          ) : null}
           <Typography textAlign="center">
             {t("signupPage.haveAnAccount")} &nbsp;
             <Link to="/auth/login">{t("signupPage.login")}!</Link>

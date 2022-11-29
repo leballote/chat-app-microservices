@@ -29,14 +29,6 @@ import { openAddFriendModal } from "../app/features/contactsSectionDrawerSlice";
 import MainContactsSubsection from "./MainContactsSubsection";
 import FriendRequestsContactsDrawerSubsection from "./FriendRequestsContactsSubsection";
 
-interface Contact {
-  id: string;
-  name: string;
-  phrase: string;
-  status: string;
-  avatar: string;
-}
-
 interface TabPanelProps {
   children?: React.ReactNode;
   index: Subsection;
@@ -117,13 +109,11 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
       </Box>
 
       <Tabs onChange={handleChangeTab} value={tabValue}>
-        {/* //TODO :  internationalize */}
-        <Tab label="Friends" value={Subsection.MAIN} />
+        <Tab label={t("app.drawer.contacts.friends")} value={Subsection.MAIN} />
         <Tab
-          // TODO:  internationalize
-          label="Friend Requests"
+          label={t("app.drawer.contacts.friendRequests")}
           //TODO: change for the actual number of friend requests
-          icon={<Box color="ButtonText">4</Box>}
+          // icon={<Box color="ButtonText">4</Box>}
           iconPosition="end"
           value={Subsection.FRIEND_REQUESTS}
         />

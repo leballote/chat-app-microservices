@@ -21,6 +21,7 @@ import { WithHeight } from "../../types/utilTypes";
 import FormatedAvatar from "../../utils/FormatedAvatar";
 import { openDetails } from "../../app/features/chatSectionSlice";
 import { useAppDispatch } from "../../app/hooks";
+import { setValue as setCurrentUserProfilePage } from "../../app/features/currentUserProfilePageSlice";
 
 interface Props {
   height: string | number;
@@ -45,6 +46,19 @@ function IndividualChatHeader({ height }: WithHeight) {
   const currentUser = useContext(CurrentUserContext);
   //TODO: handle this more elegantly "currentUser?.id, how to be sure that it is already loaded";
   const receiver = participants.filter(({ id }) => id != currentUser?.id)[0];
+  const dispatch = useAppDispatch();
+  const user = useContext(CurrentUserContext);
+
+  const handleOpenDetailsClick: React.MouseEventHandler<
+    HTMLDivElement
+  > = () => {
+    dispatch(openDetails());
+    dispatch(
+      setCurrentUserProfilePage(
+        participants.filter((participant) => user?.id != participant.id)[0]
+      )
+    );
+  };
 
   const props = {
     name: chatInfo.name,
@@ -54,6 +68,7 @@ function IndividualChatHeader({ height }: WithHeight) {
     avatarName: chatInfo.name,
     height,
     to: `/profile/user/${chatInfo.id}`,
+    onOpenDetailsClick: handleOpenDetailsClick,
   };
 
   return <BaseChatHeader {...props} />;
@@ -63,6 +78,13 @@ function GroupChatHeader({ height }: WithHeight) {
   const chat = useContext(ChatContext);
   if (!chat) return null;
   const { participants, ...chatInfo } = chat;
+  const dispatch = useAppDispatch();
+
+  const handleOpenDetailsClick: React.MouseEventHandler<
+    HTMLDivElement
+  > = () => {
+    dispatch(openDetails());
+  };
 
   const props: BaseChatHeaderProps = {
     name: chatInfo.name,
@@ -71,6 +93,7 @@ function GroupChatHeader({ height }: WithHeight) {
     avatarName: chatInfo.name,
     height,
     to: `/profile/group/${chatInfo.id}`,
+    onOpenDetailsClick: handleOpenDetailsClick,
   };
   return <BaseChatHeader {...props} />;
 }
@@ -83,15 +106,13 @@ type BaseChatHeaderProps = {
   avatarName?: string;
   avatarSrc?: string;
   to: string;
+  onOpenDetailsClick?: React.MouseEventHandler<HTMLDivElement>;
 } & ({ avatarName: string } | { avatarSrc: string }) &
   WithHeight;
 
 function BaseChatHeader(props: BaseChatHeaderProps) {
   const { name, status, phrase, height, to } = props;
-  const dispatch = useAppDispatch();
-  const hanldeDetailsClick: React.MouseEventHandler<HTMLDivElement> = (ev) => {
-    return dispatch(openDetails());
-  };
+  const { onOpenDetailsClick, ...others } = props;
 
   return (
     <Box
@@ -102,7 +123,7 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
       }}
     >
       <Box
-        onClick={hanldeDetailsClick}
+        onClick={onOpenDetailsClick}
         sx={{
           display: "flex",
           textDecoration: "none",
@@ -116,7 +137,7 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
           },
         }}
       >
-        <FormatedAvatar {...props} />
+        <FormatedAvatar {...others} />
         <Container>
           <Typography component="h1" fontWeight="bold">
             {name}

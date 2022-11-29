@@ -47,6 +47,7 @@ const context: ContextFunction = async ({ req, res, ...moreContext }) => {
   // serverCleanup requires context
   // context requires server
   // So I don't know how is this supposed to work, but it hasn't failed
+
   const { cache } = server;
   return {
     listen: { port: 4000 },

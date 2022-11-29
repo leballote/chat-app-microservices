@@ -25,6 +25,13 @@ export async function requestGetChat(chatId: string): Promise<any> {
             name
             phrase
             avatar
+            individualChat {
+              id
+              type
+              phrase
+              name
+              avatar
+            }
           }
           messages {
             id

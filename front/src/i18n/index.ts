@@ -16,7 +16,11 @@ type Translation = {
           title: string;
           language: string;
         };
-        contacts: {};
+        contacts: {
+          title: string;
+          friends: string;
+          friendRequests: string;
+        };
       };
       chat: {};
     };
@@ -68,7 +72,11 @@ const resources: { [language: string]: Translation } = {
             title: "Ajustes",
             language: "Idioma",
           },
-          contacts: {},
+          contacts: {
+            title: "Amigos",
+            friends: "Amigos",
+            friendRequests: "Solicitudes de amistad",
+          },
         },
         chat: {},
       },
@@ -118,7 +126,11 @@ const resources: { [language: string]: Translation } = {
             title: "Settings",
             language: "Language",
           },
-          contacts: {},
+          contacts: {
+            title: "Friends",
+            friends: "Friends",
+            friendRequests: "Friend requests",
+          },
         },
         chat: {},
       },
@@ -168,7 +180,11 @@ const resources: { [language: string]: Translation } = {
             title: "Einstellungen",
             language: "Sprachen",
           },
-          contacts: {},
+          contacts: {
+            title: "Freunde",
+            friends: "Freunde",
+            friendRequests: "Freundschaftsanfrage",
+          },
         },
         chat: {},
       },

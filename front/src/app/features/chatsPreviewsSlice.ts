@@ -39,9 +39,9 @@ export const chatsPreviewsSlice = createSlice({
   initialState,
   reducers: {
     getValue(state, { payload }: PayloadAction<string>) {
-      //TODO: not sure if this is needed
-      state.loading = true;
+      // state.loading = true;
     },
+    getChatPreview(_, { payload }: PayloadAction<string>) {},
     setSearchTerm(state, { payload }) {
       state.searchTerm = payload;
       //TODO: check if this is the way to do it
@@ -79,6 +79,7 @@ export const {
   pushChat,
   removeChat,
   resetState,
+  getChatPreview,
 } = chatsPreviewsSlice.actions;
 
 export const selectChatsPreviews = (state: RootState) => state.chatsPreviews;

@@ -47,6 +47,7 @@ export const friendRequestsPreviewsSlice = createSlice({
       state.loading = false;
     },
     acceptFriendRequest(_, { payload }: PayloadAction<string>) {},
+    rejectFriendRequest(_, { payload }: PayloadAction<string>) {},
     removeFriendRequest(state, { payload }: PayloadAction<string>) {
       if (state.value[payload]) {
         delete state.value[payload];
@@ -92,6 +93,7 @@ export const {
   setError,
   resetState,
   acceptFriendRequest,
+  rejectFriendRequest,
   addFriendRequest,
   removeFriendRequest,
   setFriendRequestToAccepting,

@@ -99,6 +99,21 @@ export default class ChatAPI extends RESTDataSource {
     }
   }
 
+  async addParticipants({
+    chatId,
+    participants,
+  }: {
+    chatId: string;
+    participants: { id: string; admin: boolean }[];
+  }) {
+    return this.post<ChatModelResponse>(`participant/multiple`, {
+      body: {
+        chatId,
+        participants,
+      },
+    });
+  }
+
   async getParticipants(args: {
     chatId: string;
   }): Promise<DefaultAPIResponse<ChatParticipantSuccessResponse[]>> {

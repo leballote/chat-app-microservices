@@ -9,7 +9,7 @@ export async function requestGetContactsPreviews(
 ): Promise<any> {
   //in the query should be a search term
   const GET_CONTACTS_PREVIEWS_DATA = gql`
-    query GetChatPreviews {
+    query GetContactsPreviews {
       viewer {
         id
         friends {
@@ -18,6 +18,9 @@ export async function requestGetContactsPreviews(
           avatar
           phrase
           status
+          individualChat {
+            id
+          }
         }
       }
     }

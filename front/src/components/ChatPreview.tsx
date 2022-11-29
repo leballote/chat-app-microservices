@@ -43,7 +43,7 @@ export default function ChatPreview({
   if (lastMessage) {
     previewSection = (
       <Typography component="p" fontSize={".8em"} color="textSecondary">
-        {content.slice(1, 50)}
+        {content.slice(0, 50)}
       </Typography>
     );
   } else {

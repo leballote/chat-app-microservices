@@ -25,6 +25,7 @@ import { useNavigate } from "react-router";
 import {
   acceptFriendRequest,
   getValue as getFriendsRequestsPreviewsValue,
+  rejectFriendRequest,
 } from "../app/features/friendRequestsPreviewsSlice";
 import FriendRequestPreview from "./FriendRequestPreview";
 import GenericPeopleLoading from "./GenericPeopleLoading";
@@ -84,9 +85,9 @@ export default function FriendRequestsContactsDrawerSubsection() {
     const target = ev.currentTarget as HTMLElement;
     const previewTarget = target?.closest("[data-user-id]") as HTMLElement;
     const userId = previewTarget?.dataset.userId;
-    // if (userId) {
-    //   dispatch()
-    // }
+    if (userId) {
+      dispatch(rejectFriendRequest(userId));
+    }
   }
 
   return (

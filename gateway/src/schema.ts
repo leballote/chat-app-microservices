@@ -27,6 +27,7 @@ const typeDefs = gql`
     avatar: String
     chat(chatId: String): Chat
     settings: UserSettings
+    individualChat: Chat
   }
 
   type Viewer implements UserInterface {
@@ -54,6 +55,7 @@ const typeDefs = gql`
     status: Status!
     avatar: String
     admin: Boolean!
+    individualChat: Chat
     participantSince: String!
   }
 
@@ -67,6 +69,7 @@ const typeDefs = gql`
     lastMessage: Message
     avatar: String
     viewerAsChatUser: ChatUser!
+    lastActionDate: String!
   }
 
   enum ChatType {
@@ -130,7 +133,12 @@ const typeDefs = gql`
     chats: [Chat!]!
     messages(input: GetMessagesInput!): [Message!]!
     friendshipRequestsReceived: [FriendRequest!]!
+    user(input: GetUserInput!): User!
     viewer: User
+  }
+
+  input GetUserInput {
+    userId: ID!
   }
 
   type Mutation {
@@ -148,8 +156,40 @@ const typeDefs = gql`
       input: RequestFriendshipInput!
     ): RequestFriendshipResponse!
     acceptFriendship(input: AcceptFriendshipInput!): AcceptFriendshipResponse!
+    rejectFriendship(input: RejectFriendshipInput!): RejectFriendshipResponse!
+    removeFriendship(input: RemoveFriendshipInput!): RemoveFriendshipResponse!
     leaveGroupChat(input: LeaveGroupChatInput!): LeaveGroupChatResponse!
     removeParticipant(input: RemoveParticipantInput): RemoveParticipantResponse!
+    addParticipants(input: AddParticipantsInput): AddParticipantsResponse!
+  }
+
+  input AddParticipantsInput {
+    chatId: ID!
+    participants: [ParticipantInput!]!
+  }
+
+  type AddParticipantsResponse {
+    chatModified: Chat!
+  }
+
+  input RemoveFriendshipInput {
+    userToRemoveId: ID
+    userToRemoveEmail: String
+    userToRemoveUsername: String
+  }
+
+  type RemoveFriendshipResponse {
+    userRemoved: User!
+  }
+
+  input RejectFriendshipInput {
+    userToReject: ID
+    userToRejectEmail: String
+    userToRejectUsername: String
+  }
+
+  type RejectFriendshipResponse {
+    friendRejected: User!
   }
 
   input RemoveParticipantInput {
@@ -245,7 +285,7 @@ const typeDefs = gql`
   type Subscription {
     messageCreated: MessageCreatedSubscriptionResponse
     friendshipRequestReceived: FriendshipRequestReceivedSubscriptionResponse
-    friendshipRequestAccepted: FriendshipRequestAcceptedSubscriptionResponse
+    friendshipResponseReceived: FriendshipResponseReceivedSubscriptionResponse
   }
 
   type FriendshipRequestReceivedSubscriptionResponse {
@@ -253,9 +293,10 @@ const typeDefs = gql`
     accepterUser: User!
   }
 
-  type FriendshipRequestAcceptedSubscriptionResponse {
+  type FriendshipResponseReceivedSubscriptionResponse {
     requesterUser: User!
     accepterUser: User!
+    accept: Boolean!
   }
 `;
 export default typeDefs;

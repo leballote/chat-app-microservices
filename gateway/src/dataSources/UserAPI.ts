@@ -33,17 +33,9 @@ export default class UserAPI extends RESTDataSource {
       .map(([key, val]) => `${key}=${val}`)
       .join("&");
 
-    try {
-      return this.get<DefaultAPIResponse<UserModelSuccessResponse[]>>(
-        `user/?${query}`
-      );
-    } catch (e) {
-      return {
-        error: {
-          message: JSON.stringify(e),
-        },
-      };
-    }
+    return this.get<DefaultAPIResponse<UserModelSuccessResponse[]>>(
+      `user/?${query}`
+    );
   }
 
   async createUser(input: CreateUserModelInput): Promise<UserModelResponse> {
@@ -85,6 +77,21 @@ export default class UserAPI extends RESTDataSource {
     );
   }
 
+  async deleteFriendshipRequest({
+    from,
+    to,
+  }: {
+    from: string;
+    to: string;
+  }): Promise<FriendshipRequestResponse> {
+    return this.delete<FriendshipRequestResponse>("friendshipRequest", {
+      body: {
+        from,
+        to,
+      },
+    });
+  }
+
   async createFriendship({
     user1Id,
     user2Id,
@@ -94,6 +101,21 @@ export default class UserAPI extends RESTDataSource {
   }): Promise<FriendshipResponse> {
     return this.post<FriendshipResponse>("friendship", {
       body: { user1Id, user2Id },
+    });
+  }
+
+  async deleteFriendship({
+    user1Id,
+    user2Id,
+  }: {
+    user1Id: string;
+    user2Id: string;
+  }) {
+    return this.delete<FriendshipResponse>("friendship", {
+      body: {
+        user1Id,
+        user2Id,
+      },
     });
   }
 
