@@ -1,7 +1,6 @@
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
-//TODO: maybe change this with https
 import { createServer } from "http";
 import express from "express";
 import { makeExecutableSchema } from "@graphql-tools/schema";
@@ -12,12 +11,9 @@ import typeDefs from "./schema";
 import ChatAPI from "./dataSources/ChatAPI";
 import UserAPI from "./dataSources/UserAPI";
 import AuthAPI from "./dataSources/AuthAPI";
-import {
-  UserModelResponse,
-  UserModelSuccessResponse,
-} from "./types/servicesRest";
+import { UserModelSuccessResponse } from "./types/servicesRest";
 import cookieParser from "cookie-parser";
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import { isErrorResponse } from "./types/general.types";
 import cookie from "cookie";
 
@@ -51,8 +47,6 @@ const context: ContextFunction = async ({ req, res, ...moreContext }) => {
   const { cache } = server;
   return {
     listen: { port: 4000 },
-    // We create new instances of our data sources with each request,
-    // passing in our server's cache.
     req,
     res,
     moreContext,
@@ -60,7 +54,6 @@ const context: ContextFunction = async ({ req, res, ...moreContext }) => {
       chatAPI: new ChatAPI({ cache }),
       userAPI: new UserAPI({ cache }),
       authAPI: new AuthAPI({ cache }),
-      //TODO this should send a request to auth and get the user from the token
       getViewer: async function () {
         const token = req.cookies.jwt_token;
         const authUser = await this.authAPI.authorize(token);
@@ -75,16 +68,11 @@ const context: ContextFunction = async ({ req, res, ...moreContext }) => {
   };
 };
 
-// Create the schema, which will be used separately by ApolloServer and
-// the WebSocket server.
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
-// Create an Express app and HTTP server; we will attach both the WebSocket
-// server and the ApolloServer to this HTTP server.
 const app = express();
 const httpServer = createServer(app);
 
-// Create our WebSocket server using the HTTP server we just set up.
 const wsServer = new WebSocketServer({
   server: httpServer,
   path: "/graphql",
@@ -93,7 +81,7 @@ const wsServer = new WebSocketServer({
 const serverCleanup = useServer(
   {
     schema,
-    context: async (ctx, msg, args) => {
+    context: async (ctx) => {
       const { cache } = server;
       const { jwt_token } = ctx.extra.request.headers.cookie
         ? cookie.parse(ctx.extra.request.headers.cookie)
@@ -139,8 +127,6 @@ const server = new ApolloServer({
     },
   ],
 });
-
-// Save the returned server's info so we can shutdown this server later
 
 async function start() {
   await server.start();
