@@ -21,7 +21,7 @@ export default function ProfilePreview({
   status,
 }: Props) {
   return (
-    <ListItem button component={RouterLink} to="profile/me">
+    <ListItem>
       <ListItemAvatar>
         <Avatar
           alt={`${avatar} of ${name}`}
