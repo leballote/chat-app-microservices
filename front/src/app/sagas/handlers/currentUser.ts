@@ -7,7 +7,7 @@ import {
 } from "../../features/currentUserSlice";
 import { requestGetUser } from "../requests/currentUser";
 
-export function* handleGetUser(action: Action): any {
+export function* handleGetUser(_action: Action): any {
   try {
     put(setLoading(true));
     const response = yield call(requestGetUser);
@@ -15,7 +15,7 @@ export function* handleGetUser(action: Action): any {
     const { viewer } = data;
     yield put(setCurrentUser(viewer));
   } catch (error) {
-    put(setLoading(false));
-    put(setError(error));
+    yield put(setLoading(false));
+    yield put(setError(error));
   }
 }

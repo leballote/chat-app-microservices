@@ -3,30 +3,27 @@ import Toolbar from "@mui/material/Toolbar";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
-import Box from "@mui/material/Box";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import ProfilePreview, { Props as ProfilePreviewProps } from "./ProfilePreview";
+import ProfilePreview from "./ProfilePreview";
 import ChatsDrawerSection from "./ChatsDrawerSection";
 import ContactsIcon from "@mui/icons-material/Contacts";
 import { useContext, useEffect, useRef, useState } from "react";
-import { CurrentUserContext } from "../contexts";
-import { useAppSelector } from "../app/hooks";
+import { CurrentUserContext } from "../../contexts";
+import { useAppSelector } from "../../app/hooks";
 import { useDispatch } from "react-redux";
 import {
   resetState as resetMainDrawerState,
   turnOffMoreMenu,
   turnOnMoreMenu,
-} from "../app/features/mainSectionDrawerSlice";
+} from "../../app/features/mainSectionDrawerSlice";
 import { gql, useMutation } from "@apollo/client";
 import { useNavigate } from "react-router";
-import { getValue as getCurrentUserValue } from "../app/features/currentUserSlice";
+import { getValue as getCurrentUserValue } from "../../app/features/currentUserSlice";
 import { useTranslation } from "react-i18next";
 import {
   setNewGroupDrawerSection,
   setSettingsDrawerSection,
-} from "../app/features/sideBarSlice";
-import { resetState as resetNewGroupState } from "../app/features/newGroupSectionDrawerSlice";
-import { resetState as resetSettingsDrawerSectionState } from "../app/features/settingsSectionSlice";
+} from "../../app/features/sideBarSlice";
 
 interface Props {
   onContactsClick: (ev: React.MouseEvent<HTMLElement>) => void;
@@ -124,7 +121,5 @@ export default function MainDrawerView(props: Props) {
         </Menu>
       ) : null}
     </>
-  ) : (
-    <h1>Temp</h1>
-  );
+  ) : null;
 }

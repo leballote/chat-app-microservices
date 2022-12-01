@@ -6,18 +6,19 @@ import {
   setError,
 } from "../../features/chatsPreviewsSlice";
 import { requestGetChatsPreviews } from "../requests/chatsPreviews";
+import indexArrayByField from "../../../utils/indexArrayByField";
 
 export function* handleChatsPreviews(action: PayloadAction<string>): any {
   const { payload } = action;
   try {
     yield put(setLoading(true));
     const response = yield call(requestGetChatsPreviews, payload);
-    console.log(response);
     const { data } = response;
     const {
       viewer: { chats },
     } = data;
-    yield put(setChatsPreviews(chats));
+    const chats_ = indexArrayByField(chats, "id");
+    yield put(setChatsPreviews(chats_));
   } catch (error) {
     yield put(setLoading(false));
     yield put(setError(error));

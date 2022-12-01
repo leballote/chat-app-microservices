@@ -1,20 +1,7 @@
 import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
-import { Link as RouterLink, useParams } from "react-router-dom";
-import { useState, useEffect, useContext, createContext } from "react";
-import {
-  List,
-  ListItem,
-  Avatar,
-  ListItemAvatar,
-  ListItemText,
-  Grid,
-  CssBaseline,
-  Button,
-} from "@mui/material";
+import { useContext } from "react";
 import React from "react";
 import { ChatContext, CurrentUserContext } from "../../contexts";
 import { WithHeight } from "../../types/utilTypes";
@@ -23,11 +10,7 @@ import { openDetails } from "../../app/features/chatSectionSlice";
 import { useAppDispatch } from "../../app/hooks";
 import { setValue as setCurrentUserProfilePage } from "../../app/features/currentUserProfilePageSlice";
 
-interface Props {
-  height: string | number;
-}
-
-export default function ChatHeader({ height }: Props) {
+export default function ChatHeader({ height }: WithHeight) {
   const chat = useContext(ChatContext);
   if (!chat) return null;
   const { participants, ...chatInfo } = chat;

@@ -1,50 +1,29 @@
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
-import {
-  useState,
-  useEffect,
-  useContext,
-  createContext,
-  useRef,
-  useLayoutEffect,
-  useInsertionEffect,
-} from "react";
+import { useState, useEffect, useContext, useRef } from "react";
 import {
   List,
   ListItem,
   Avatar,
   ListItemAvatar,
   ListItemText,
-  Grid,
-  CssBaseline,
   Button,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
 import ImageIcon from "@mui/icons-material/Image";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import {
-  Chat,
-  ChatContextType,
-  ChatDataResponse,
-  ChatUser,
-  Message,
-} from "../types/ChatSectionTypes";
+import { Message } from "../types/ChatSectionTypes";
 import { ChatContext, CurrentUserContext } from "../contexts";
 import ChatHeader from "../components/ChatSectionComponents/ChatHeader";
 import { WithHeight } from "../types/utilTypes";
 import indexArrayByField from "../utils/indexArrayByField";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { User } from "../types/AppTypes";
 import {
   getValue as getCurrentChatValue,
   sendMessage,
   loadMessages,
-  setError,
-  setValue,
-  setLoading,
   resetState as resetCurrentChatState,
 } from "../app/features/currentChatSlice";
 import {
@@ -53,7 +32,8 @@ import {
 } from "../app/features/chatSectionSlice";
 import getScrollHeightGap from "../utils/getScrollHeightGap";
 import { useDispatch } from "react-redux";
-import ChatDetailsModal from "../components/ChatDetailsModal";
+import ChatDetailsModal from "../components/Modals/ChatDetailsModal";
+import ChatLoading from "../components/Feedback/ChatLoading";
 
 interface Props extends WithHeight {
   messages: Message[];
@@ -114,7 +94,15 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
       ref={chatAreaRef}
       onScroll={handleScroll}
     >
-      <List sx={{ display: "flex", flexFlow: "column-reverse" }}>
+      <List
+        sx={{
+          display: "flex",
+          flexFlow: "column-reverse",
+          height: "100%",
+          alignItems: "end",
+          justifyContent: "end",
+        }}
+      >
         {messages.map((message, index: number) => {
           return (
             <Box
@@ -131,6 +119,7 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
                     ? "flex-end"
                     : "flex-start",
                 maxWidth: "70%",
+                flexGrow: "0",
               }}
               key={message.id}
             >
@@ -308,18 +297,10 @@ export default function ChatSection() {
   }, [error, chat, loading]);
 
   let component;
-  // if (!chat) {
-  //   component = <h1>Loading...</h1>;
-  // }
   if (loading) {
-    component = <h1>Loading...</h1>;
+    component = <ChatLoading />;
   } else if (error) {
-    component = (
-      <div>
-        <h1>Loading...</h1>
-        <p>Error: {error.message}</p>
-      </div>
-    );
+    component = <Navigate to={"error"} />;
   } else if (chat != null) {
     const { messages, participants, ...chatInfo } = chat;
     component = (

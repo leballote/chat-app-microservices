@@ -32,8 +32,8 @@ export default function SignupPage() {
   const { t } = useTranslation();
   //TODO: move this into a saga
   const [mutationFunction, { data, loading, error }] = useMutation(SIGNUP);
-  console.log("GRAPHQL", error?.graphQLErrors);
-  // const errorMessages = error?.graphQLErrors.map();
+  const errorMessages = error?.graphQLErrors;
+  console.log("ERROR MESSAGES", errorMessages);
 
   const [clientError, setClientError] = useState<{ message: string } | null>(
     null

@@ -1,43 +1,29 @@
 import {
   Box,
   Typography,
-  List,
   Button,
-  BottomNavigation,
-  BottomNavigationAction,
   Paper,
   Avatar,
   TextField,
   Stack,
-  Grid,
   Container,
 } from "@mui/material";
-import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "./DrawerSearchBar";
-import React, { ChangeEvent, useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../app/features/contactsPreviewsSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
-import { setMainDrawerSection } from "../app/features/sideBarSlice";
+import { setMainDrawerSection } from "../../app/features/sideBarSlice";
 import {
-  addParticipant,
   resetState as resetNewGroupDrawerSectionState,
   setAddFriendsSubsection,
-} from "../app/features/newGroupSectionDrawerSlice";
-import { ParticipantsToAdd } from "./ParticipantsToAdd";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+} from "../../app/features/newGroupSectionDrawerSlice";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import DoneIcon from "@mui/icons-material/Done";
 import { useMutation, gql } from "@apollo/client";
 import { useNavigate } from "react-router";
-import { CurrentUserContext } from "../contexts";
-import { User } from "../types/AppTypes";
-import { resetState as resetMainDrawerSectionState } from "../app/features/mainSectionDrawerSlice";
-import { pushChat } from "../app/features/chatsPreviewsSlice";
+import { CurrentUserContext } from "../../contexts";
+import { resetState as resetMainDrawerSectionState } from "../../app/features/mainSectionDrawerSlice";
+import { upsertChat } from "../../app/features/chatsPreviewsSlice";
 
 const CREATE_GROUP_CHAT = gql`
   mutation CreateGroupChat($input: CreateGroupChatInput!) {
@@ -77,7 +63,6 @@ export default function SetTitleAndAvatarDrawerSubsection() {
       phrase: { value: phrase },
     } = elements;
     const participants = participantsToAdd.map((id) => ({ id, admin: false }));
-    // .concat({ id: user.id, admin: true });
 
     const res = await createGroupChatFn({
       variables: {
@@ -91,7 +76,7 @@ export default function SetTitleAndAvatarDrawerSubsection() {
     dispatch(resetNewGroupDrawerSectionState());
     dispatch(resetMainDrawerSectionState());
     dispatch(setMainDrawerSection());
-    dispatch(pushChat(res.data.createGroupChat.chat));
+    dispatch(upsertChat(res.data.createGroupChat.chat));
     if (!res.errors) {
       navigate(`/app/chat/${res.data.createGroupChat.chat.id}`);
     }

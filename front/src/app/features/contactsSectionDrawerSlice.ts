@@ -5,7 +5,7 @@ export type DrawerSectionContacts = {
   sendFriendRequest: {
     value: AddedFriend | null;
     loading: boolean;
-    error: Error | null;
+    error: { message: string } | null;
   };
 };
 
@@ -47,7 +47,10 @@ export const contactsDrawerSectionSlice = createSlice({
     setSendFriendRequestLoading(state, { payload }: PayloadAction<boolean>) {
       state.sendFriendRequest.loading = payload;
     },
-    setSendFriendRequestError(state, { payload }: PayloadAction<Error | null>) {
+    setSendFriendRequestError(
+      state,
+      { payload }: PayloadAction<{ message: string } | null>
+    ) {
       state.sendFriendRequest.error = payload;
     },
     openAddFriendModal(state) {

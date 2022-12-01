@@ -1,7 +1,6 @@
 import { PayloadAction } from "@reduxjs/toolkit";
 import {
   GetMessagesInput,
-  unshiftMessage,
   setErrorMessages,
   setLoadingMessages,
   setMessagesNoBatch,

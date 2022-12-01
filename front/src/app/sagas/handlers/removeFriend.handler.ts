@@ -14,8 +14,6 @@ export function* handleRemoveFriend(action: PayloadAction<string>): any {
     const { removeFriendship } = data;
     const { userRemoved } = removeFriendship;
     yield put(removeContact(payload));
-    const profileId = store.getState().currentUserProfilePage.value?.id;
-    console.log("IDS", profileId, payload);
     if (store.getState().currentUserProfilePage.value?.id == payload) {
       yield put(closeDetails());
       // yield put(setValue(null));
@@ -23,7 +21,6 @@ export function* handleRemoveFriend(action: PayloadAction<string>): any {
     // yield put(removeFriendRequest(payload));
     // yield put(addContact(acceptFriendship.friendAdded));
   } catch (error) {
-    console.log(error);
     //TODO: see how to handle this error
   }
 }

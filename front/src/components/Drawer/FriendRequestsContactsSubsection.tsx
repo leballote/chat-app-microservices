@@ -1,43 +1,15 @@
-import {
-  Box,
-  Typography,
-  List,
-  Button,
-  Grid,
-  Divider,
-  ListItem,
-} from "@mui/material";
-import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "./DrawerSearchBar";
-import { ChangeEvent, useState, useEffect } from "react";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
+import { Box, List } from "@mui/material";
+import { useEffect } from "react";
 import * as React from "react";
-import { useQuery, gql, useMutation } from "@apollo/client";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../app/features/contactsPreviewsSlice";
-import { useTranslation } from "react-i18next";
-import { pushChat } from "../app/features/chatsPreviewsSlice";
-import { useNavigate } from "react-router";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   acceptFriendRequest,
   getValue as getFriendsRequestsPreviewsValue,
   rejectFriendRequest,
-} from "../app/features/friendRequestsPreviewsSlice";
-import FriendRequestPreview from "./FriendRequestPreview";
-import GenericPeopleLoading from "./GenericPeopleLoading";
-interface Contact {
-  id: string;
-  name: string;
-  phrase: string;
-  status: string;
-  avatar: string;
-}
+} from "../../app/features/friendRequestsPreviewsSlice";
+import FriendRequestPreview from "../Modals/FriendRequestPreview";
+import GenericPeopleLoading from "../Feedback/GenericPeopleLoading";
 
-//TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
 export default function FriendRequestsContactsDrawerSubsection() {
   const {
     value: friendRequests,
@@ -51,8 +23,6 @@ export default function FriendRequestsContactsDrawerSubsection() {
     }
   );
   const dispatch = useAppDispatch();
-  const { t } = useTranslation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getFriendsRequestsPreviewsValue());
@@ -94,17 +64,14 @@ export default function FriendRequestsContactsDrawerSubsection() {
     <>
       <Box sx={{ overflowY: "auto", marginTop: ".2em" }}>
         <List>
-          {friendRequestsList.map(
-            (friendRequest) => (
-              <FriendRequestPreview
-                key={friendRequest.user.id}
-                onAccept={handleAccept}
-                onReject={handleReject}
-                {...friendRequest}
-              />
-            )
-            // <ContactPreview {...contact} key={contact.id} />
-          )}
+          {friendRequestsList.map((friendRequest) => (
+            <FriendRequestPreview
+              key={friendRequest.user.id}
+              onAccept={handleAccept}
+              onReject={handleReject}
+              {...friendRequest}
+            />
+          ))}
         </List>
       </Box>
     </>

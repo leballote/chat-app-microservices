@@ -3,34 +3,16 @@ import {
   Typography,
   List,
   Button,
-  Grid,
-  BottomNavigation,
-  BottomNavigationAction,
-  Paper,
   ListItem,
   ListItemButton,
-  ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "./DrawerSearchBar";
-import { ChangeEvent, useState, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../app/features/contactsPreviewsSlice";
+import { useAppDispatch } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
-import { setMainDrawerSection } from "../app/features/sideBarSlice";
-import { addParticipant } from "../app/features/newGroupSectionDrawerSlice";
-import { ParticipantsToAdd } from "./ParticipantsToAdd";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionDrawerSlice";
-import LanguageIcon from "@mui/icons-material/Language";
 import i18next from "i18next";
 import { useMutation, gql } from "@apollo/client";
-import { setMainSubsection } from "../app/features/settingsSectionSlice";
+import { setMainSubsection } from "../../app/features/settingsSectionSlice";
 
 const LngAbbreviationMapping: { [code: string]: string } = {
   en: "English",
@@ -47,8 +29,6 @@ const languageCodeNamePairs = (["de", "en", "es"] ?? [])
   .sort(([code1, language1], [code2, language2]) => {
     return language1 > language2 ? 1 : -1;
   });
-
-// console.log(i18next.languages);
 
 const SET_LANGUAGE = gql`
   mutation SetLanguage($input: SetLanguageInput) {

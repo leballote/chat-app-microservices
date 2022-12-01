@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { resetState as resetMainDrawerSectionState } from "./mainSectionDrawerSlice";
 import { resetState as resetContactsDrawerSectionState } from "./contactsSectionDrawerSlice";
 import { SectionName } from "./types";
 

@@ -4,18 +4,9 @@ import Avatar from "@mui/material/Avatar";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
-import * as React from "react";
 import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
 import { green, red } from "@mui/material/colors";
-
-import {
-  Link as RouterLink,
-  LinkProps as RouterLinkProps,
-} from "react-router-dom";
 
 export interface Props {
   user: {
@@ -33,10 +24,10 @@ export interface Props {
 }
 
 export default function ({
-  user: { name, username, phrase, avatar, id },
+  user: { name, username, phrase: _phrase, avatar, id },
   // sentAt,
-  accepting,
-  rejecting,
+  accepting: _accepting,
+  rejecting: _rejecting,
   onAccept,
   onReject,
 }: Props) {

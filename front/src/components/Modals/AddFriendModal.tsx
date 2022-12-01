@@ -1,48 +1,22 @@
 import {
   Box,
-  Typography,
-  List,
   Button,
-  Grid,
-  BottomNavigation,
-  BottomNavigationAction,
-  Paper,
   Dialog,
   DialogTitle,
-  DialogContentText,
   DialogContent,
   DialogActions,
   TextField,
   CircularProgress,
+  Alert,
 } from "@mui/material";
-import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "./DrawerSearchBar";
-import {
-  ChangeEvent,
-  useState,
-  useEffect,
-  FormEventHandler,
-  MouseEventHandler,
-} from "react";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../app/features/contactsPreviewsSlice";
+import { FormEventHandler, MouseEventHandler } from "react";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
-import { setMainDrawerSection } from "../app/features/sideBarSlice";
-import { addParticipant } from "../app/features/newGroupSectionDrawerSlice";
-import { ParticipantsToAdd } from "./ParticipantsToAdd";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionDrawerSlice";
-import SearchBar from "./DrawerSearchBar";
 import {
   closeAddFriendModal,
   resetSendFriendRequest,
   sendFriendRequest,
-  setSendFriendRequestLoading,
-} from "../app/features/contactsSectionDrawerSlice";
+} from "../../app/features/contactsSectionDrawerSlice";
 import { green } from "@mui/material/colors";
 import DoneIcon from "@mui/icons-material/Done";
 
@@ -89,7 +63,7 @@ export default function AddFriendModal() {
     dispatch(sendFriendRequest({ userToAddEmail }));
   };
 
-  const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {
+  const handleClose: MouseEventHandler<HTMLButtonElement> = () => {
     closeModal();
   };
 
@@ -144,6 +118,9 @@ export default function AddFriendModal() {
               )}
             </Box>
           </DialogActions>
+          {sendFriendRequestError ? (
+            <Alert severity="error">{sendFriendRequestError.message}</Alert>
+          ) : null}
         </Box>
       </DialogContent>
     </Dialog>

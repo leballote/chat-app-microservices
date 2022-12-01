@@ -46,8 +46,8 @@ export const friendRequestsPreviewsSlice = createSlice({
       state.firstFetch = true;
       state.loading = false;
     },
-    acceptFriendRequest(_, { payload }: PayloadAction<string>) {},
-    rejectFriendRequest(_, { payload }: PayloadAction<string>) {},
+    acceptFriendRequest(_, _action: PayloadAction<string>) {},
+    rejectFriendRequest(_, _action: PayloadAction<string>) {},
     removeFriendRequest(state, { payload }: PayloadAction<string>) {
       if (state.value[payload]) {
         delete state.value[payload];
@@ -80,7 +80,7 @@ export const friendRequestsPreviewsSlice = createSlice({
     setError(state, { payload }) {
       state.error = payload;
     },
-    resetState(state) {
+    resetState() {
       return initialState;
     },
   },

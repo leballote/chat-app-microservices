@@ -1,8 +1,7 @@
-import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
-import type { Chat, Message } from "../../types/ChatSectionTypes";
+import type { Chat, Message, ChatUser } from "../../types/ChatSectionTypes";
 import removeOne from "../../utils/removeOne";
-import { NavigateFunction } from "react-router";
 
 //TODO: handle loading sent messages and errored sent messages
 // Define a type for the slice state
@@ -14,6 +13,7 @@ type CurrentChatState = {
   messagesNoBatch: number;
   loadingMessages: boolean;
   errorMessages: Error | null;
+  participantsToAddIds: string[];
 };
 
 //TODO: maybe if asked too many times to go up increase the batch size
@@ -32,6 +32,16 @@ export type GetMessagesInput = {
   offset?: number;
 };
 
+type AddParticipantInput = {
+  chatId: string;
+  participants: ParticipantInput[];
+};
+
+type ParticipantInput = {
+  id: string;
+  admin: boolean;
+};
+
 // Define the initial state using that type
 const initialState: CurrentChatState = {
   value: null,
@@ -41,6 +51,7 @@ const initialState: CurrentChatState = {
   messagesNoBatch: 0,
   loadingMessages: false,
   errorMessages: null,
+  participantsToAddIds: [],
 };
 
 export const currentChatSlice = createSlice({
@@ -51,6 +62,18 @@ export const currentChatSlice = createSlice({
       state.loading = true;
     },
     sendMessage(_, _action: PayloadAction<SendMessageInput>) {},
+    addParticipants(state, { payload }: PayloadAction<ChatUser[]>) {
+      if (state.value?.participants) {
+        const participantsIds = state.value.participants.map(
+          (participant) => participant.id
+        );
+        for (const participant of payload) {
+          if (!participantsIds.includes(participant.id)) {
+            state.value.participants.push(participant);
+          }
+        }
+      }
+    },
     removeParticipant(
       state,
       { payload }: PayloadAction<{ chatId: string; participantId: string }>
@@ -66,10 +89,11 @@ export const currentChatSlice = createSlice({
     },
     requestRemoveParticipant(
       _,
-      { payload }: PayloadAction<{ chatId: string; participantId: string }>
+      _action: PayloadAction<{ chatId: string; participantId: string }>
     ) {},
-    requestLeaveGroup(_, action: PayloadAction<{ chatId: string }>) {},
-    loadMessages(state, action?: PayloadAction<GetMessagesInput>) {},
+    requestLeaveGroup(_, _action: PayloadAction<{ chatId: string }>) {},
+    requestAddParticipants(_, _action: PayloadAction<AddParticipantInput>) {},
+    loadMessages(_, _action?: PayloadAction<GetMessagesInput>) {},
     setMessagesNoBatch(state, { payload }: PayloadAction<number>) {
       state.messagesNoBatch = payload;
     },
@@ -102,8 +126,27 @@ export const currentChatSlice = createSlice({
     setError(state, { payload }) {
       state.error = payload;
     },
-    resetState(state) {
+    resetState() {
       return initialState;
+    },
+    addParticipantToAdd(state, action: PayloadAction<string>) {
+      if (!state.participantsToAddIds.includes(action.payload)) {
+        state.participantsToAddIds.push(action.payload);
+      }
+    },
+    removeParticipantToAdd(state, action: PayloadAction<string>) {
+      state.participantsToAddIds = removeOne(
+        state.participantsToAddIds,
+        action.payload
+      );
+    },
+    setParticipants(state, { payload }: PayloadAction<ChatUser[]>) {
+      if (state.value) {
+        state.value.participants = payload;
+      }
+    },
+    resetParticipantsToAdd(state) {
+      state.participantsToAddIds = [];
     },
   },
 });
@@ -126,6 +169,12 @@ export const {
   requestRemoveParticipant,
   requestLeaveGroup,
   resetState,
+  addParticipantToAdd,
+  removeParticipantToAdd,
+  requestAddParticipants,
+  addParticipants,
+  setParticipants,
+  resetParticipantsToAdd,
 } = currentChatSlice.actions;
 
 export const selectCurrentChat = (state: RootState) => state.currentChat;

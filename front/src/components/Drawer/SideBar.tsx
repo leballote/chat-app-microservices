@@ -1,25 +1,18 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
 import Drawer from "@mui/material/Drawer";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
 import MainDrawerView from "./MainDrawerView";
-import ContactPreview from "./ContactPreview";
 import ContactsDrawerSection from "./ContactsDrawerSection";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { getValue } from "../app/features/currentUserSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   setContactsDrawerSection,
   setMainDrawerSection,
-} from "../app/features/sideBarSlice";
-import { SectionName as DrawerSection } from "../app/features/types";
+} from "../../app/features/sideBarSlice";
+import { SectionName as DrawerSection } from "../../app/features/types";
 import NewGroupDrawerSection from "./NewGroupDrawerSection";
 import SettingsDrawerSection from "./SettingsDrawerSection";
-import { setMainDrawerSectionAndReset } from "../app/utils";
 
 const drawerWidth = 400;
 
 export default function ResponsiveDrawer() {
-  //TODO: Change any for the proper data type
   const { name: currentDrawerSection } = useAppSelector(
     (state) => state.sideBar
   );
@@ -47,6 +40,7 @@ export default function ResponsiveDrawer() {
   } else if (currentDrawerSection == DrawerSection.SETTINGS) {
     section = <SettingsDrawerSection />;
   } else {
+    section = null;
     throw Error("This should be unreachable");
   }
 

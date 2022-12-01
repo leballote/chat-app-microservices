@@ -1,31 +1,12 @@
-import {
-  Box,
-  Typography,
-  List,
-  Button,
-  Grid,
-  Tab,
-  Tabs,
-  Container,
-  Badge,
-} from "@mui/material";
-import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "./DrawerSearchBar";
-import { ChangeEvent, useState, useEffect } from "react";
+import { Box, Typography, Button, Tab, Tabs } from "@mui/material";
+import { useState } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import * as React from "react";
-import { useQuery, gql, useMutation } from "@apollo/client";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../app/features/contactsPreviewsSlice";
+import { useAppDispatch } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
-import { pushChat } from "../app/features/chatsPreviewsSlice";
-import { useNavigate } from "react-router";
-import AddFriendModal from "./AddFriendModal";
-import { openAddFriendModal } from "../app/features/contactsSectionDrawerSlice";
+import AddFriendModal from "../Modals/AddFriendModal";
+import { openAddFriendModal } from "../../app/features/contactsSectionDrawerSlice";
 import MainContactsSubsection from "./MainContactsSubsection";
 import FriendRequestsContactsDrawerSubsection from "./FriendRequestsContactsSubsection";
 
@@ -76,7 +57,7 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
   };
 
   const handleChangeTab = (
-    event: React.SyntheticEvent,
+    _event: React.SyntheticEvent,
     newValue: Subsection
   ) => {
     setTabValue(newValue);
@@ -112,8 +93,6 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
         <Tab label={t("app.drawer.contacts.friends")} value={Subsection.MAIN} />
         <Tab
           label={t("app.drawer.contacts.friendRequests")}
-          //TODO: change for the actual number of friend requests
-          // icon={<Box color="ButtonText">4</Box>}
           iconPosition="end"
           value={Subsection.FRIEND_REQUESTS}
         />

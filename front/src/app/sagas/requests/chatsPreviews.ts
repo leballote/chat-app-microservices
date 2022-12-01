@@ -17,6 +17,7 @@ export async function requestGetChatsPreviews(
           type
           name
           avatar
+          lastActionDate
           lastMessage {
             id
             content

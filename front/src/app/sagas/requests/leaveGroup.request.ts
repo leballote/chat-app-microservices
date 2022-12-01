@@ -1,6 +1,5 @@
 import { gql } from "@apollo/client";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { NavigateFunction } from "react-router";
 import client from "../../../client";
 
 const LEAVE_GROUP = gql`

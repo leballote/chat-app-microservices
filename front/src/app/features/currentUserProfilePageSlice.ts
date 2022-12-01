@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../store";
 
 type ProfiledUser = {
   id: string;
@@ -27,7 +26,7 @@ export const currentUserProfilePage = createSlice({
   name: "currentUserProfilePage",
   initialState,
   reducers: {
-    getValue(state, { payload }: PayloadAction<string>) {
+    getValue(state, _action: PayloadAction<string>) {
       //TODO: not sure if this is needed
       state.loading = true;
     },

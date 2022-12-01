@@ -1,36 +1,27 @@
-import {
-  Box,
-  Typography,
-  List,
-  Button,
-  Grid,
-  BottomNavigation,
-  BottomNavigationAction,
-  Paper,
-} from "@mui/material";
+import { Box, Typography, List, Button, Paper } from "@mui/material";
 import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "./DrawerSearchBar";
-import { ChangeEvent, useState, useEffect } from "react";
+import DrawerSearchBar from "../Drawer/DrawerSearchBar";
+import { ChangeEvent, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   getValue as getContactsPreviewsValue,
   setSearchTerm,
-} from "../app/features/contactsPreviewsSlice";
+} from "../../app/features/contactsPreviewsSlice";
 import { useTranslation } from "react-i18next";
-import { setMainDrawerSection } from "../app/features/sideBarSlice";
+import { setMainDrawerSection } from "../../app/features/sideBarSlice";
 import {
   addParticipant,
   resetState,
-} from "../app/features/newGroupSectionDrawerSlice";
+} from "../../app/features/newGroupSectionDrawerSlice";
 import { ParticipantsToAdd } from "./ParticipantsToAdd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionDrawerSlice";
-import GenericPeopleLoading from "./GenericPeopleLoading";
+import { setSetTitleAndAvatarSubsection } from "../../app/features/newGroupSectionDrawerSlice";
+import GenericPeopleLoading from "../Feedback/GenericPeopleLoading";
+import GenericError from "../Feedback/GenericError";
 
 export default function AddParticipantsDrawerSubsection() {
-  //TODO: change for const
-  let {
+  const {
     value: contacts,
     loading,
     error,
@@ -73,12 +64,7 @@ export default function AddParticipantsDrawerSubsection() {
   if (loading) {
     component = <GenericPeopleLoading numberOfPeople={5} />;
   } else if (error) {
-    component = (
-      <div>
-        <h1>Error</h1>
-        <p>{error.message}</p>
-      </div>
-    );
+    component = <GenericError />;
   } else {
     component = (
       <List>

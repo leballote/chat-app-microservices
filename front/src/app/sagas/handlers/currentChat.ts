@@ -2,7 +2,6 @@ import { call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { requestGetChat } from "../requests/currentChat";
 import {
-  currentChatSlice,
   setError,
   setLoading,
   setValue as setCurrentChatValue,

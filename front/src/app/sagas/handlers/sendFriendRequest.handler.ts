@@ -16,6 +16,7 @@ export function* handleSendFriendRequest(
 ): any {
   const { payload } = action;
   try {
+    yield put(setSendFriendRequestError(null));
     yield put(setSendFriendRequestLoading(true));
     const response = yield call(requestSendFriendRequest, payload);
     const { data } = response;
@@ -24,8 +25,12 @@ export function* handleSendFriendRequest(
     } = data;
     yield put(setSendFriendRequestValue(friendAdded));
     yield put(setSendFriendRequestLoading(false));
-  } catch (error) {
+  } catch (error: any) {
     yield put(setSendFriendRequestLoading(false));
-    yield put(setSendFriendRequestError(error as Error));
+    if (error.message) {
+      yield put(setSendFriendRequestError({ message: error.message }));
+    } else {
+      yield put(setSendFriendRequestError({ message: "Something went wrong" }));
+    }
   }
 }

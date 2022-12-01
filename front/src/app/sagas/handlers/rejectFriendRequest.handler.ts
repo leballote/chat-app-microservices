@@ -1,4 +1,4 @@
-import { call, put } from "redux-saga/effects";
+import { call } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { rejectFriendRequest } from "../requests/rejectFriendRequest";
 

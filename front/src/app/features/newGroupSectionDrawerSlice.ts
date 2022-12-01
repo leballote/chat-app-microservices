@@ -1,7 +1,6 @@
-import { Drawer } from "@mui/material";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import removeOne from "../../utils/removeOne";
-import { SectionName, GroupSectionDrawerSubsection } from "./types";
+import { GroupSectionDrawerSubsection } from "./types";
 
 export type DrawerSectionNewGroup = {
   subsection: GroupSectionDrawerSubsection;

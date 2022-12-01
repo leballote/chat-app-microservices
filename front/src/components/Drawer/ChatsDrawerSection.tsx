@@ -1,32 +1,28 @@
-import {
-  Box,
-  Typography,
-  TextField,
-  InputAdornment,
-  List,
-} from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
+import { Box, Typography, List } from "@mui/material";
 import ChatPreview, { Props as ChatPreviewProps } from "./ChatPreview";
 import DrawerSearchBar from "./DrawerSearchBar";
-import { ChangeEvent, useState, useEffect } from "react";
+import { ChangeEvent, useEffect } from "react";
 import * as React from "react";
-import { gql, useQuery } from "@apollo/client";
 import {
   getValue as getChatsPreviewsValue,
   setSearchTerm,
-} from "../app/features/chatsPreviewsSlice";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+} from "../../app/features/chatsPreviewsSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
-import GenericPeopleLoading from "./GenericPeopleLoading";
+import GenericPeopleLoading from "../Feedback/GenericPeopleLoading";
+import GenericError from "../Feedback/GenericError";
 
 //TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
 export default function ChatDrawerSection() {
-  const {
-    value: chats,
+  let {
+    value: chats_,
     loading,
     error,
     searchTerm: chatSearched,
   } = useAppSelector((state) => state.chatsPreviews);
+  const chats = Object.values(chats_).sort((chat1, chat2) => {
+    return chat1.lastActionDate > chat2.lastActionDate ? -1 : 1;
+  });
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
@@ -49,12 +45,7 @@ export default function ChatDrawerSection() {
   if (loading) {
     component = <GenericPeopleLoading numberOfPeople={8} />;
   } else if (error) {
-    component = (
-      <div>
-        <h1>Error</h1>
-        <p>{error.message}</p>
-      </div>
-    );
+    component = <GenericError />;
   } else {
     component = (
       <List>

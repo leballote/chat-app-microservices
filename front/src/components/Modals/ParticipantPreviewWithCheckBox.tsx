@@ -1,29 +1,46 @@
 import ListItem from "@mui/material/ListItem";
-import Box from "@mui/material/Box";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
-import { Link as RouterLink } from "react-router-dom";
+import * as React from "react";
+import { useAppSelector } from "../../app/hooks";
 
 export interface Props {
   id: string;
-  avatar: string;
   name: string;
   phrase: string;
-  status: "online" | "offline";
+  status: string;
+  avatar?: string;
+  onAddParticipantToAdd?: (
+    ev: React.MouseEvent<HTMLLIElement, globalThis.MouseEvent>,
+    participantId: string
+  ) => void;
+  onRemove?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-export default function ProfilePreview({
-  id,
-  avatar,
+export default function ({
   name,
-  phrase,
-  status,
+  avatar,
+  id,
+  onAddParticipantToAdd,
+  onRemove,
 }: Props) {
+  const { value: currentUser } = useAppSelector((state) => state.currentUser);
   return (
-    //TODO: check this if there is time: I don't like to have lists with children not being list item
-    <ListItem button component={RouterLink} to="profile/me">
+    <ListItem
+      key={id}
+      button
+      component={"li"}
+      onClick={(ev) => {
+        if (id && currentUser?.id == id) return;
+        const contactId = ev.currentTarget.dataset["userId"];
+        if (onAddParticipantToAdd && contactId) {
+          onAddParticipantToAdd(ev, contactId);
+        }
+      }}
+      data-user-id={`${id}`}
+    >
       <ListItemAvatar>
         <Avatar
           alt={`${avatar} of ${name}`}
@@ -46,9 +63,6 @@ export default function ProfilePreview({
           color="textPrimary"
         >
           {name}
-        </Typography>
-        <Typography component="p" fontSize={".8em"} color="textSecondary">
-          {phrase}
         </Typography>
       </ListItemText>
     </ListItem>

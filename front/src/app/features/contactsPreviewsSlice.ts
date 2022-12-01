@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ContactPreview } from "../../types/AppTypes";
 import removeOne from "../../utils/removeOne";
 import type { RootState } from "../store";
 
@@ -9,18 +10,6 @@ type ContactsPreviewsState = {
   error: Error | null;
   searchTerm: string;
   firstFetch: boolean;
-};
-
-//TODO: maybe define this in the types directory?
-type ContactPreview = {
-  id: string;
-  name: string;
-  avatar: string;
-  phrase: string;
-  individualChat: {
-    id: string;
-  };
-  status: "ONLINE" | "OFFLINE";
 };
 
 // Define the initial state using that type

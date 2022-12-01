@@ -1,12 +1,10 @@
 import { call, put } from "redux-saga/effects";
-import { PayloadAction } from "@reduxjs/toolkit";
 import {
   setValue,
   setLoading,
   setError,
 } from "../../features/friendRequestsPreviewsSlice";
 import { requestGetFriendRequestsPreviews } from "../requests/friendRequestsPreviews";
-import indexArrayByField from "../../../utils/indexArrayByField";
 
 export function* handleFriendRequestsPreviews(): any {
   try {

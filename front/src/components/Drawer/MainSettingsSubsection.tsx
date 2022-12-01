@@ -3,32 +3,17 @@ import {
   Typography,
   List,
   Button,
-  Grid,
-  BottomNavigation,
-  BottomNavigationAction,
-  Paper,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "./DrawerSearchBar";
-import { ChangeEvent, useState, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../app/features/contactsPreviewsSlice";
+import { useAppDispatch } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
-import { setMainDrawerSection } from "../app/features/sideBarSlice";
-import { addParticipant } from "../app/features/newGroupSectionDrawerSlice";
-import { ParticipantsToAdd } from "./ParticipantsToAdd";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { setSetTitleAndAvatarSubsection } from "../app/features/newGroupSectionDrawerSlice";
+import { setMainDrawerSection } from "../../app/features/sideBarSlice";
 import LanguageIcon from "@mui/icons-material/Language";
-import { setLanguageSubsection } from "../app/features/settingsSectionSlice";
+import { setLanguageSubsection } from "../../app/features/settingsSectionSlice";
 
 export default function LanguageSettingsSubsection() {
   //TODO: change for const

@@ -1,37 +1,20 @@
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import React, { createContext, useState, useEffect, useContext } from "react";
-import SideBar from "../components/SideBar";
-import { BrowserRouter, Routes, Route, useNavigate } from "react-router-dom";
+import { useEffect, useContext } from "react";
+import SideBar from "../components/Drawer/SideBar";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import ChatSection from "../sections/ChatSection";
-import { User } from "../types/AppTypes";
 import { CurrentUserContext } from "../contexts";
-import { useQuery, gql, useSubscription } from "@apollo/client";
+import { gql, useSubscription } from "@apollo/client";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { getValue as getCurrentUserValue } from "../app/features/currentUserSlice";
 import { unshiftMessage } from "../app/features/currentChatSlice";
-import { current } from "@reduxjs/toolkit";
-import LoginPage from "./LoginPage";
-import SignupPage from "./SignupPage";
 import i18next from "i18next";
 import {
   addFriendRequest,
   removeFriendRequest,
 } from "../app/features/friendRequestsPreviewsSlice";
 import { addContact } from "../app/features/contactsPreviewsSlice";
-import { requestGetChat } from "../app/sagas/requests/currentChat";
-import { getChatPreview } from "../app/features/chatsPreviewsSlice";
-
-//TODO: this component will be removed
-const Placeholder = ({ text }: any) => {
-  return (
-    <Container sx={{ display: "block" }}>
-      <h1>{text}</h1>
-    </Container>
-  );
-};
+import { getChatPreview, upsertChat } from "../app/features/chatsPreviewsSlice";
+import ErrorChat from "../components/Feedback/ErrorChat";
 
 const MESSAGE_CREATED = gql`
   subscription {
@@ -101,11 +84,6 @@ export default function ChatAppPage() {
 
   const currentChatState = useAppSelector((state) => state.currentChat);
 
-  // const {
-  //   loading: messageCreatedLoading,
-  //   error: messageCreatedError,
-  //   data: messageCreatedData,
-  // } =
   useSubscription(MESSAGE_CREATED, {
     onData: ({ data }) => {
       const chatId = data.data?.messageCreated.message.chat.id;
@@ -117,14 +95,20 @@ export default function ChatAppPage() {
         ) {
           dispatch(unshiftMessage(data.data.messageCreated.message));
         }
-        if (chatId && !chats.map((chat) => chat.id).includes(chatId)) {
+        if (chatId && !chats[chatId]) {
           dispatch(getChatPreview(chatId));
+        } else {
+          dispatch(
+            upsertChat({
+              ...chats[chatId],
+              lastActionDate: data.data.messageCreated.message.sentAt,
+              lastMessage: data.data.messageCreated.message,
+            })
+          );
         }
       }
     },
   });
-
-  // const messageId = messageCreatedData?.messageCreated?.message?.id;
 
   useSubscription(FRIENDSHIP_REQUEST_RECEIVED, {
     onData: ({ data }) => {
@@ -134,7 +118,6 @@ export default function ChatAppPage() {
         dispatch(
           addFriendRequest({
             user: data.data?.friendshipRequestReceived.requesterUser,
-            //TODO: this should be taken from database
             sentAt: new Date().toISOString(),
             error: null,
           })
@@ -148,8 +131,6 @@ export default function ChatAppPage() {
       const friendshipResponseReceived = data.data?.friendshipResponseReceived;
       const { accepterUser, requesterUser, accept } =
         friendshipResponseReceived;
-      console.log("FRIENDSHIP RESPONSE", friendshipResponseReceived);
-      console.log("DATA", data.data);
       if (accept) {
         if (accepterUser && accepterUser.id == user?.id) {
           dispatch(addContact(requesterUser));
@@ -173,22 +154,6 @@ export default function ChatAppPage() {
     }
   }, [user]);
 
-  // useEffect(() => {
-  //   if (messageCreatedData?.messageCreated.message) {
-  //     if (
-  //       messageCreatedData.messageCreated.message.chat.id ==
-  //         currentChatState.value?.id &&
-  //       currentChatState.value
-  //     ) {
-  //       dispatch(unshiftMessage(messageCreatedData.messageCreated.message));
-  //     }
-  //   }
-  // }, [messageId]);
-
-  // useEffect(() => {
-  //   console.log("hoal");
-  // }, []);
-
   const settings = user?.settings;
 
   useEffect(() => {
@@ -200,7 +165,7 @@ export default function ChatAppPage() {
       <SideBar />
       <Routes>
         <Route path="chat/:id" element={<ChatSection />} />
-        <Route path="contact/:id" element={<Placeholder text="Contact" />} />
+        <Route path="error" element={<ErrorChat />} />
       </Routes>
     </Box>
   ) : null;

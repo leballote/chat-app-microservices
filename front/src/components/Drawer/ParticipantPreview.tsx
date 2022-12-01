@@ -2,19 +2,15 @@ import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import ListItemText from "@mui/material/ListItemText";
-import ListItemButton from "@mui/material/ListItemButton";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import * as React from "react";
-import { ChatUser } from "../types/ChatSectionTypes";
 import { IconButton } from "@mui/material";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useNavigate } from "react-router";
 import { useMutation, gql } from "@apollo/client";
-import { pushChat } from "../app/features/chatsPreviewsSlice";
-import { closeDetails } from "../app/features/chatSectionSlice";
+import { upsertChat } from "../../app/features/chatsPreviewsSlice";
+import { closeDetails } from "../../app/features/chatSectionSlice";
 
 export interface Props {
   id: string;
@@ -42,16 +38,7 @@ const GET_OR_CREATE_CHAT = gql`
   }
 `;
 
-export default function ({
-  name,
-  phrase,
-  status,
-  avatar,
-  id,
-  onClick,
-  onRemove,
-  isViewerAdmin,
-}: Props) {
+export default function ({ name, avatar, id, onRemove, isViewerAdmin }: Props) {
   const { value: currentUser } = useAppSelector((state) => state.currentUser);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -75,7 +62,7 @@ export default function ({
           const { chat: newChat, created } =
             getOrCreateChatRes.data.getOrCreateIndividualChat;
           if (created) {
-            dispatch(pushChat(newChat));
+            dispatch(upsertChat(newChat));
           }
           dispatch(closeDetails());
 

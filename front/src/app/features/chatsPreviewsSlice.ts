@@ -1,21 +1,19 @@
 import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../store";
-import { User } from "../../types/AppTypes";
 
-// Define a type for the slice state
 type ChatsPreviewsState = {
-  value: ChatPreview[];
+  value: { [id: string]: ChatPreview };
   loading: boolean;
   error: Error | null;
   searchTerm: string;
 };
 
-//TODO: maybe define this in the types directory?
 type ChatPreview = {
   id: string;
   type: "INDIVIDUAL" | "GROUP";
   name: string;
   avatar?: string;
+  lastActionDate: string;
   lastMessage: {
     id: string;
     content: string;
@@ -26,9 +24,8 @@ type ChatPreview = {
   };
 };
 
-// Define the initial state using that type
 const initialState: ChatsPreviewsState = {
-  value: [],
+  value: {},
   searchTerm: "",
   loading: true,
   error: null,
@@ -38,18 +35,15 @@ export const chatsPreviewsSlice = createSlice({
   name: "chatsPreviews",
   initialState,
   reducers: {
-    getValue(state, { payload }: PayloadAction<string>) {
-      // state.loading = true;
-    },
-    getChatPreview(_, { payload }: PayloadAction<string>) {},
+    getValue(_, _action: PayloadAction<string>) {},
+    getChatPreview(_, _action: PayloadAction<string>) {},
     setSearchTerm(state, { payload }) {
       state.searchTerm = payload;
       //TODO: check if this is the way to do it
       chatsPreviewsSlice.actions.getValue(payload);
     },
-    pushChat(state, { payload }: PayloadAction<ChatPreview>) {
-      //TODO: we should sort on every insertion to solve prevent race conditions
-      state.value = [payload, ...state.value];
+    upsertChat(state, { payload }: PayloadAction<ChatPreview>) {
+      state.value[payload.id] = payload;
     },
     setValue(state, { payload }) {
       state.value = payload;
@@ -62,7 +56,7 @@ export const chatsPreviewsSlice = createSlice({
       state.error = payload;
     },
     removeChat(state, { payload }: PayloadAction<{ chatId: string }>) {
-      state.value = state.value.filter((chat) => chat.id != payload.chatId);
+      delete state.value[payload.chatId];
     },
     resetState() {
       return initialState;
@@ -76,7 +70,7 @@ export const {
   setLoading,
   setError,
   setSearchTerm,
-  pushChat,
+  upsertChat,
   removeChat,
   resetState,
   getChatPreview,

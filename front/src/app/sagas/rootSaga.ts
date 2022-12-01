@@ -29,6 +29,8 @@ import { requestRemoveFriend } from "../features/contactsPreviewsSlice";
 import { handleRemoveFriend } from "./handlers/removeFriend.handler";
 import { handleGetChatPreview } from "./handlers/getChatPreview.handler";
 import { getChatPreview } from "../features/chatsPreviewsSlice";
+import { requestAddParticipants } from "../features/currentChatSlice";
+import { handleAddParticipant } from "./handlers/addParticipantsToGroup.handler";
 
 export function* watcherSaga() {
   yield takeLatest(getCurrentUserValue.toString(), handleGetUser);
@@ -48,4 +50,5 @@ export function* watcherSaga() {
   yield takeEvery(rejectFriendRequest.toString(), handleRejectFriendRequest);
   yield takeEvery(requestRemoveFriend.toString(), handleRemoveFriend);
   yield takeEvery(getChatPreview.toString(), handleGetChatPreview);
+  yield takeEvery(requestAddParticipants.toString(), handleAddParticipant);
 }

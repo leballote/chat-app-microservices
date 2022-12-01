@@ -4,10 +4,10 @@ import client from "../../../client";
 //TODO: solve this any
 export async function requestGetChat(chatId: string): Promise<any> {
   const GET_CHAT_DATA = gql`
-    query GetChat {
+    query GetChat($chatId: String!) {
       viewer {
         id
-        chat(chatId: "${chatId}") {
+        chat(chatId: $chatId) {
           viewerAsChatUser {
             id
             admin
@@ -47,5 +47,9 @@ export async function requestGetChat(chatId: string): Promise<any> {
   `;
   return client.query({
     query: GET_CHAT_DATA,
+    variables: {
+      chatId: chatId,
+    },
+    fetchPolicy: "no-cache",
   });
 }
