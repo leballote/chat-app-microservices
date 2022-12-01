@@ -1,5 +1,4 @@
 import { Resolvers, SubscriptionResolvers } from "../generated/graphql";
-import { PubSub } from "graphql-subscriptions";
 import { UserModelSuccessResponse } from "../types/servicesRest";
 import { withFilter } from "graphql-subscriptions";
 import {
@@ -9,6 +8,7 @@ import {
   pubsub,
 } from "./actions";
 import { isErrorResponse } from "../types/general.types";
+import { GraphQLError } from "graphql";
 
 export const subscriptionResolvers: SubscriptionResolvers = {
   messageCreated: {
@@ -63,7 +63,7 @@ const responseSubscriptionResponses: Resolvers = {
         dataSources: typeof context.dataSources;
       };
       if (!user) {
-        throw new Error("Not authenticated");
+        throw new GraphQLError("Not authenticated");
       }
 
       const parent_ = parent as unknown as {
@@ -83,7 +83,7 @@ const responseSubscriptionResponses: Resolvers = {
         dataSources: typeof context.dataSources;
       };
       if (!user) {
-        throw new Error("Not authenticated");
+        throw new GraphQLError("Not authenticated");
       }
 
       const parent_ = parent as unknown as {
@@ -105,7 +105,7 @@ const responseSubscriptionResponses: Resolvers = {
         dataSources: typeof context.dataSources;
       };
       if (!user) {
-        throw new Error("Not authenticated");
+        throw new GraphQLError("Not authenticated");
       }
 
       const parent_ = parent as unknown as {
@@ -124,7 +124,7 @@ const responseSubscriptionResponses: Resolvers = {
         dataSources: typeof context.dataSources;
       };
       if (!user) {
-        throw new Error("Not authenticated");
+        throw new GraphQLError("Not authenticated");
       }
 
       const parent_ = parent as unknown as {
@@ -143,13 +143,13 @@ const responseSubscriptionResponses: Resolvers = {
       //TODO: change this type to the correct one
       const { user, dataSources } = context as any;
       if (!user) {
-        throw new Error("Not authenticated");
+        throw new GraphQLError("Not authenticated");
       }
       const parentTemp = parent as any;
       const message = parentTemp.data;
       const chatRes = await dataSources.chatAPI.getChat(message.chatId);
       if (isErrorResponse(chatRes)) {
-        throw new Error(chatRes.error.message);
+        throw new GraphQLError(chatRes.error.message);
       }
       const { participants } = chatRes.data;
 

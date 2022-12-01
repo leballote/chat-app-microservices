@@ -1,6 +1,5 @@
-//TODO: this doesn't seem to handle errors correctly
 const { default: mongoose } = require("mongoose");
-const Chat = require("../models/message.model");
+const Chat = require("../models/chat.model");
 const Message = require("../models/message.model");
 
 const router = require("express").Router();
@@ -14,9 +13,10 @@ router.post("/message", async (req, res) => {
   try {
     const { chatId } = req.body;
     const message = await Message.create(req.body);
-    await Chat.findOneAndUpdate(
-      { _id: chatId },
-      { lastMessage: message._id },
+
+    const update = await Chat.findOneAndUpdate(
+      { _id: mongoose.Types.ObjectId(chatId) },
+      { $set: { lastMessageId: message._id } },
       { new: true }
     );
     return res.status(201).send({ data: message });

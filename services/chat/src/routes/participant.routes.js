@@ -9,8 +9,42 @@ const errors = {
   participantNotFound: { error: { message: "Participant not found" } },
 };
 
+router.post("/multiple", async (req, res) => {
+  const { participants, chatId } = req.body;
+  try {
+    const chat = await Chat.findOne({ _id: chatId });
+    if (!chat) {
+      return res
+        .status(400)
+        .send({ error: { message: "This chat doesn't exist" } });
+    }
+    const chatRels = [];
+    // const participantsBefore = await Participant.find({ "chat.id": chatId });
+    // const participantsBeforeObject = { }
+
+    for (const { id, admin = false } of participants) {
+      const chatRel = {
+        user: { id, admin, participantSince: chat.createdAt },
+        chat: { id: chat._id },
+      };
+      chatRels.push(chatRel);
+    }
+    await Participant.create(chatRels);
+    const participantsAfter = await Participant.find({ "chat.id": chatId });
+    return res.status(201).send({
+      data: {
+        ...chat.toObject(),
+        participants: participantsAfter.map((rel) => rel.user),
+      },
+    });
+  } catch (e) {
+    return res
+      .status(500)
+      .send({ ...errors.serverError, debugError: e.message });
+  }
+});
+
 router.post("/", async (req, res) => {
-  //TODO: with this model you can add participants to non existent chats, and also add non existent participants, check if this is a problem
   const { chatId, userId } = req.body;
   try {
     const chat = Chat.findOne({ _id: chatId });
@@ -77,7 +111,7 @@ router.delete("/", async (req, res) => {
 router.get("/", async (req, res) => {
   const { chatId, userId } = req.query;
   let baseQueryParams = { chatId, userId };
-  baseQueryParams["chat.id"] = baseQueryParams.chatId; //baseQueryParams.chatId;
+  baseQueryParams["chat.id"] = baseQueryParams.chatId;
   baseQueryParams["user.id"] = baseQueryParams.userId;
   baseQueryParams.chatId = undefined;
   baseQueryParams.userId = undefined;

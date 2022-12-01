@@ -35,7 +35,7 @@ authUserSchema.plugin(passportLocalMongoose, {
   usernameUnique: true,
   passwordValidator(password, cb) {
     if (!validatorLib.isStrongPassword(password)) {
-      const errorMessage = `password should be length 8, and contain at least one of each of the following: lowercase letter, uppercase letter, symbol and number.`;
+      const errorMessage = `Password should be length 8, and contain at least one of each of the following: lowercase letter, uppercase letter, symbol and number.`;
       const error = new Error(errorMessage);
       error.publicMessage = errorMessage;
       cb(error);
@@ -44,19 +44,6 @@ authUserSchema.plugin(passportLocalMongoose, {
     return cb();
   },
 });
-
-// authUserSchema.pre("save", async function (next) {
-//   const user = this;
-//   const hashedPassword = await bcrypt.hash(user.password, 10);
-//   user.password = hashedPassword;
-//   next();
-// });
-
-// authUserSchema.methods.isValidPassword = async function (password) {
-//   const user = this;
-//   const compare = await bcrypt.compare(password, user.password);
-//   return compare;
-// };
 
 const AuthUserModel = mongoose.model("authUser", authUserSchema);
 

@@ -8,6 +8,7 @@ import {
   MESSAGE_CREATED,
   pubsub,
 } from "./actions";
+import { GraphQLError } from "graphql";
 
 const mutationRelatedResolvers: MutationResolvers = {
   signup: async (
@@ -17,18 +18,20 @@ const mutationRelatedResolvers: MutationResolvers = {
   ) => {
     //TODO: check if there is already a user with that username in auth or userRes, we'll mock it up right now
     //
+
     const alreadyUser = false;
     const alreadyAuthUser = false;
     if (alreadyAuthUser || alreadyUser) {
-      throw new Error("This user already exists");
+      throw new GraphQLError("This user already exists");
     }
 
     const authPostRes = await dataSources.authAPI.signUp({
       username,
       password,
     });
+
     if (isErrorResponse(authPostRes)) {
-      throw new Error(authPostRes.error.message);
+      throw new GraphQLError(authPostRes.error.message);
     }
 
     const userPostRes = await dataSources.userAPI.createUser({
@@ -39,7 +42,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     });
     if (isErrorResponse(userPostRes)) {
       dataSources.authAPI.deleteAuthUser(authPostRes.data.user._id);
-      throw new Error(userPostRes.error.message);
+      throw new GraphQLError(userPostRes.error.message);
     }
     return {
       success: true,
@@ -56,7 +59,7 @@ const mutationRelatedResolvers: MutationResolvers = {
       sameSite: "none",
     };
     if (isErrorResponse(authRes)) {
-      throw new Error(authRes.error.message);
+      throw new GraphQLError(authRes.error.message);
     }
     res.cookie("jwt_token", authRes.data.token, options);
     return authRes.data;
@@ -79,7 +82,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     const { chatId, content, sentAt, sentById } = input;
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not logged in user");
+      throw new GraphQLError("Not logged in user");
     }
     const createMessageRes = await dataSources.chatAPI.createMessage({
       chatId,
@@ -89,7 +92,7 @@ const mutationRelatedResolvers: MutationResolvers = {
       sentBy: sentById,
     });
     if (isErrorResponse(createMessageRes)) {
-      throw new Error(createMessageRes.error.message);
+      throw new GraphQLError(createMessageRes.error.message);
     }
     pubsub.publish(MESSAGE_CREATED, { messageCreated: createMessageRes });
     const out = { message: createMessageRes.data, success: true };
@@ -98,7 +101,7 @@ const mutationRelatedResolvers: MutationResolvers = {
   createGroupChat: async (_, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
     const participantsAndViewer = input.participants;
 
@@ -107,7 +110,7 @@ const mutationRelatedResolvers: MutationResolvers = {
 
     for (const participant of participantsAndViewer) {
       if (!friendsIds.includes(participant.id)) {
-        throw new Error("You can only chat with your friends");
+        throw new GraphQLError("You can only chat with your friends");
       }
     }
 
@@ -126,14 +129,14 @@ const mutationRelatedResolvers: MutationResolvers = {
       avatar: input?.avatar,
     });
     if (isErrorResponse(createChatRes)) {
-      throw new Error(createChatRes.error.message);
+      throw new GraphQLError(createChatRes.error.message);
     }
     return { chat: createChatRes.data };
   },
   getOrCreateIndividualChat: async (_, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
 
     // let friends = viewer.friends as UserModelSuccessResponse[];
@@ -149,7 +152,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     });
 
     if (isErrorResponse(getChatRes)) {
-      throw new Error(getChatRes.error.message);
+      throw new GraphQLError(getChatRes.error.message);
     } else if (getChatRes.data.length > 0) {
       return { chat: getChatRes.data[0], created: false };
     }
@@ -163,7 +166,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     });
 
     if (isErrorResponse(createChatRes)) {
-      throw new Error(createChatRes.error.message);
+      throw new GraphQLError(createChatRes.error.message);
     }
     return { chat: createChatRes.data, created: true };
   },
@@ -171,7 +174,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     //TODO: simplify this, you made a mess!
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
     const { userToAdd, userToAddEmail, userToAddUsername } = input;
     let queryByFields = { userToAdd, userToAddEmail, userToAddUsername };
@@ -180,7 +183,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     );
     //if there is more than one query field specified throw error
     if (queryByFieldsArray.length > 1) {
-      throw new Error("Please specify only one query field");
+      throw new GraphQLError("Please specify only one query field");
     }
     const queryObject = Object.fromEntries(queryByFieldsArray) as {
       userToAdd?: string;
@@ -195,10 +198,10 @@ const mutationRelatedResolvers: MutationResolvers = {
       });
       //this should never happen, it should allways return at least an empty array
       if (isErrorResponse(userToAddRes)) {
-        throw new Error("Unexpected error");
+        throw new GraphQLError("Unexpected error");
       }
       if (userToAddRes.data.length == 0) {
-        throw new Error("User with that email doesn't exist");
+        throw new GraphQLError("User with that email doesn't exist");
       }
       userToAddId = userToAddRes.data[0]._id;
     } else if (queryObject.userToAddUsername) {
@@ -207,10 +210,10 @@ const mutationRelatedResolvers: MutationResolvers = {
       });
       //this should never happen, it should allways return at least an empty array
       if (isErrorResponse(userToAddRes)) {
-        throw new Error("Unexpected error");
+        throw new GraphQLError("Unexpected error");
       }
       if (userToAddRes.data.length == 0) {
-        throw new Error("User with that username doesn't exist");
+        throw new GraphQLError("User with that username doesn't exist");
       }
       userToAddId = userToAddRes.data[0]._id;
     }
@@ -220,11 +223,11 @@ const mutationRelatedResolvers: MutationResolvers = {
       to: userToAddId,
     });
     if (isErrorResponse(friendRequestRes)) {
-      throw new Error(friendRequestRes.error.message);
+      throw new GraphQLError(friendRequestRes.error.message);
     }
     const userAddedRes = await dataSources.userAPI.getUser(userToAddId);
     if (isErrorResponse(userAddedRes)) {
-      throw new Error(userAddedRes.error.message);
+      throw new GraphQLError(userAddedRes.error.message);
     }
 
     pubsub.publish(FRIENDSHIP_REQUEST_RECEIVED, {
@@ -240,7 +243,7 @@ const mutationRelatedResolvers: MutationResolvers = {
   acceptFriendship: async (parent, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
     const friendshipRequestRes =
       await dataSources.userAPI.getFriendshipRequests({
@@ -249,11 +252,11 @@ const mutationRelatedResolvers: MutationResolvers = {
       });
 
     if (isErrorResponse(friendshipRequestRes)) {
-      throw new Error(friendshipRequestRes.error.message);
+      throw new GraphQLError(friendshipRequestRes.error.message);
     }
 
     if (friendshipRequestRes.data.length == 0) {
-      throw new Error("Friendship request not available");
+      throw new GraphQLError("Friendship request not available");
     }
 
     const friendshipRes = await dataSources.userAPI.createFriendship({
@@ -261,13 +264,13 @@ const mutationRelatedResolvers: MutationResolvers = {
       user2Id: input.userToAccept,
     });
     if (isErrorResponse(friendshipRes)) {
-      throw new Error(friendshipRes.error.message);
+      throw new GraphQLError(friendshipRes.error.message);
     }
 
     const userAddedRes = await dataSources.userAPI.getUser(input.userToAccept);
 
     if (isErrorResponse(userAddedRes)) {
-      throw new Error(userAddedRes.error.message);
+      throw new GraphQLError(userAddedRes.error.message);
     }
 
     pubsub.publish(FRIENDSHIP_RESPONSE_RECEIVED, {
@@ -285,7 +288,7 @@ const mutationRelatedResolvers: MutationResolvers = {
   rejectFriendship: async (parent, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
     const friendshipRequestRes =
       await dataSources.userAPI.getFriendshipRequests({
@@ -294,11 +297,11 @@ const mutationRelatedResolvers: MutationResolvers = {
       });
 
     if (isErrorResponse(friendshipRequestRes)) {
-      throw new Error(friendshipRequestRes.error.message);
+      throw new GraphQLError(friendshipRequestRes.error.message);
     }
 
     if (friendshipRequestRes.data.length == 0) {
-      throw new Error("Friendship request not available");
+      throw new GraphQLError("Friendship request not available");
     }
 
     const friendshipRes = await dataSources.userAPI.deleteFriendshipRequest({
@@ -307,7 +310,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     });
 
     if (isErrorResponse(friendshipRes)) {
-      throw new Error(friendshipRes.error.message);
+      throw new GraphQLError(friendshipRes.error.message);
     }
 
     const userRejectedRes = await dataSources.userAPI.getUser(
@@ -315,7 +318,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     );
 
     if (isErrorResponse(userRejectedRes)) {
-      throw new Error(userRejectedRes.error.message);
+      throw new GraphQLError(userRejectedRes.error.message);
     }
 
     pubsub.publish(FRIENDSHIP_RESPONSE_RECEIVED, {
@@ -333,7 +336,7 @@ const mutationRelatedResolvers: MutationResolvers = {
   setLanguage: async (parent, { input: { language } }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
     const userRes = await dataSources.userAPI.updateUser(viewer._id, {
       settings: {
@@ -341,24 +344,24 @@ const mutationRelatedResolvers: MutationResolvers = {
       },
     });
     if (isErrorResponse(userRes)) {
-      throw new Error(userRes.error.message);
+      throw new GraphQLError(userRes.error.message);
     }
     return { language: userRes.data.settings.language, success: true };
   },
   removeParticipant: async (parent, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
     const viewerParticipantRes = await dataSources.chatAPI.getParticipant(
       input.chatId,
       viewer._id
     );
     if (isErrorResponse(viewerParticipantRes)) {
-      throw new Error(viewerParticipantRes.error.message);
+      throw new GraphQLError(viewerParticipantRes.error.message);
     }
     if (!viewerParticipantRes.data.admin) {
-      throw new Error("Only admins can remove participants");
+      throw new GraphQLError("Only admins can remove participants");
     }
 
     const delParticipantRes = await dataSources.chatAPI.deleteParticipant(
@@ -367,7 +370,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     );
 
     if (isErrorResponse(delParticipantRes)) {
-      throw new Error(delParticipantRes.error.message);
+      throw new GraphQLError(delParticipantRes.error.message);
     }
     return {
       chatId: input.chatId,
@@ -378,7 +381,7 @@ const mutationRelatedResolvers: MutationResolvers = {
   leaveGroupChat: async (parent, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
     const delParticipantRes = await dataSources.chatAPI.deleteParticipant(
       input.chatId,
@@ -386,47 +389,41 @@ const mutationRelatedResolvers: MutationResolvers = {
     );
 
     if (isErrorResponse(delParticipantRes)) {
-      throw new Error(delParticipantRes.error.message);
+      throw new GraphQLError(delParticipantRes.error.message);
     }
-    console.log(delParticipantRes);
     return {
       chatId: input.chatId,
       success: true,
     };
   },
   removeFriendship: async (parent, { input }, { dataSources }) => {
-    console.log("called");
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
-    console.log("first");
     const friendhipRemoveRes = await dataSources.userAPI.deleteFriendship({
       user1Id: viewer._id,
       user2Id: input.userToRemoveId,
     });
-    console.log("real sescond", friendhipRemoveRes);
 
     if (isErrorResponse(friendhipRemoveRes)) {
-      throw new Error(friendhipRemoveRes.error.message);
+      throw new GraphQLError(friendhipRemoveRes.error.message);
     }
-    console.log("second");
 
     const userToRemoveRes = await dataSources.userAPI.getUser(
       input.userToRemoveId
     );
-    console.log("third", userToRemoveRes);
 
     if (isErrorResponse(userToRemoveRes)) {
-      throw new Error(userToRemoveRes.error.message);
+      throw new GraphQLError(userToRemoveRes.error.message);
     }
 
     return { userRemoved: userToRemoveRes.data };
   },
-  addParticipants: async (parent, { input }, { dataSources }) => {
+  addParticipants: async (_, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new Error("Not authenticated");
+      throw new GraphQLError("Not authenticated");
     }
     const chatRes = await dataSources.chatAPI.addParticipants({
       chatId: input.chatId,
@@ -434,7 +431,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     });
 
     if (isErrorResponse(chatRes)) {
-      throw new Error(chatRes.error.message);
+      throw new GraphQLError(chatRes.error.message);
     }
 
     return {
@@ -443,4 +440,4 @@ const mutationRelatedResolvers: MutationResolvers = {
   },
 };
 
-export default mutationRelatedResolvers;
+export default { Mutation: mutationRelatedResolvers };

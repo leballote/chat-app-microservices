@@ -4,21 +4,24 @@ import {
   UserModelSuccessResponse,
   UserModelResponse,
   DefaultAPIResponse,
+  FriendshipRequestSuccessResponse,
+  FriendshipRequestResponse,
+  FriendshipResponse,
+  UpdateUserInput,
 } from "../types/servicesRest";
+import queryString from "query-string";
+import { HandleError } from "./utils";
 
 export default class UserAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
   override baseURL = process.env.USER_URI;
 
+  @HandleError()
   async getUser(id: string): Promise<UserModelResponse> {
-    try {
-      return this.get<UserModelResponse>(`user/${encodeURIComponent(id)}`);
-    } catch (e) {
-      return {
-        error: { message: JSON.stringify(e) },
-      };
-    }
+    return this.get<UserModelResponse>(`user/${encodeURIComponent(id)}`);
   }
+
+  @HandleError()
   async getUsers(
     args: {
       limit?: string;
@@ -29,25 +32,29 @@ export default class UserAPI extends RESTDataSource {
       birthDate?: string;
     } = {}
   ): Promise<DefaultAPIResponse<UserModelSuccessResponse[]>> {
-    const query = Object.entries(args)
-      .map(([key, val]) => `${key}=${val}`)
-      .join("&");
+    const query = queryString.stringify(args);
 
     return this.get<DefaultAPIResponse<UserModelSuccessResponse[]>>(
       `user/?${query}`
     );
   }
 
+  @HandleError()
   async createUser(input: CreateUserModelInput): Promise<UserModelResponse> {
-    try {
-      return this.post<UserModelResponse>("user", { body: input });
-    } catch (e) {
-      return {
-        error: { message: JSON.stringify(e) },
-      };
-    }
+    return this.post<UserModelResponse>("user", { body: input });
   }
 
+  @HandleError()
+  async updateUser(
+    userId: string,
+    options: UpdateUserInput
+  ): Promise<UserModelResponse> {
+    return this.put<UserModelResponse>(`user/${userId}`, {
+      body: options,
+    });
+  }
+
+  @HandleError()
   async createFriendshipRequest({
     from,
     to,
@@ -60,6 +67,7 @@ export default class UserAPI extends RESTDataSource {
     });
   }
 
+  @HandleError()
   async getFriendshipRequests({
     from,
     to,
@@ -67,16 +75,14 @@ export default class UserAPI extends RESTDataSource {
     from?: string;
     to?: string;
   }): Promise<DefaultAPIResponse<FriendshipRequestSuccessResponse[]>> {
-    const query = Object.entries({ from, to })
-      .filter(([, val]) => val != undefined)
-      .map(([key, val]) => `${key}=${val}`)
-      .join("&");
+    const query = queryString.stringify({ from, to }, undefined, undefined, {});
 
     return this.get<DefaultAPIResponse<FriendshipRequestSuccessResponse[]>>(
       `friendshipRequest?${query}`
     );
   }
 
+  @HandleError()
   async deleteFriendshipRequest({
     from,
     to,
@@ -92,6 +98,7 @@ export default class UserAPI extends RESTDataSource {
     });
   }
 
+  @HandleError()
   async createFriendship({
     user1Id,
     user2Id,
@@ -104,6 +111,7 @@ export default class UserAPI extends RESTDataSource {
     });
   }
 
+  @HandleError()
   async deleteFriendship({
     user1Id,
     user2Id,
@@ -118,39 +126,4 @@ export default class UserAPI extends RESTDataSource {
       },
     });
   }
-
-  async updateUser(
-    userId: string,
-    options: UpdateUserInput
-  ): Promise<UserModelResponse> {
-    console.log(options);
-    return this.put<UserModelResponse>(`user/${userId}`, {
-      body: options,
-    });
-  }
 }
-
-type UpdateUserInput = {
-  name?: string;
-  avatar?: string;
-  settings?: {
-    language?: string;
-  };
-};
-
-//TODO: put this in the types folder
-type FriendshipRequestSuccessResponse = {
-  from: string;
-  to: string;
-  createdAt: string;
-};
-
-type FriendshipSuccessResponse = {
-  user1: string;
-  user2: string;
-};
-
-type FriendshipRequestResponse =
-  DefaultAPIResponse<FriendshipRequestSuccessResponse>;
-
-type FriendshipResponse = DefaultAPIResponse<FriendshipSuccessResponse>;

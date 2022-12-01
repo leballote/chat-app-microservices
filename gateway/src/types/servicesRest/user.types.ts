@@ -26,4 +26,28 @@ export type CreateUserModelInput = {
   avatar?: string;
 };
 
+export type UpdateUserInput = {
+  name?: string;
+  avatar?: string;
+  settings?: {
+    language?: string;
+  };
+};
+
 export type UserModelResponse = DefaultAPIResponse<UserModelSuccessResponse>;
+
+export type FriendshipRequestSuccessResponse = {
+  from: string;
+  to: string;
+  createdAt: string;
+};
+
+export type FriendshipSuccessResponse = {
+  user1: string;
+  user2: string;
+};
+
+export type FriendshipRequestResponse =
+  DefaultAPIResponse<FriendshipRequestSuccessResponse>;
+
+export type FriendshipResponse = DefaultAPIResponse<FriendshipSuccessResponse>;

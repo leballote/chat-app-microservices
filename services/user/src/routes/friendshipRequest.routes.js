@@ -1,4 +1,5 @@
 const FriendRequestModel = require("../models/friendRequest.model");
+const UserModel = require("../models/user.model");
 
 const router = require("express").Router();
 
@@ -16,26 +17,35 @@ const errors = {
   friendshipRequestNotFound: {
     error: { message: "Friendship request not found" },
   },
+  youAreAlreadyFriends: {
+    error: { message: "You are already friends" },
+  },
 };
 
 router.post("/friendshipRequest", async (req, res) => {
   const { from, to } = req.body;
-  console.log("BODY", req.body);
   try {
     if (from == to) {
       return res.status(400).send(errors.cannotRequestFriendshipToYourself);
     }
-    const friendReq = await FriendRequestModel.findOne({
-      $or: [
-        { from, to },
-        { from: to, to: from },
-      ],
-    });
+    const [friendReq, user1] = await Promise.all([
+      FriendRequestModel.findOne({
+        $or: [
+          { from, to },
+          { from: to, to: from },
+        ],
+      }),
+      UserModel.findById(from),
+    ]);
+
     if (friendReq?.from == from) {
       return res.status(400).send(errors.youAlreadyRequestedFriendship);
     }
     if (friendReq?.to == from) {
       return res.status(400).send(errors.heAlreadyRequestedFriendship);
+    }
+    if (user1.friends.includes(to)) {
+      return res.status(400).send(errors.youAreAlreadyFriends);
     }
 
     const friendshipRequest = await FriendRequestModel.create({
@@ -59,11 +69,8 @@ router.get("/friendshipRequest", async (req, res) => {
     Object.entries(baseQueryParams).filter(([, val]) => val != null)
   );
 
-  console.log("BASE QUERY PARAMS", baseQueryParams);
-
   try {
     const friendshipRequest = await FriendRequestModel.find(baseQueryParams);
-    console.log(friendshipRequest);
 
     return res.send({
       data: friendshipRequest,

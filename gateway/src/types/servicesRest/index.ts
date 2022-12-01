@@ -1,7 +1,12 @@
 import {
+  CreateUserModelInput,
+  UpdateUserInput,
   UserModelSuccessResponse,
   UserModelResponse,
-  CreateUserModelInput,
+  FriendshipSuccessResponse,
+  FriendshipResponse,
+  FriendshipRequestSuccessResponse,
+  FriendshipRequestResponse,
 } from "./user.types";
 import {
   ChatModelSuccessResponse,
@@ -29,6 +34,11 @@ import { DefaultAPIResponse, DefaultError } from "./general.types";
 export {
   UserModelResponse,
   UserModelSuccessResponse,
+  FriendshipRequestResponse,
+  FriendshipRequestSuccessResponse,
+  FriendshipResponse,
+  FriendshipSuccessResponse,
+  UpdateUserInput,
   CreateUserModelInput,
   ChatModelSuccessResponse,
   ChatModelResponse,

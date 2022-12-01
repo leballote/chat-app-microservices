@@ -42,6 +42,7 @@ export type Chat = {
   __typename?: 'Chat';
   avatar?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
+  lastActionDate: Scalars['String'];
   lastMessage?: Maybe<Message>;
   messages: Array<Message>;
   name: Scalars['String'];
@@ -177,7 +178,6 @@ export type Mutation = {
   addParticipants: AddParticipantsResponse;
   createGroupChat: GetOrCreateChatResponse;
   createMessage: CreateMessageResponse;
-  createPost: Post;
   getOrCreateIndividualChat: GetOrCreateChatResponse;
   leaveGroupChat: LeaveGroupChatResponse;
   login: LogInResponse;
@@ -208,12 +208,6 @@ export type MutationCreateGroupChatArgs = {
 
 export type MutationCreateMessageArgs = {
   input: CreateMessageInput;
-};
-
-
-export type MutationCreatePostArgs = {
-  author?: InputMaybe<Scalars['String']>;
-  comment?: InputMaybe<Scalars['String']>;
 };
 
 
@@ -265,12 +259,6 @@ export type MutationSignupArgs = {
 export type ParticipantInput = {
   admin: Scalars['Boolean'];
   id: Scalars['String'];
-};
-
-export type Post = {
-  __typename?: 'Post';
-  author: Scalars['String'];
-  comment: Scalars['String'];
 };
 
 export type Query = {
@@ -522,7 +510,6 @@ export type ResolversTypes = {
   MessageCreatedSubscriptionResponse: ResolverTypeWrapper<Omit<MessageCreatedSubscriptionResponse, 'message'> & { message?: Maybe<ResolversTypes['Message']> }>;
   Mutation: ResolverTypeWrapper<{}>;
   ParticipantInput: ParticipantInput;
-  Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<{}>;
   RejectFriendshipInput: RejectFriendshipInput;
   RejectFriendshipResponse: ResolverTypeWrapper<Omit<RejectFriendshipResponse, 'friendRejected'> & { friendRejected: ResolversTypes['User'] }>;
@@ -575,7 +562,6 @@ export type ResolversParentTypes = {
   MessageCreatedSubscriptionResponse: Omit<MessageCreatedSubscriptionResponse, 'message'> & { message?: Maybe<ResolversParentTypes['Message']> };
   Mutation: {};
   ParticipantInput: ParticipantInput;
-  Post: Post;
   Query: {};
   RejectFriendshipInput: RejectFriendshipInput;
   RejectFriendshipResponse: Omit<RejectFriendshipResponse, 'friendRejected'> & { friendRejected: ResolversParentTypes['User'] };
@@ -610,6 +596,7 @@ export type AddParticipantsResponseResolvers<ContextType = MyContext, ParentType
 export type ChatResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Chat'] = ResolversParentTypes['Chat']> = {
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  lastActionDate?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   lastMessage?: Resolver<Maybe<ResolversTypes['Message']>, ParentType, ContextType>;
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -707,7 +694,6 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   addParticipants?: Resolver<ResolversTypes['AddParticipantsResponse'], ParentType, ContextType, Partial<MutationAddParticipantsArgs>>;
   createGroupChat?: Resolver<ResolversTypes['GetOrCreateChatResponse'], ParentType, ContextType, RequireFields<MutationCreateGroupChatArgs, 'input'>>;
   createMessage?: Resolver<ResolversTypes['CreateMessageResponse'], ParentType, ContextType, RequireFields<MutationCreateMessageArgs, 'input'>>;
-  createPost?: Resolver<ResolversTypes['Post'], ParentType, ContextType, Partial<MutationCreatePostArgs>>;
   getOrCreateIndividualChat?: Resolver<ResolversTypes['GetOrCreateChatResponse'], ParentType, ContextType, RequireFields<MutationGetOrCreateIndividualChatArgs, 'input'>>;
   leaveGroupChat?: Resolver<ResolversTypes['LeaveGroupChatResponse'], ParentType, ContextType, RequireFields<MutationLeaveGroupChatArgs, 'input'>>;
   login?: Resolver<ResolversTypes['LogInResponse'], ParentType, ContextType, Partial<MutationLoginArgs>>;
@@ -718,12 +704,6 @@ export type MutationResolvers<ContextType = MyContext, ParentType extends Resolv
   requestFriendship?: Resolver<ResolversTypes['RequestFriendshipResponse'], ParentType, ContextType, RequireFields<MutationRequestFriendshipArgs, 'input'>>;
   setLanguage?: Resolver<ResolversTypes['SetLanguageResponse'], ParentType, ContextType, Partial<MutationSetLanguageArgs>>;
   signup?: Resolver<ResolversTypes['SignUpResponse'], ParentType, ContextType, Partial<MutationSignupArgs>>;
-};
-
-export type PostResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Post'] = ResolversParentTypes['Post']> = {
-  author?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  comment?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type QueryResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
@@ -834,7 +814,6 @@ export type Resolvers<ContextType = MyContext> = {
   Message?: MessageResolvers<ContextType>;
   MessageCreatedSubscriptionResponse?: MessageCreatedSubscriptionResponseResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
-  Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   RejectFriendshipResponse?: RejectFriendshipResponseResolvers<ContextType>;
   RemoveFriendshipResponse?: RemoveFriendshipResponseResolvers<ContextType>;

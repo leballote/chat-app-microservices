@@ -72,12 +72,9 @@ router.post("/chat", async (req, res) => {
         });
       }
     } catch (e) {
-      return (
-        res
-          .status(500)
-          //TODO: remove debug
-          .send({ ...errors.serverError, debug: { error: e.message } })
-      );
+      return res
+        .status(500)
+        .send({ ...errors.serverError, debug: { error: e.message } });
     }
   }
 
@@ -85,6 +82,11 @@ router.post("/chat", async (req, res) => {
     const chat = await Chat.create(chatData);
     //there should not be  unique key error because it is handeled before
     if (type == "individual") {
+      if (user1Id == user2Id) {
+        return res.status(400).send({
+          error: { message: "Can't create an individual chat with yourself" },
+        });
+      }
       await IndividualRel.create({
         user1Id,
         user2Id,
@@ -163,7 +165,30 @@ router.get("/chat", async (req, res) => {
     let chats;
     const basePipeline = [
       {
-        $sort: { createdAt: -1 },
+        $lookup: {
+          from: "messages",
+          localField: "lastMessageId",
+          foreignField: "_id",
+          as: "lastMessage",
+        },
+      },
+      {
+        $unwind: {
+          path: "$lastMessage",
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          lastActionDate: {
+            $ifNull: ["$lastMessage.sentAt", "$createdAt"],
+          },
+        },
+      },
+      {
+        $sort: {
+          lastActionDate: -1,
+        },
       },
       {
         $skip: offset,

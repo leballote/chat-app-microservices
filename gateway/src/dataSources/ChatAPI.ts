@@ -3,7 +3,6 @@ import { isErrorResponse } from "../types/general.types";
 import {
   ChatModelResponse,
   ChatModelSuccessResponse,
-  ChatModelType,
   MessageModelResponse,
   MessageModelSuccessResponse,
   CreateMessageModelInput,
@@ -13,26 +12,25 @@ import {
   ChatParticipantReseponse,
   ChatParticipantSuccessResponse,
   CreateChatModelInput,
-  isGroupChatModelInput,
 } from "../types/servicesRest/chat.types";
+import queryString from "query-string";
+import { HandleError } from "./utils";
 
 export default class ChatAPI extends RESTDataSource {
   //TODO: maybe put this baseURL as an environment variable
   override baseURL = process.env.CHAT_URI;
 
+  @HandleError()
   async getChat(
     id: string,
     queryBy?: {
       userId: string;
     }
   ): Promise<ChatModelResponse> {
-    try {
-      return this.get<ChatModelResponse>(`chat/${encodeURIComponent(id)}`);
-    } catch (e) {
-      return { error: { message: JSON.stringify(e) } };
-    }
+    return this.get<ChatModelResponse>(`chat/${encodeURIComponent(id)}`);
   }
 
+  @HandleError()
   async getChats(
     args: {
       limit?: number;
@@ -43,23 +41,14 @@ export default class ChatAPI extends RESTDataSource {
       user2Id?: string;
     } = {}
   ): Promise<DefaultAPIResponse<ChatModelSuccessResponse[]>> {
-    const query = Object.entries(args)
-      .map(([key, val]) => `${key}=${val}`)
-      .join("&");
+    const query = queryString.stringify(args);
 
-    try {
-      return this.get<DefaultAPIResponse<ChatModelSuccessResponse[]>>(
-        `chat/?${query}`
-      );
-    } catch (e) {
-      return {
-        error: {
-          message: JSON.stringify(e),
-        },
-      };
-    }
+    return this.get<DefaultAPIResponse<ChatModelSuccessResponse[]>>(
+      `chat/?${query}`
+    );
   }
 
+  @HandleError()
   async getMessages(
     args: {
       afterDate?: string;
@@ -70,19 +59,13 @@ export default class ChatAPI extends RESTDataSource {
       userId?: string;
     } = {}
   ): Promise<DefaultAPIResponse<MessageModelSuccessResponse[]>> {
-    const query = Object.entries(args)
-      .map(([key, val]) => `${key}=${val}`)
-      .join("&");
-
-    try {
-      return this.get<DefaultAPIResponse<MessageModelSuccessResponse[]>>(
-        `message/?${query}`
-      );
-    } catch (e) {
-      return { error: { message: JSON.stringify(e) } };
-    }
+    const query = queryString.stringify(args);
+    return this.get<DefaultAPIResponse<MessageModelSuccessResponse[]>>(
+      `message/?${query}`
+    );
   }
 
+  @HandleError()
   async getParticipant(
     chatId: string,
     userId: string
@@ -99,6 +82,7 @@ export default class ChatAPI extends RESTDataSource {
     }
   }
 
+  @HandleError()
   async addParticipants({
     chatId,
     participants,
@@ -114,17 +98,17 @@ export default class ChatAPI extends RESTDataSource {
     });
   }
 
+  @HandleError()
   async getParticipants(args: {
     chatId: string;
   }): Promise<DefaultAPIResponse<ChatParticipantSuccessResponse[]>> {
-    const query = Object.entries(args)
-      .map(([key, val]) => `${key}=${val}`)
-      .join("&");
+    const query = queryString.stringify(args);
     return this.get<DefaultAPIResponse<ChatParticipantSuccessResponse[]>>(
       `participant/${query}`
     );
   }
 
+  @HandleError()
   async deleteParticipant(
     chatId: string,
     userId: string
@@ -137,27 +121,17 @@ export default class ChatAPI extends RESTDataSource {
     });
   }
 
+  @HandleError()
   async createMessage(
     input: CreateMessageModelInput
   ): Promise<MessageModelResponse> {
-    try {
-      return this.post("message", { body: input });
-    } catch (e) {
-      return {
-        error: { message: JSON.stringify(e) },
-      };
-    }
+    return this.post("message", { body: input });
   }
 
+  @HandleError()
   async createChat(input: CreateChatModelInput): Promise<ChatModelResponse> {
-    try {
-      return this.post<ChatModelResponse>("chat", {
-        body: input,
-      });
-    } catch (e) {
-      return {
-        error: { message: JSON.stringify(e) },
-      };
-    }
+    return this.post<ChatModelResponse>("chat", {
+      body: input,
+    });
   }
 }

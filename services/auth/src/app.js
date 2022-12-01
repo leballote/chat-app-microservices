@@ -12,6 +12,9 @@ const app = express();
 app.use(express.json());
 // app.use(cookieParser);
 app.use("/auth", authRouter);
+app.get("/healthz", (_, res) => {
+  return res.send("Healthy!");
+});
 
 mongoose.connect(MONGODB_CONNECTION_STRING).then(
   app.listen(PORT, async () => {

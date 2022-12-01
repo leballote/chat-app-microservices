@@ -6,11 +6,16 @@ import {
   DefaultAPIResponse,
 } from "../types/servicesRest";
 import { AuthenticateJWTResponse } from "../types/servicesRest/auth.types";
+import queryString from "query-string";
+import { GraphQLError } from "graphql";
+import { HandleError } from "./utils";
+
+import { isErrorResponse } from "../types/general.types";
 
 export default class AuthAPI extends RESTDataSource {
-  //TODO: maybe put this baseURL as an environment variable
   override baseURL = process.env.AUTH_URI;
 
+  @HandleError()
   async signUp({
     username,
     password,
@@ -18,25 +23,16 @@ export default class AuthAPI extends RESTDataSource {
     username: string;
     password: string;
   }): Promise<SignUpModelResponse> {
-    try {
-      return this.post<SignUpModelResponse>(`auth/signup`, {
-        body: { username, password },
-      });
-    } catch (e) {
-      return { error: { message: JSON.stringify(e) } };
-    }
+    return this.post<SignUpModelResponse>(`auth/signup`, {
+      body: { username, password },
+    });
   }
 
+  @HandleError()
   async logIn({ username, password }): Promise<LogInModelResponse> {
-    try {
-      return this.post<LogInModelResponse>(`auth/login`, {
-        body: { username, password },
-      });
-    } catch (e) {
-      return {
-        error: { message: JSON.stringify(e) },
-      };
-    }
+    return await this.post<LogInModelResponse>(`auth/login`, {
+      body: { username, password },
+    });
   }
 
   async authorize(token: string): Promise<AuthenticateJWTResponse> {
@@ -45,15 +41,12 @@ export default class AuthAPI extends RESTDataSource {
     });
   }
 
+  @HandleError()
   async deleteAuthUser(id: string): Promise<AuthUserResponse> {
-    try {
-      return this.delete(`auth/user/${id}`);
-    } catch (e) {
-      return { error: { message: JSON.stringify(e) } };
-    }
+    return this.delete(`auth/user/${id}`);
   }
 
-  //TODO: finish this, it is not using the query params correctly
+  @HandleError()
   async getAuthUsers({
     query,
   }: {
@@ -63,13 +56,7 @@ export default class AuthAPI extends RESTDataSource {
       offset: number;
     };
   }): Promise<DefaultAPIResponse<AuthUserResponse[]>> {
-    try {
-      const queryString = Object.entries(query)
-        .map(([key, val]) => `${key}=${val}`)
-        .join("&");
-      return this.get(`auth/user?${queryString}`);
-    } catch (e) {
-      return { error: { message: JSON.stringify(e) } };
-    }
+    let query_ = queryString.stringify(query);
+    return this.get(`auth/user?${query_}`);
   }
 }

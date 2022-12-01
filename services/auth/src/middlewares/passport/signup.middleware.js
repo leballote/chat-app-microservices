@@ -47,7 +47,6 @@ function signupMiddleware(req, res, next) {
     }
 
     if (err || !user) {
-      // console.log("USER: ", err);
       return res.status(500).send({ error: { message: "Another error" } });
     }
     req.login(user, { session: false }, (err) => {
