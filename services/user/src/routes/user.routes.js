@@ -91,7 +91,6 @@ router.put("/user/:id", async (req, res) => {
       { name, birthDate, phrase, avatar, settings },
       { new: true }
     );
-    console.log(user);
     if (!user) {
       return res.send(errors.userNotFound);
     }

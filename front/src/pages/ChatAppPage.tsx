@@ -137,7 +137,6 @@ export default function ChatAppPage() {
           dispatch(removeFriendRequest(requesterUser.id));
         }
         if (requesterUser && requesterUser.id == user?.id) {
-          console.log(requesterUser);
           dispatch(addContact(accepterUser));
         }
       } else {

@@ -54,7 +54,6 @@ const queryRelatedResolvers: QueryResolvers = {
       friendReq,
       userRes: promisesRes[index],
     }));
-    console.log("PROMISES RES WITH FRIENDSHIP DATA", mergedRes);
     const notErroredRes = mergedRes.filter(
       ({ userRes }) => !isErrorResponse(userRes)
     ) as {
