@@ -7,10 +7,7 @@ import {
 } from "../types/servicesRest";
 import { AuthenticateJWTResponse } from "../types/servicesRest/auth.types";
 import queryString from "query-string";
-import { GraphQLError } from "graphql";
 import { HandleError } from "./utils";
-
-import { isErrorResponse } from "../types/general.types";
 
 export default class AuthAPI extends RESTDataSource {
   override baseURL = process.env.AUTH_URI;

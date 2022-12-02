@@ -43,7 +43,7 @@ function signupMiddleware(req, res, next) {
       }
       //TODO: if there is a validation error, see what provides more information and wether it is possible tu just send the messages
       const errorValue = Object.values(err)[0];
-      return res.status.send({ error: { message: errorValue.message } });
+      return res.status(400).send({ error: { message: errorValue.message } });
     }
 
     if (err || !user) {

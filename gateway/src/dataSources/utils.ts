@@ -13,12 +13,19 @@ export function HandleError() {
       try {
         const res = await original.bind(this)(...args);
         if (isErrorResponse(res)) {
-          throw new GraphQLError(res.error.message);
+          throw new GraphQLError(res.error.message, {
+            extensions: { code: "ERROR_NOT_400_NOR_500" },
+          });
         }
         return res;
       } catch (error) {
         if (error?.extensions?.response?.body?.error?.message) {
           throw new GraphQLError(error.extensions.response.body.error.message);
+        } else if (
+          error.message &&
+          error?.extensions?.code == "ERROR_NOT_400_NOR_500"
+        ) {
+          throw error;
         } else {
           throw new GraphQLError("Something went wrong");
         }
