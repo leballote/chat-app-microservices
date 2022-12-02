@@ -1,8 +1,8 @@
 import { call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { leaveGroupRequest } from "../requests/leaveGroup.request";
-import { getValue } from "../../features/currentChatSlice";
-import { removeChat } from "../../features/chatsPreviewsSlice";
+import { getValue } from "../../features/appData/currentChatSlice";
+import { removeChat } from "../../features/appData/chatsPreviewsSlice";
 // import { removeParticipant as removeParticipantInState } from "../../features/currentChatSlice";
 import { store } from "../../store";
 

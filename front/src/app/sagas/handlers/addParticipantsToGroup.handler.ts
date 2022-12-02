@@ -4,7 +4,7 @@ import { addParticipants as requestAddParticipants } from "../requests/addPartic
 import {
   setParticipants,
   resetParticipantsToAdd,
-} from "../../features/currentChatSlice";
+} from "../../features/appData/currentChatSlice";
 
 type AddParticipantInput = {
   chatId: string;

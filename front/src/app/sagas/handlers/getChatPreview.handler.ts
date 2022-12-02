@@ -1,6 +1,6 @@
 import { call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { upsertChat } from "../../features/chatsPreviewsSlice";
+import { upsertChat } from "../../features/appData/chatsPreviewsSlice";
 import { requestGetChatPreview } from "../requests/getChatPreview.request";
 
 export function* handleGetChatPreview(action: PayloadAction<string>): any {

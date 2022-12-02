@@ -5,11 +5,11 @@ import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CurrentUserContext } from "./contexts";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
-import { getValue as getCurrentUserValue } from "./app/features/currentUserSlice";
+import { getValue as getCurrentUserValue } from "./app/features/appData/currentUserSlice";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
 import ChatAppPage from "./pages/ChatAppPage";
-import LinearDeterminate from "./components/Feedback/LinearDeterminate";
+import LinearDeterminate from "./components/feedback/LinearDeterminate";
 import Typography from "@mui/material/Typography";
 
 const App: React.FunctionComponent = function () {

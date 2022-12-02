@@ -11,7 +11,7 @@ import {
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { getValue as getCurrentUserValue } from "../app/features/currentUserSlice";
+import { getValue as getCurrentUserValue } from "../app/features/appData/currentUserSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 
 const LOGIN = gql`

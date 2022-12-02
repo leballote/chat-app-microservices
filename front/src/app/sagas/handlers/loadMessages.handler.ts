@@ -5,7 +5,7 @@ import {
   setLoadingMessages,
   setMessagesNoBatch,
   appendMessages,
-} from "../../features/currentChatSlice";
+} from "../../features/appData/currentChatSlice";
 import { put, call } from "redux-saga/effects";
 import { loadMessages } from "../requests/loadMessages.request";
 import { store } from "../../store";

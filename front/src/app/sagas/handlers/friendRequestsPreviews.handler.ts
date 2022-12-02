@@ -3,7 +3,7 @@ import {
   setValue,
   setLoading,
   setError,
-} from "../../features/friendRequestsPreviewsSlice";
+} from "../../features/appData/friendRequestsPreviewsSlice";
 import { requestGetFriendRequestsPreviews } from "../requests/friendRequestsPreviews";
 
 export function* handleFriendRequestsPreviews(): any {

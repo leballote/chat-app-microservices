@@ -1,7 +1,7 @@
 import { call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { removeParticipant } from "../requests/removeParticipant.request";
-import { removeParticipant as removeParticipantInState } from "../../features/currentChatSlice";
+import { removeParticipant as removeParticipantInState } from "../../features/appData/currentChatSlice";
 
 export function* handleRemoveParticipant(
   action: PayloadAction<{ participantId: string; chatId: string }>

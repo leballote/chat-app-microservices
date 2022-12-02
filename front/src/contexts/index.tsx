@@ -1,6 +1,6 @@
 import { createContext } from "react";
-import { ChatContextType } from "../types/ChatSectionTypes";
-import { User } from "../types/AppTypes";
+import { ChatContextType } from "../types/chat.types";
+import { User } from "../types/user.types";
 
 export const ChatContext = createContext<ChatContextType | null>(null);
 

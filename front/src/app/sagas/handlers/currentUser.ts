@@ -4,7 +4,7 @@ import {
   setValue as setCurrentUser,
   setLoading,
   setError,
-} from "../../features/currentUserSlice";
+} from "../../features/appData/currentUserSlice";
 import { requestGetUser } from "../requests/currentUser";
 
 export function* handleGetUser(_action: Action): any {

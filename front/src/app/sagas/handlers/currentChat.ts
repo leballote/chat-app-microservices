@@ -5,7 +5,7 @@ import {
   setError,
   setLoading,
   setValue as setCurrentChatValue,
-} from "../../features/currentChatSlice";
+} from "../../features/appData/currentChatSlice";
 
 //TODO: how to remove this nay
 export function* handleGetChat(action: PayloadAction<{ chatId: string }>): any {

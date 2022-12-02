@@ -1,4 +1,4 @@
-import { Chat } from "../types/ChatSectionTypes";
+import { Chat } from "../types/chat.types";
 import Avatar from "@mui/material/Avatar";
 
 function getAvatarInitialsFromName(name: string): string {

@@ -1,10 +1,9 @@
 import { call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { removeFriend } from "../requests/removeFriend.request";
-import { removeContact } from "../../features/contactsPreviewsSlice";
+import { removeContact } from "../../features/appData/contactsPreviewsSlice";
 import { store } from "../../store";
-import { closeDetails } from "../../features/chatSectionSlice";
-import { setValue } from "../../features/currentUserProfilePageSlice";
+import { closeDetails } from "../../features/appView/chatSectionSlice";
 
 export function* handleRemoveFriend(action: PayloadAction<string>): any {
   const { payload } = action;

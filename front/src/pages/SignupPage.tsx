@@ -12,7 +12,7 @@ import {
 import { useContext, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
-import { setError } from "../app/features/chatsPreviewsSlice";
+import { setError } from "../app/features/appData/chatsPreviewsSlice";
 import { CurrentUserContext } from "../contexts";
 
 const SIGNUP = gql`
@@ -30,7 +30,7 @@ export default function SignupPage() {
   const passwordInput = useRef<HTMLInputElement>(null);
   const confirmPasswordInput = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
-  //TODO: move this into a saga
+  //TODO: maybe move this into a saga
   const [mutationFunction, { data, loading, error }] = useMutation(SIGNUP);
 
   const [clientError, setClientError] = useState<{ message: string } | null>(

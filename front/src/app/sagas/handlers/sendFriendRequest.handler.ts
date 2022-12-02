@@ -5,7 +5,7 @@ import {
   setSendFriendRequestError,
   setSendFriendRequestLoading,
   setSendFriendRequestValue,
-} from "../../features/contactsSectionDrawerSlice";
+} from "../../features/appView/contactsDrawerSection/friendRequestsDrawerSlice";
 
 type SendFriendRequestInput = {
   userToAdd: string;

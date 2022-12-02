@@ -1,36 +1,42 @@
-import { takeLatest, takeEvery } from "redux-saga/effects";
-import { handleGetUser } from "./handlers/currentUser";
-import { handleChatsPreviews } from "./handlers/chatsPreviews";
-import { handleGetChat } from "./handlers/currentChat";
-import { handleContactsPreviews } from "./handlers/contactsPreviews";
-import { getValue as getCurrentUserValue } from "../features/currentUserSlice";
-import { getValue as getChatsPreviewsValue } from "../features/chatsPreviewsSlice";
-import { getValue as getContactsPreviewsValue } from "../features/contactsPreviewsSlice";
+import { takeEvery, takeLatest } from "redux-saga/effects";
+import {
+  getChatPreview,
+  getValue as getChatsPreviewsValue,
+} from "../features/appData/chatsPreviewsSlice";
+import {
+  getValue as getContactsPreviewsValue,
+  requestRemoveFriend,
+} from "../features/appData/contactsPreviewsSlice";
 import {
   getValue as getCurrentChatValue,
+  loadMessages,
+  requestAddParticipants,
   requestLeaveGroup,
   requestRemoveParticipant,
-} from "../features/currentChatSlice";
-import { sendMessage } from "../features/currentChatSlice";
-import { handleSendMessage } from "./handlers/sendMessage";
-import { sendFriendRequest } from "../features/contactsSectionDrawerSlice";
-import { handleSendFriendRequest } from "./handlers/sendFriendRequest.handler";
-import { handleLoadMessages } from "./handlers/loadMessages.handler";
-import { loadMessages } from "../features/currentChatSlice";
-import { getValue as getFriendRequestsPreviewsValue } from "../features/friendRequestsPreviewsSlice";
-import { handleFriendRequestsPreviews } from "./handlers/friendRequestsPreviews.handler";
+  sendMessage,
+} from "../features/appData/currentChatSlice";
+import { getValue as getCurrentUserValue } from "../features/appData/currentUserSlice";
+import {
+  acceptFriendRequest,
+  getValue as getFriendRequestsPreviewsValue,
+  rejectFriendRequest,
+} from "../features/appData/friendRequestsPreviewsSlice";
+import { sendFriendRequest } from "../features/appView/contactsDrawerSection/friendRequestsDrawerSlice";
 import { handleAcceptFriend } from "./handlers/acceptFriendRequest.handler";
-import { acceptFriendRequest } from "../features/friendRequestsPreviewsSlice";
-import { handleRemoveParticipant } from "./handlers/removeParticipant.handler";
-import { handleLeaveGroup } from "./handlers/leaveGroup.handler";
-import { handleRejectFriendRequest } from "./handlers/rejectFriendRequest.handler";
-import { rejectFriendRequest } from "../features/friendRequestsPreviewsSlice";
-import { requestRemoveFriend } from "../features/contactsPreviewsSlice";
-import { handleRemoveFriend } from "./handlers/removeFriend.handler";
-import { handleGetChatPreview } from "./handlers/getChatPreview.handler";
-import { getChatPreview } from "../features/chatsPreviewsSlice";
-import { requestAddParticipants } from "../features/currentChatSlice";
 import { handleAddParticipant } from "./handlers/addParticipantsToGroup.handler";
+import { handleChatsPreviews } from "./handlers/chatsPreviews";
+import { handleContactsPreviews } from "./handlers/contactsPreviews";
+import { handleGetChat } from "./handlers/currentChat";
+import { handleGetUser } from "./handlers/currentUser";
+import { handleFriendRequestsPreviews } from "./handlers/friendRequestsPreviews.handler";
+import { handleGetChatPreview } from "./handlers/getChatPreview.handler";
+import { handleLeaveGroup } from "./handlers/leaveGroup.handler";
+import { handleLoadMessages } from "./handlers/loadMessages.handler";
+import { handleRejectFriendRequest } from "./handlers/rejectFriendRequest.handler";
+import { handleRemoveFriend } from "./handlers/removeFriend.handler";
+import { handleRemoveParticipant } from "./handlers/removeParticipant.handler";
+import { handleSendFriendRequest } from "./handlers/sendFriendRequest.handler";
+import { handleSendMessage } from "./handlers/sendMessage";
 
 export function* watcherSaga() {
   yield takeLatest(getCurrentUserValue.toString(), handleGetUser);

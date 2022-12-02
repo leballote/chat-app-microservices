@@ -1,34 +1,53 @@
 import { configureStore } from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
+import chatsPreviewsReducer from "./features/appData/chatsPreviewsSlice";
+import contactsPreviewsReducer from "./features/appData/contactsPreviewsSlice";
+import currentChatReducer from "./features/appData/currentChatSlice";
+import userReducer from "./features/appData/currentUserSlice";
+import friendRequestsPreviewsReducer from "./features/appData/friendRequestsPreviewsSlice";
+import settingsSectionReducer from "./features/appData/settingsSectionSlice";
+import chatSectionReducer from "./features/appView/chatSectionSlice";
+import currentUserProfilePageReducer from "./features/appView/currentUserProfilePageSlice";
+import mainSectionDrawerReducer from "./features/appView/mainSectionDrawerSlice";
+import newGroupSectionDrawerReducer from "./features/appView/newGroupSectionDrawerSlice";
+
+import contactsDrawerSectionReducer from "./features/appView/contactsDrawerSection/contactsDrawerSectionSlice";
+import friendshipRequestsDrawerSubsectionReducer from "./features/appView/contactsDrawerSection/friendRequestsDrawerSlice";
+import mainContactsDrawerSubsectionReducer from "./features/appView/contactsDrawerSection/mainSectionDrawerSlice";
+
+import chatDetailsModalReducer from "./features/appView/chatDetailsModal/chatDetailsModalSlice";
+
+import sideBarReducer from "./features/appView/sideBarSlice";
 import { watcherSaga } from "./sagas/rootSaga";
-import userReducer from "./features/currentUserSlice";
-import chatsPreviewsReducer from "./features/chatsPreviewsSlice";
-import contactsPreviewsReducer from "./features/contactsPreviewsSlice";
-import currentChatReducer from "./features/currentChatSlice";
-import mainSectionDrawerReducer from "./features/mainSectionDrawerSlice";
-import contactsSectionDrawerReducer from "./features/contactsSectionDrawerSlice";
-import sideBarReducer from "./features/sideBarSlice";
-import newGroupSectionDrawerReducer from "./features/newGroupSectionDrawerSlice";
-import chatSectionReducer from "./features/chatSectionSlice";
-import settingsSectionReducer from "./features/settingsSectionSlice";
-import friendRequestsPreviewsReducer from "./features/friendRequestsPreviewsSlice";
-import currentUserProfilePageReducer from "./features/currentUserProfilePageSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
   reducer: {
+    //appData
     currentUser: userReducer,
+
     currentChat: currentChatReducer,
+
     chatsPreviews: chatsPreviewsReducer,
+
     contactsPreviews: contactsPreviewsReducer,
-    mainSectionDrawer: mainSectionDrawerReducer,
-    contactsSectionDrawer: contactsSectionDrawerReducer,
-    sideBar: sideBarReducer,
-    newGroupSectionDrawer: newGroupSectionDrawerReducer,
-    chatSection: chatSectionReducer,
+
     settingsSection: settingsSectionReducer,
     friendRequestsPreviews: friendRequestsPreviewsReducer,
+    //appView
+    chatSection: chatSectionReducer,
+
+    sideBar: sideBarReducer,
+
+    contactsDrawerSubsection: contactsDrawerSectionReducer,
+    mainContactsDrawerSubsection: mainContactsDrawerSubsectionReducer,
+    friendshipRequestsDrawerSubsection:
+      friendshipRequestsDrawerSubsectionReducer,
+
+    newGroupSectionDrawer: newGroupSectionDrawerReducer,
     currentUserProfilePage: currentUserProfilePageReducer,
+    mainSectionDrawer: mainSectionDrawerReducer,
+    chatDetailsModalSection: chatDetailsModalReducer,
   },
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware({ thunk: false }),

@@ -1,20 +1,23 @@
 import Box from "@mui/material/Box";
 import { useEffect, useContext } from "react";
-import SideBar from "../components/Drawer/SideBar";
+import SideBar from "../components/drawerSection/SideBar";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import ChatSection from "../sections/ChatSection";
+import ChatSection from "../components/chatSection/ChatSection";
 import { CurrentUserContext } from "../contexts";
 import { gql, useSubscription } from "@apollo/client";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { unshiftMessage } from "../app/features/currentChatSlice";
+import { unshiftMessage } from "../app/features/appData/currentChatSlice";
 import i18next from "i18next";
 import {
   addFriendRequest,
   removeFriendRequest,
-} from "../app/features/friendRequestsPreviewsSlice";
-import { addContact } from "../app/features/contactsPreviewsSlice";
-import { getChatPreview, upsertChat } from "../app/features/chatsPreviewsSlice";
-import ErrorChat from "../components/Feedback/ErrorChat";
+} from "../app/features/appData/friendRequestsPreviewsSlice";
+import { addContact } from "../app/features/appData/contactsPreviewsSlice";
+import {
+  getChatPreview,
+  upsertChat,
+} from "../app/features/appData/chatsPreviewsSlice";
+import ErrorChat from "../components/feedback/ErrorChat";
 
 const MESSAGE_CREATED = gql`
   subscription {

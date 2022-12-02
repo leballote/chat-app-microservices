@@ -4,7 +4,7 @@ import {
   setValue as setChatsPreviews,
   setLoading,
   setError,
-} from "../../features/chatsPreviewsSlice";
+} from "../../features/appData/chatsPreviewsSlice";
 import { requestGetChatsPreviews } from "../requests/chatsPreviews";
 import indexArrayByField from "../../../utils/indexArrayByField";
 

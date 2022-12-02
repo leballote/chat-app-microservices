@@ -4,7 +4,7 @@ import {
   setValue as setContactsPreviewsValue,
   setLoading,
   setError,
-} from "../../features/contactsPreviewsSlice";
+} from "../../features/appData/contactsPreviewsSlice";
 import { requestGetContactsPreviews } from "../requests/contactsPreviews";
 
 export function* handleContactsPreviews(action: PayloadAction<string>): any {

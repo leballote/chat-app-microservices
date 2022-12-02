@@ -1,7 +1,7 @@
 import { call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { acceptFriendRequest } from "../requests/acceptFriendRequest";
-import { removeFriendRequest } from "../../features/friendRequestsPreviewsSlice";
+import { removeFriendRequest } from "../../features/appData/friendRequestsPreviewsSlice";
 
 export function* handleAcceptFriend(action: PayloadAction<string>): any {
   const { payload } = action;
