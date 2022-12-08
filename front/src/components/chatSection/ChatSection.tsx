@@ -90,7 +90,8 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
       sx={{
         height,
         overflowY: "auto",
-        position: "relative",
+        display: "flex",
+        flexFlow: "column",
       }}
       ref={chatAreaRef}
       onScroll={handleScroll}
@@ -99,12 +100,7 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
         sx={{
           display: "flex",
           flexFlow: "column-reverse",
-          width: "100%",
-          // position: "absolute",
-          // bottom: "0",
-          // height: "100%",
-          // alignItems: "end",
-          // justifyContent: "end",
+          flex: "1 1 0px",
         }}
       >
         {messages.map((message, index: number) => {
