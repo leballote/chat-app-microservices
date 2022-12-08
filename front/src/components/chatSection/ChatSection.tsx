@@ -87,18 +87,24 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
 
   return (
     <Box
-      sx={{ height, overflowY: "scroll" }}
+      sx={{
+        height,
+        overflowY: "auto",
+        position: "relative",
+      }}
       ref={chatAreaRef}
       onScroll={handleScroll}
     >
       <List
         sx={{
-          overflowY: "auto",
           display: "flex",
           flexFlow: "column-reverse",
-          height: "100%",
-          alignItems: "end",
-          justifyContent: "end",
+          width: "100%",
+          // position: "absolute",
+          // bottom: "0",
+          // height: "100%",
+          // alignItems: "end",
+          // justifyContent: "end",
         }}
       >
         {messages.map((message, index: number) => {
