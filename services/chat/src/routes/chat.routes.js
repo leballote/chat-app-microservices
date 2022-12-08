@@ -116,7 +116,7 @@ router.post("/chat", async (req, res) => {
 });
 
 router.get("/chat", async (req, res) => {
-  const { userId, type, user1Id, user2Id } = req.query;
+  const { userId, type, user1Id, user2Id, nameContains } = req.query;
   let { offset, limit } = req.query;
 
   offset = Number(offset);
@@ -126,9 +126,17 @@ router.get("/chat", async (req, res) => {
   limit = !Number.isNaN(limit) || limit == null ? limit : 1000;
 
   let baseQueryParams = { type };
+  // const nameContainsQuery = { $name };
+
   baseQueryParams = Object.fromEntries(
     Object.entries(baseQueryParams).filter(([, val]) => val != null)
   );
+  if (nameContains != null) {
+    baseQueryParams = {
+      ...baseQueryParams,
+      //  ...nameContainsQuery
+    };
+  }
 
   if (type == "group") {
     if (user1Id || user2Id) {
@@ -235,7 +243,6 @@ router.get("/chat", async (req, res) => {
         ...basePipeline,
       ]);
     }
-
     chats = chats.map((el) => {
       return {
         ...el,

@@ -11,18 +11,23 @@ import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { useTranslation } from "react-i18next";
 import GenericPeopleLoading from "../../feedback/GenericPeopleLoading";
 import GenericError from "../../feedback/GenericError";
+import { searchChats } from "../../../app/features/appView/chatsDrawerSection/chatDrawerSection";
 
-//TODO: it might be better to pass chats as props and accept onSearch as props; consider it.
 export default function ChatDrawerSection() {
   let {
     value: chats_,
     loading,
     error,
-    searchTerm: chatSearched,
   } = useAppSelector((state) => state.chatsPreviews);
-  const chats = Object.values(chats_).sort((chat1, chat2) => {
+  let { searchTerm: chatSearched, chatsShown } = useAppSelector(
+    (state) => state.chatsDrawerSubsection
+  );
+
+  const allChats = Object.values(chats_).sort((chat1, chat2) => {
     return chat1.lastActionDate > chat2.lastActionDate ? -1 : 1;
   });
+
+  const chats = chatSearched == "" ? allChats : chatsShown;
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 
@@ -33,11 +38,11 @@ export default function ChatDrawerSection() {
   }, []);
 
   function handleSearch(ev: ChangeEvent<HTMLInputElement>) {
-    dispatch(setSearchTerm(ev.target.value));
+    dispatch(searchChats(ev.target.value));
   }
   function handleEscapeOnSearch(ev: KeyboardEvent) {
     if (ev.key === "Escape") {
-      dispatch(setSearchTerm(""));
+      dispatch(searchChats(""));
     }
   }
 

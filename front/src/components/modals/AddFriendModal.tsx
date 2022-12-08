@@ -71,28 +71,27 @@ export default function AddFriendModal() {
 
   return (
     <Dialog open={addFriendOpen} onClose={handleClose}>
-      <DialogTitle>Add friend</DialogTitle>
+      <DialogTitle>{t("app.modals.addFriend.title")}</DialogTitle>
       <DialogContent>
         <Box component="form" onSubmit={handleSend}>
           <TextField
             autoFocus
             margin="dense"
             id="name"
-            //  TODO: internationalize
-            label="Friend's email"
+            label={t("app.modals.addFriend.friendEmail")}
             type="email"
+            required
             fullWidth
             name="email"
             variant="standard"
           />
           <DialogActions>
-            {/* // TODO: internationalize */}
             <Button
               autoFocus
               onClick={handleClose}
               disabled={sendFriendRequestLoading}
             >
-              Cancel
+              {t("app.modals.addFriend.cancel")}
             </Button>
 
             <Box sx={{ m: 1, position: "relative" }}>
@@ -103,7 +102,11 @@ export default function AddFriendModal() {
                 disabled={sendFriendRequestLoading}
                 variant="contained"
               >
-                {sendFriendRequestValue ? <DoneIcon /> : "Send"}
+                {sendFriendRequestValue ? (
+                  <DoneIcon />
+                ) : (
+                  t("app.modals.addFriend.mainAction")
+                )}
               </Button>
               {sendFriendRequestLoading && (
                 <CircularProgress

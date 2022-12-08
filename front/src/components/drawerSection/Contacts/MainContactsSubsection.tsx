@@ -1,18 +1,16 @@
-import { Box, List } from "@mui/material";
-import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
-import DrawerSearchBar from "../DrawerSearchBar";
-import { ChangeEvent, useEffect } from "react";
-import * as React from "react";
 import { gql, useMutation } from "@apollo/client";
-import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../../../app/features/appData/contactsPreviewsSlice";
-import { upsertChat } from "../../../app/features/appData/chatsPreviewsSlice";
+import { Box, List } from "@mui/material";
+import * as React from "react";
+import { ChangeEvent, useEffect } from "react";
 import { useNavigate } from "react-router";
-import GenericPeopleLoading from "../../feedback/GenericPeopleLoading";
+import { upsertChat } from "../../../app/features/appData/chatsPreviewsSlice";
+import { getValue as getContactsPreviewsValue } from "../../../app/features/appData/contactsPreviewsSlice";
+import { searchContacts } from "../../../app/features/appView/contactsDrawerSection/mainSectionDrawerSlice";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import GenericError from "../../feedback/GenericError";
+import GenericPeopleLoading from "../../feedback/GenericPeopleLoading";
+import DrawerSearchBar from "../DrawerSearchBar";
+import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
 
 interface Props {
   onBackClick: (ev: React.MouseEvent<HTMLElement>) => void;
@@ -35,12 +33,15 @@ const GET_OR_CREATE_CHAT = gql`
 
 export default function MainContactsSubsection({ onBackClick }: Props) {
   const {
-    value: contacts,
+    value: allContacts,
     loading,
     error,
     firstFetch,
-    searchTerm: contactSearched,
   } = useAppSelector((state) => state.contactsPreviews);
+  const { contactsShown, searchTerm: contactSearched } = useAppSelector(
+    (state) => state.mainContactsDrawerSubsection
+  );
+  const contacts = contactSearched == "" ? allContacts : contactsShown;
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   let [
@@ -57,11 +58,11 @@ export default function MainContactsSubsection({ onBackClick }: Props) {
   }, []);
 
   function handleSearch(ev: ChangeEvent<HTMLInputElement>) {
-    dispatch(setSearchTerm(ev.target.value));
+    dispatch(searchContacts(ev.target.value));
   }
   function handleEscapeOnSearch(ev: KeyboardEvent) {
     if (ev.key === "Escape") {
-      dispatch(setSearchTerm(""));
+      dispatch(searchContacts(""));
     }
   }
 

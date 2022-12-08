@@ -6,29 +6,30 @@ import DrawerSearchBar from "../DrawerSearchBar";
 import { ChangeEvent, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import {
-  getValue as getContactsPreviewsValue,
-  setSearchTerm,
-} from "../../../app/features/appData/contactsPreviewsSlice";
+import { getValue as getContactsPreviewsValue } from "../../../app/features/appData/contactsPreviewsSlice";
 import { useTranslation } from "react-i18next";
 import { setMainDrawerSection } from "../../../app/features/appView/sideBarSlice";
 import {
   addParticipant,
   resetState,
-} from "../../../app/features/appView/newGroupSectionDrawerSlice";
+  searchContacts,
+  setSetTitleAndAvatarSubsection,
+} from "../../../app/features/appView/newGroupDrawerSection/newGroupSectionDrawerSlice";
 import { ParticipantsToAdd } from "./ParticipantsToAdd";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import { setSetTitleAndAvatarSubsection } from "../../../app/features/appView/newGroupSectionDrawerSlice";
 import GenericPeopleLoading from "../../feedback/GenericPeopleLoading";
 import GenericError from "../../feedback/GenericError";
 
 export default function AddParticipantsDrawerSubsection() {
   const {
-    value: contacts,
+    value: allContacts,
     loading,
     error,
-    searchTerm: contactSearched,
   } = useAppSelector((state) => state.contactsPreviews);
+  const { contactsShown, searchTerm: contactSearched } = useAppSelector(
+    (state) => state.newGroupSectionDrawer
+  );
+  const contacts = contactSearched == "" ? allContacts : contactsShown;
   const participants = useAppSelector(
     (state) => state.newGroupSectionDrawer.participantsToAdd
   );
@@ -40,11 +41,11 @@ export default function AddParticipantsDrawerSubsection() {
   }, []);
 
   function handleSearch(ev: ChangeEvent<HTMLInputElement>) {
-    dispatch(setSearchTerm(ev.target.value));
+    dispatch(searchContacts(ev.target.value));
   }
   function handleEscapeOnSearch(ev: KeyboardEvent) {
     if (ev.key === "Escape") {
-      dispatch(setSearchTerm(""));
+      dispatch(searchContacts(""));
     }
   }
 
@@ -98,8 +99,7 @@ export default function AddParticipantsDrawerSubsection() {
           >
             <ArrowBackIcon />
           </Button>
-          {/* //TODO: internationalize*/}
-          Add participants
+          {t("app.drawer.newGroup.addParticipantsSubsection.mainAction")}
         </Typography>
       </Box>
 

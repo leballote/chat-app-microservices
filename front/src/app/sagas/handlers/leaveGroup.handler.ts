@@ -20,7 +20,7 @@ export function* handleLeaveGroup(
     const currentChatId = store.getState().currentChat.value?.id;
 
     if (currentChatId && currentChatId == chatId) {
-      yield put(getValue(currentChatId));
+      yield put(getValue({ chatId: currentChatId }));
     }
 
     // yield put(removeParticipantInState({ chatId, participantId }));

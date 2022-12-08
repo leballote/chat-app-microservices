@@ -25,7 +25,7 @@ export default function SearchBar({ onSearch, onKeyDown, value }: Props) {
           </InputAdornment>
         ),
       }}
-      value={value}
+      // value={value}
       onChange={onSearch}
       //TODO: check what is going on with this event
       onKeyDown={onKeyDown as any}

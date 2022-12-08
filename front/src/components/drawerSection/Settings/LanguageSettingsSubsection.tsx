@@ -67,7 +67,6 @@ export default function LanguageSettingsSubsection() {
           >
             <ArrowBackIcon />
           </Button>
-          {/* //TODO: internationalize*/}
           {t("settingsSection.languageSubsection.title")}
         </Typography>
       </Box>
@@ -93,7 +92,6 @@ export default function LanguageSettingsSubsection() {
             >
               <ListItemText primary={languageName} />
             </ListItemButton>
-            {/* TODO: internationalize */}
           </ListItem>
         ))}
       </List>

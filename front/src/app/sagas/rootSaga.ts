@@ -21,7 +21,10 @@ import {
   getValue as getFriendRequestsPreviewsValue,
   rejectFriendRequest,
 } from "../features/appData/friendRequestsPreviewsSlice";
+import { searchChats } from "../features/appView/chatsDrawerSection/chatDrawerSection";
 import { sendFriendRequest } from "../features/appView/contactsDrawerSection/friendRequestsDrawerSlice";
+import { searchContacts as searchMainContactsSectionContacts } from "../features/appView/contactsDrawerSection/mainSectionDrawerSlice";
+import { searchContacts as searchNewGroupContactsSectionContacts } from "../features/appView/newGroupDrawerSection/newGroupSectionDrawerSlice";
 import { handleAcceptFriend } from "./handlers/acceptFriendRequest.handler";
 import { handleAddParticipant } from "./handlers/addParticipantsToGroup.handler";
 import { handleChatsPreviews } from "./handlers/chatsPreviews";
@@ -35,6 +38,9 @@ import { handleLoadMessages } from "./handlers/loadMessages.handler";
 import { handleRejectFriendRequest } from "./handlers/rejectFriendRequest.handler";
 import { handleRemoveFriend } from "./handlers/removeFriend.handler";
 import { handleRemoveParticipant } from "./handlers/removeParticipant.handler";
+import { handleSearchChats } from "./handlers/searchChats.handler";
+import { handleSearchContact } from "./handlers/searchMainContactsSectionContacts.handler";
+import { handleSearchContactFromNewGroupDrawerSection } from "./handlers/searchNewGroupSectionContacts";
 import { handleSendFriendRequest } from "./handlers/sendFriendRequest.handler";
 import { handleSendMessage } from "./handlers/sendMessage";
 
@@ -57,4 +63,13 @@ export function* watcherSaga() {
   yield takeEvery(requestRemoveFriend.toString(), handleRemoveFriend);
   yield takeEvery(getChatPreview.toString(), handleGetChatPreview);
   yield takeEvery(requestAddParticipants.toString(), handleAddParticipant);
+  yield takeEvery(
+    searchMainContactsSectionContacts.toString(),
+    handleSearchContact
+  );
+  yield takeEvery(
+    searchNewGroupContactsSectionContacts.toString(),
+    handleSearchContactFromNewGroupDrawerSection
+  );
+  yield takeEvery(searchChats.toString(), handleSearchChats);
 }

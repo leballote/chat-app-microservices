@@ -1,4 +1,5 @@
-import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ChatPreview } from "../../../types/chat.types";
 import type { RootState } from "../../store";
 
 type ChatsPreviewsState = {
@@ -6,22 +7,6 @@ type ChatsPreviewsState = {
   loading: boolean;
   error: Error | null;
   searchTerm: string;
-};
-
-type ChatPreview = {
-  id: string;
-  type: "INDIVIDUAL" | "GROUP";
-  name: string;
-  avatar?: string;
-  lastActionDate: string;
-  lastMessage: {
-    id: string;
-    content: string;
-    sentAt: string;
-    sentBy: {
-      id: string;
-    };
-  };
 };
 
 const initialState: ChatsPreviewsState = {
@@ -39,8 +24,6 @@ export const chatsPreviewsSlice = createSlice({
     getChatPreview(_, _action: PayloadAction<string>) {},
     setSearchTerm(state, { payload }) {
       state.searchTerm = payload;
-      //TODO: check if this is the way to do it
-      chatsPreviewsSlice.actions.getValue(payload);
     },
     upsertChat(state, { payload }: PayloadAction<ChatPreview>) {
       state.value[payload.id] = payload;

@@ -9,7 +9,7 @@ import settingsSectionReducer from "./features/appData/settingsSectionSlice";
 import chatSectionReducer from "./features/appView/chatSectionSlice";
 import currentUserProfilePageReducer from "./features/appView/currentUserProfilePageSlice";
 import mainSectionDrawerReducer from "./features/appView/mainSectionDrawerSlice";
-import newGroupSectionDrawerReducer from "./features/appView/newGroupSectionDrawerSlice";
+import newGroupSectionDrawerReducer from "./features/appView/newGroupDrawerSection/newGroupSectionDrawerSlice";
 
 import contactsDrawerSectionReducer from "./features/appView/contactsDrawerSection/contactsDrawerSectionSlice";
 import friendshipRequestsDrawerSubsectionReducer from "./features/appView/contactsDrawerSection/friendRequestsDrawerSlice";
@@ -18,6 +18,9 @@ import mainContactsDrawerSubsectionReducer from "./features/appView/contactsDraw
 import chatDetailsModalReducer from "./features/appView/chatDetailsModal/chatDetailsModalSlice";
 
 import sideBarReducer from "./features/appView/sideBarSlice";
+
+import chatsDrawerSectionReducer from "./features/appView/chatsDrawerSection/chatDrawerSection";
+
 import { watcherSaga } from "./sagas/rootSaga";
 
 const sagaMiddleware = createSagaMiddleware();
@@ -40,6 +43,7 @@ export const store = configureStore({
     sideBar: sideBarReducer,
 
     contactsDrawerSubsection: contactsDrawerSectionReducer,
+    chatsDrawerSubsection: chatsDrawerSectionReducer,
     mainContactsDrawerSubsection: mainContactsDrawerSubsectionReducer,
     friendshipRequestsDrawerSubsection:
       friendshipRequestsDrawerSubsectionReducer,

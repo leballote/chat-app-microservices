@@ -2,7 +2,11 @@ import { gql } from "@apollo/client";
 import client from "../../../client";
 
 //TODO: solve this any
-export async function requestGetChat(chatId: string): Promise<any> {
+export async function requestGetChat({
+  chatId,
+}: {
+  chatId: string;
+}): Promise<any> {
   const GET_CHAT_DATA = gql`
     query GetChat($chatId: String!) {
       viewer {
@@ -48,7 +52,7 @@ export async function requestGetChat(chatId: string): Promise<any> {
   return client.query({
     query: GET_CHAT_DATA,
     variables: {
-      chatId: chatId,
+      chatId,
     },
     fetchPolicy: "no-cache",
   });

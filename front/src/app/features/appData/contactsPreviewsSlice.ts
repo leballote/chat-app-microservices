@@ -7,14 +7,12 @@ type ContactsPreviewsState = {
   value: ContactPreview[];
   loading: boolean;
   error: Error | null;
-  searchTerm: string;
   firstFetch: boolean;
 };
 
 // Define the initial state using that type
 const initialState: ContactsPreviewsState = {
   value: [],
-  searchTerm: "",
   loading: true,
   error: null,
   firstFetch: false,
@@ -28,11 +26,6 @@ export const contactsPreviewsSlice = createSlice({
       state.loading = true;
     },
     requestRemoveFriend(_, _action: PayloadAction<string>) {},
-    setSearchTerm(state, { payload }) {
-      state.searchTerm = payload;
-      //TODO: check if this is the way to do it
-      contactsPreviewsSlice.actions.getValue(payload);
-    },
     setValue(state, { payload }) {
       state.value = payload;
       state.firstFetch = true;
@@ -41,9 +34,6 @@ export const contactsPreviewsSlice = createSlice({
     addContact(state, { payload }: PayloadAction<ContactPreview>) {
       if (state.value != null) {
         state.value.push(payload);
-        // return state.value.sort((a, b) => {
-        //   return a.name > b.name ? 1 : -1;
-        // });
       }
     },
     removeContact(state, { payload }: PayloadAction<string>) {
@@ -57,7 +47,7 @@ export const contactsPreviewsSlice = createSlice({
     setError(state, { payload }) {
       state.error = payload;
     },
-    resetState(state) {
+    resetState() {
       return initialState;
     },
   },
@@ -68,7 +58,6 @@ export const {
   getValue,
   setLoading,
   setError,
-  setSearchTerm,
   resetState,
   addContact,
   removeContact,

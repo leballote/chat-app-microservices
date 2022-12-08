@@ -20,7 +20,7 @@ import { resetState as resetMainDrawerSectionState } from "../../../app/features
 import {
   resetState as resetNewGroupDrawerSectionState,
   setAddFriendsSubsection,
-} from "../../../app/features/appView/newGroupSectionDrawerSlice";
+} from "../../../app/features/appView/newGroupDrawerSection/newGroupSectionDrawerSlice";
 import { setMainDrawerSection } from "../../../app/features/appView/sideBarSlice";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { CurrentUserContext } from "../../../contexts";
@@ -99,8 +99,7 @@ export default function SetTitleAndAvatarDrawerSubsection() {
           >
             <ArrowBackIcon />
           </Button>
-          {/* //TODO: internationalize*/}
-          New Group
+          {t("app.drawer.newGroup.title")}
         </Typography>
       </Box>
 
@@ -120,20 +119,17 @@ export default function SetTitleAndAvatarDrawerSubsection() {
           <PhotoCameraIcon sx={{ fontSize: "2.5em" }} />
         </Avatar>
       </Container>
-      {/* //TODO: internationalize this  */}
       <TextField
         sx={{ margin: ".5em 1em" }}
-        label="Group name"
+        label={t("app.drawer.newGroup.groupName")}
         name="name"
         required
       />
-      {/* TODO: internationalize this */}
       <TextField
         sx={{ margin: ".5em 1em" }}
-        label="Group phrase"
+        label={t("app.drawer.newGroup.groupPhrase")}
         name="phrase"
         size="small"
-        required
       />
 
       <Paper

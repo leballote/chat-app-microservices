@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ContactPreview } from "../../../../types/user.types";
+import { ChatPreview } from "../../../../types/chat.types";
 
-export type DrawerSectionContacts = {
-  contactsShown: ContactPreview[];
+export type State = {
+  chatsShown: ChatPreview[];
   searchTerm: string;
 };
 
 // Define the initial state using that type
-const initialState: DrawerSectionContacts = {
-  contactsShown: [],
+const initialState: State = {
+  chatsShown: [],
   searchTerm: "",
 };
 
@@ -16,9 +16,9 @@ export const contactsDrawerSection = createSlice({
   name: "mainContactsSubsection",
   initialState,
   reducers: {
-    searchContacts(_state, _action: PayloadAction<string>) {},
-    setContactsShown(state, { payload }: PayloadAction<ContactPreview[]>) {
-      state.contactsShown = payload;
+    searchChats(_state, _action: PayloadAction<string>) {},
+    setChatsShown(state, { payload }: PayloadAction<ChatPreview[]>) {
+      state.chatsShown = payload;
     },
     setSearchTerm(state, { payload }: PayloadAction<string>) {
       state.searchTerm = payload;
@@ -29,7 +29,7 @@ export const contactsDrawerSection = createSlice({
   },
 });
 
-export const { setContactsShown, searchContacts, setSearchTerm, resetState } =
+export const { setChatsShown, searchChats, setSearchTerm, resetState } =
   contactsDrawerSection.actions;
 
 export default contactsDrawerSection.reducer;

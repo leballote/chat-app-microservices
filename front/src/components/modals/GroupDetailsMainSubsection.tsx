@@ -21,6 +21,7 @@ import {
   requestLeaveGroup,
   requestRemoveParticipant,
 } from "../../app/features/appData/currentChatSlice";
+import { useTranslation } from "react-i18next";
 
 export default function GroupDetailsMainSubsection({
   name,
@@ -34,6 +35,7 @@ export default function GroupDetailsMainSubsection({
 }) {
   const dispatch = useAppDispatch();
   const { value: currentUser } = useAppSelector((state) => state.currentUser);
+  const { t } = useTranslation();
 
   const handleRemoveClick: React.MouseEventHandler<HTMLButtonElement> = (
     ev
@@ -110,8 +112,7 @@ export default function GroupDetailsMainSubsection({
                   // fontWeight="bold"
                   color={blue[400]}
                 >
-                  {/* TODO: internationalize  */}
-                  Add participant
+                  {t("app.modals.chatDetails.addParticipants")}
                 </Typography>
               </ListItemText>
             </ListItem>
@@ -139,7 +140,7 @@ export default function GroupDetailsMainSubsection({
           }}
           onClick={handleLeaveGroupClick}
         >
-          Leave Group &nbsp;
+          {t("app.modals.chatDetails.leaveGroup")}
           <ExitToAppIcon />
         </Button>
       </DialogContent>

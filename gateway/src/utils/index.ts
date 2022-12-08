@@ -2,13 +2,32 @@ import { UserModelSuccessResponse } from "../types/servicesRest";
 import { isErrorResponse, DataObject } from "../types/general.types";
 import { MyContext } from "..";
 
-export function getReceiver(
-  participants: UserModelSuccessResponse[],
+interface WithId {
+  id: string;
+}
+
+interface WithId2 {
+  _id: string;
+}
+
+function hasId(participant: WithId | WithId2): participant is WithId {
+  return (participant as WithId).id != null;
+}
+
+export function getReceiver<T>(
+  participants: (T & WithId)[] | (T & WithId2)[],
   viewerId: string
-) {
-  const receiver = participants.filter((participant) => {
-    return participant._id != viewerId;
-  })[0];
+): T {
+  let receiver: (T & WithId) | (T & WithId2);
+  if (hasId(participants[0])) {
+    receiver = (participants as (T & WithId)[]).filter((participant) => {
+      return participant.id != viewerId;
+    })[0];
+  } else {
+    receiver = (participants as (T & WithId2)[]).filter((participant) => {
+      return participant._id != viewerId;
+    })[0];
+  }
   return receiver;
 }
 

@@ -6,11 +6,12 @@ import {
   setError,
 } from "../../features/appData/contactsPreviewsSlice";
 import { requestGetContactsPreviews } from "../requests/contactsPreviews";
+import { GraphQLError } from "graphql";
 
 export function* handleContactsPreviews(action: PayloadAction<string>): any {
   const { payload } = action;
   try {
-    put(setLoading(true));
+    yield put(setLoading(true));
     const response = yield call(requestGetContactsPreviews, payload);
     const { data } = response;
     const {
@@ -18,7 +19,7 @@ export function* handleContactsPreviews(action: PayloadAction<string>): any {
     } = data;
     yield put(setContactsPreviewsValue(contacts));
   } catch (error) {
-    put(setLoading(false));
-    put(setError(error));
+    yield put(setLoading(false));
+    yield put(setError((error as unknown as GraphQLError).message));
   }
 }

@@ -150,7 +150,6 @@ export type LeaveGroupChatResponse = {
 export type LogInResponse = {
   __typename?: 'LogInResponse';
   success: Scalars['Boolean'];
-  token?: Maybe<Scalars['String']>;
 };
 
 export type LogOutResponse = {
@@ -666,7 +665,6 @@ export type LeaveGroupChatResponseResolvers<ContextType = MyContext, ParentType 
 
 export type LogInResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['LogInResponse'] = ResolversParentTypes['LogInResponse']> = {
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  token?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

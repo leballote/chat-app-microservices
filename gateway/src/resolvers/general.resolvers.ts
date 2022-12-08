@@ -10,7 +10,6 @@ const resolvers: Resolvers = {
       return parent._id;
     },
     type: (parent) => {
-      //TODO: this is probably not correct
       if (parent.type == ChatModelType.GROUP) {
         return ChatType.Group;
       } else {
@@ -171,24 +170,27 @@ const resolvers: Resolvers = {
       return chatRes.data;
     },
     sentBy: async (parent, {}, { dataSources }) => {
-      const [userRes, participantRes] = await Promise.all([
+      const [
+        userRes,
+        //  participantRes
+      ] = await Promise.all([
         dataSources.userAPI.getUser(parent.sentBy),
-        dataSources.chatAPI.getParticipant(parent.chatId, parent.sentBy),
+        // dataSources.chatAPI.getParticipant(parent.chatId, parent.sentBy),
       ]);
       if (isErrorResponse(userRes)) {
         throw new GraphQLError(userRes.error.message);
       }
-      if (isErrorResponse(participantRes)) {
-        throw new GraphQLError(participantRes.error.message);
-      }
+      // if (isErrorResponse(participantRes)) {
+      //   throw new GraphQLError(participantRes.error.message);
+      // }
 
-      const out = {
+      const out: any = {
         ...userRes.data,
-        ...participantRes.data,
+        // ...participantRes.data,
         status: Status.Online,
       };
       out.id = out._id;
-      return out as any;
+      return out;
     },
   },
 
@@ -208,7 +210,7 @@ const resolvers: Resolvers = {
       }
       return chatRes.data[0] ?? null;
     },
-    status: (parent) => {
+    status: () => {
       //TODO see how you are going to solve this
       return Status.Online;
     },
@@ -240,12 +242,15 @@ const resolvers: Resolvers = {
       }
     },
     chats: async (parent, _, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
       const chatRes = await dataSources.chatAPI.getChats({
-        userId: parent._id,
+        userId: viewer._id,
       });
       if (isErrorResponse(chatRes)) {
         throw new GraphQLError(chatRes.error.message);
       }
+      console.log(chatRes.data);
+
       return chatRes.data;
     },
     chat: async (_, { chatId }, { dataSources }) => {

@@ -21,6 +21,30 @@ type Translation = {
           friends: string;
           friendRequests: string;
         };
+        newGroup: {
+          title: string;
+          groupName: string;
+          groupPhrase: string;
+          addParticipantsSubsection: {
+            mainAction: string;
+          };
+        };
+      };
+      modals: {
+        addFriend: {
+          title: string;
+          mainAction: string;
+          friendEmail: string;
+          cancel: string;
+        };
+        chatDetails: {
+          addParticipants: string;
+          leaveGroup: string;
+          addParticipantsSubsection: {
+            title: string;
+            mainAction: string;
+          };
+        };
       };
       chat: {};
     };
@@ -77,6 +101,30 @@ const resources: { [language: string]: Translation } = {
             friends: "Amigos",
             friendRequests: "Solicitudes de amistad",
           },
+          newGroup: {
+            title: "Nuevo grupo",
+            groupName: "Nombre del grupo",
+            groupPhrase: "Frase",
+            addParticipantsSubsection: {
+              mainAction: "Añadir participantes",
+            },
+          },
+        },
+        modals: {
+          addFriend: {
+            title: "Añadir amigo",
+            friendEmail: "Correo de tu amigo",
+            mainAction: "Envíar",
+            cancel: "Cancelar",
+          },
+          chatDetails: {
+            leaveGroup: "Salir del grupo",
+            addParticipants: "Añadir participante",
+            addParticipantsSubsection: {
+              title: "Añadir participantes al grupo",
+              mainAction: "Añadir",
+            },
+          },
         },
         chat: {},
       },
@@ -131,6 +179,30 @@ const resources: { [language: string]: Translation } = {
             friends: "Friends",
             friendRequests: "Friend requests",
           },
+          newGroup: {
+            title: "New group",
+            groupName: "Group name",
+            groupPhrase: "Phrase",
+            addParticipantsSubsection: {
+              mainAction: "Add participants",
+            },
+          },
+        },
+        modals: {
+          addFriend: {
+            title: "Add friend",
+            friendEmail: "Friend's email",
+            mainAction: "Send",
+            cancel: "Cancel",
+          },
+          chatDetails: {
+            addParticipants: "Add participant",
+            leaveGroup: "Leave group",
+            addParticipantsSubsection: {
+              title: "Add participants to the group",
+              mainAction: "Add",
+            },
+          },
         },
         chat: {},
       },
@@ -184,6 +256,30 @@ const resources: { [language: string]: Translation } = {
             title: "Freunde",
             friends: "Freunde",
             friendRequests: "Freundschaftsanfrage",
+          },
+          newGroup: {
+            title: "Neue Gruppe",
+            groupName: "Gruppe Name",
+            groupPhrase: "Phrase",
+            addParticipantsSubsection: {
+              mainAction: "Teilnehmer hinzufügen",
+            },
+          },
+        },
+        modals: {
+          addFriend: {
+            title: "Freund hinzufügen",
+            friendEmail: "E-Mail des Freundes",
+            mainAction: "Senden",
+            cancel: "Abbrechen",
+          },
+          chatDetails: {
+            addParticipants: "Teilnehmer hinzufüge",
+            leaveGroup: "Gruppe verlassen",
+            addParticipantsSubsection: {
+              title: "Teilnehmer zur Gruppe hinzufügen",
+              mainAction: "Hinzufügen",
+            },
           },
         },
         chat: {},

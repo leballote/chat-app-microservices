@@ -37,6 +37,7 @@ export default function AddParticipantsModalSubsection({ onBack }: Props) {
     error: contactsError,
     firstFetch: contactsFirstFetch,
   } = useAppSelector((state) => state.contactsPreviews);
+  const { t } = useTranslation();
 
   const participantsIds = chat?.participants.map(
     (participant) => participant.id
@@ -107,7 +108,7 @@ export default function AddParticipantsModalSubsection({ onBack }: Props) {
             textAlign="right"
             sx={{ fontSize: "1.8em", minWidth: "10em" }}
           >
-            Add participants to group
+            {t("app.modals.chatDetails.addParticipantsSubsection.title")}
           </DialogTitle>
         </Box>
 
@@ -149,7 +150,7 @@ export default function AddParticipantsModalSubsection({ onBack }: Props) {
                 }
               }}
             >
-              Add
+              {t("app.modals.chatDetails.addParticipantsSubsection.mainAction")}
             </Button>
           </Box>
         </DialogContent>

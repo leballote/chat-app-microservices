@@ -1,5 +1,5 @@
 import { MouseEvent } from "react";
-import { removeParticipant } from "../../../app/features/appView/newGroupSectionDrawerSlice";
+import { removeParticipant } from "../../../app/features/appView/newGroupDrawerSection/newGroupSectionDrawerSlice";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import indexArrayByField from "../../../utils/indexArrayByField";
 import { ParticipantsToAddList } from "../../shared/ParticipantsToAddList";

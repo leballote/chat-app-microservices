@@ -26,10 +26,7 @@ import {
   loadMessages,
   resetState as resetCurrentChatState,
 } from "../../app/features/appData/currentChatSlice";
-import {
-  resetState as resetChatSectionState,
-  setOnBottom,
-} from "../../app/features/appView/chatSectionSlice";
+import { resetState as resetChatSectionState } from "../../app/features/appView/chatSectionSlice";
 import getScrollHeightGap from "../../utils/getScrollHeightGap";
 import { useDispatch } from "react-redux";
 import ChatDetailsModal from "../modals/ChatDetailsModal";
@@ -90,12 +87,13 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
 
   return (
     <Box
-      sx={{ height, overflowY: "auto" }}
+      sx={{ height, overflowY: "scroll" }}
       ref={chatAreaRef}
       onScroll={handleScroll}
     >
       <List
         sx={{
+          overflowY: "auto",
           display: "flex",
           flexFlow: "column-reverse",
           height: "100%",
@@ -169,13 +167,7 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
 }
 
 //TODO: solve this any
-function ChatsFooter({
-  height,
-  onSend,
-}: {
-  height: string | number;
-  onSend: any;
-}) {
+function ChatsFooter({ height }: { height: string | number }) {
   const dispatch = useAppDispatch();
   const chat = useContext(ChatContext);
   if (!chat) return null;
@@ -196,7 +188,6 @@ function ChatsFooter({
       messageTextInput.current?.value &&
       messageTextInput.current.value.length > 0
     ) {
-      onSend();
       dispatch(
         sendMessage({
           chatId,
@@ -284,12 +275,13 @@ export default function ChatSection() {
 
   useEffect(() => {
     if (chatId) {
-      dispatch(getCurrentChatValue(chatId));
+      dispatch(getCurrentChatValue({ chatId }));
     }
   }, [chatId]);
 
   useEffect(() => {
     if (error) {
+      console.log("ERROR", error);
       navigate("/app");
       dispatch(resetCurrentChatState());
       dispatch(resetChatSectionState());
@@ -300,7 +292,7 @@ export default function ChatSection() {
   if (loading) {
     component = <ChatLoading />;
   } else if (error) {
-    component = <Navigate to={"error"} />;
+    component = <Navigate to={"/chatError"} />;
   } else if (chat != null) {
     const { messages, participants, ...chatInfo } = chat;
     component = (
@@ -320,15 +312,7 @@ export default function ChatSection() {
             height={"70vh"}
             chatAreaRef={chatAreaRef}
           />
-          <ChatsFooter
-            height={"20vh"}
-            onSend={() => {
-              const element = chatAreaRef.current;
-              if (element == null) return;
-              const scrollHeightGap = getScrollHeightGap(element);
-              dispatch(setOnBottom(scrollHeightGap < 5));
-            }}
-          />
+          <ChatsFooter height={"20vh"} />
         </ChatContext.Provider>
         <ChatDetailsModal />
       </Box>

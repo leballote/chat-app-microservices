@@ -7,16 +7,12 @@ import {
   setValue as setCurrentChatValue,
 } from "../../features/appData/currentChatSlice";
 
-//TODO: how to remove this nay
 export function* handleGetChat(action: PayloadAction<{ chatId: string }>): any {
   const { payload } = action;
   try {
     yield put(setError(null));
     yield put(setLoading(true));
-    //TODO: look how to turn off this error
-    const requestGetChat2 = requestGetChat as any;
-    //TODO: solve this any
-    const response = yield call(requestGetChat2, payload);
+    const response = yield call(requestGetChat, payload);
     const {
       data: {
         viewer: { chat },

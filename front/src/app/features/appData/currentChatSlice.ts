@@ -4,7 +4,6 @@ import type { Chat, Message, ChatUser } from "../../../types/chat.types";
 import removeOne from "../../../utils/removeOne";
 
 //TODO: handle loading sent messages and errored sent messages
-// Define a type for the slice state
 type CurrentChatState = {
   value: Chat | null;
   loading: boolean;
@@ -16,7 +15,6 @@ type CurrentChatState = {
   participantsToAddIds: string[];
 };
 
-//TODO: maybe if asked too many times to go up increase the batch size
 export const INITIAL_MESSAGES_BATCH_SIZE = 15;
 
 //TODO: this should be in types folder
@@ -58,7 +56,7 @@ export const currentChatSlice = createSlice({
   name: "currentChat",
   initialState,
   reducers: {
-    getValue(state, _action: PayloadAction<string>) {
+    getValue(state, _action: PayloadAction<{ chatId: string }>) {
       state.loading = true;
     },
     sendMessage(_, _action: PayloadAction<SendMessageInput>) {},

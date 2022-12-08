@@ -26,6 +26,22 @@ export type Chat = {
   viewerAsChatUser: ChatUser;
 };
 
+export type ChatPreview = {
+  id: string;
+  type: "INDIVIDUAL" | "GROUP";
+  name: string;
+  avatar?: string;
+  lastActionDate: string;
+  lastMessage: {
+    id: string;
+    content: string;
+    sentAt: string;
+    sentBy: {
+      id: string;
+    };
+  };
+};
+
 export type ChatContextType = Omit<Chat, "messages">;
 
 export type ChatDataResponse = {

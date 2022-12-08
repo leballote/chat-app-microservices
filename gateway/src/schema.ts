@@ -224,7 +224,6 @@ const typeDefs = gql`
 
   type LogInResponse {
     success: Boolean!
-    token: String
   }
 
   type LogOutResponse {
