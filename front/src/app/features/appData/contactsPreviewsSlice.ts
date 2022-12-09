@@ -32,7 +32,10 @@ export const contactsPreviewsSlice = createSlice({
       state.loading = false;
     },
     addContact(state, { payload }: PayloadAction<ContactPreview>) {
-      if (state.value != null) {
+      if (
+        state.value != null &&
+        !state.value.some((contact) => contact.id == payload.id)
+      ) {
         state.value.push(payload);
       }
     },

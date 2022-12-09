@@ -24,7 +24,13 @@ export function* handleLoadMessages(
     const messages = data.messages;
     yield put(appendMessages(messages));
   } catch (error) {
-    put(setLoadingMessages(false));
-    put(setErrorMessages(error as Error));
+    let message;
+    yield put(setLoadingMessages(false));
+    if ((error as any).message) {
+      message = (error as any).message;
+    } else {
+      message = "something went wrong";
+    }
+    yield put(setErrorMessages({ message }));
   }
 }

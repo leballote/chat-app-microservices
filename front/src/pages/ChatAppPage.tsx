@@ -1,29 +1,31 @@
-import Box from "@mui/material/Box";
-import { useEffect, useContext } from "react";
-import SideBar from "../components/drawerSection/SideBar";
-import { Routes, Route, useNavigate } from "react-router-dom";
-import ChatSection from "../components/chatSection/ChatSection";
-import { CurrentUserContext } from "../contexts";
 import { gql, useSubscription } from "@apollo/client";
-import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { unshiftMessage } from "../app/features/appData/currentChatSlice";
+import Box from "@mui/material/Box";
 import i18next from "i18next";
-import {
-  addFriendRequest,
-  removeFriendRequest,
-} from "../app/features/appData/friendRequestsPreviewsSlice";
-import { addContact } from "../app/features/appData/contactsPreviewsSlice";
+import { useContext, useEffect } from "react";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import {
   getChatPreview,
   upsertChat,
 } from "../app/features/appData/chatsPreviewsSlice";
-import ErrorChat from "../components/feedback/ErrorChat";
-import AppNotifications from "../components/notifications/AppNotifications";
+import { addContact } from "../app/features/appData/contactsPreviewsSlice";
+import { unshiftMessage } from "../app/features/appData/currentChatSlice";
+import {
+  addFriendRequest,
+  removeFriendRequest,
+} from "../app/features/appData/friendRequestsPreviewsSlice";
 import { triggerNewNotification } from "../app/features/appView/notifications/notificationsSlice";
 import {
+  appNotificationManager,
   FriendRequestReceivedAppNotification,
+  FriendRequestAcceptedAppNotification,
   NotificationType,
 } from "../app/features/appView/types";
+import { useAppDispatch, useAppSelector } from "../app/hooks";
+import ChatSection from "../components/chatSection/ChatSection";
+import SideBar from "../components/drawerSection/SideBar";
+import ErrorChat from "../components/feedback/ErrorChat";
+import AppNotifications from "../components/notifications/AppNotifications";
+import { CurrentUserContext } from "../contexts";
 
 const MESSAGE_CREATED = gql`
   subscription {
@@ -134,8 +136,11 @@ export default function ChatAppPage() {
 
         dispatch(
           triggerNewNotification(
-            new FriendRequestReceivedAppNotification({
-              sender: requesterUser,
+            appNotificationManager.createNotification({
+              notification: {
+                notificationType: NotificationType.FRIEND_REQUEST_RECEIVED,
+                sender: requesterUser,
+              } as FriendRequestReceivedAppNotification,
             })
           )
         );
@@ -155,6 +160,17 @@ export default function ChatAppPage() {
         }
         if (requesterUser && requesterUser.id == user?.id) {
           dispatch(addContact(accepterUser));
+
+          dispatch(
+            triggerNewNotification(
+              appNotificationManager.createNotification({
+                notification: {
+                  notificationType: NotificationType.FRIEND_REQUEST_ACCEPTED,
+                  accepter: accepterUser,
+                } as FriendRequestAcceptedAppNotification,
+              })
+            )
+          );
         }
       } else {
         if (accepterUser && accepterUser.id == user?.id) {
@@ -183,7 +199,6 @@ export default function ChatAppPage() {
         <Route path="chat/:id" element={<ChatSection />} />
         <Route path="/app/error" element={<ErrorChat />} />
       </Routes>
-      <AppNotifications />
     </Box>
   ) : null;
 }

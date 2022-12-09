@@ -64,22 +64,24 @@ export default function SetTitleAndAvatarDrawerSubsection() {
     } = elements;
     const participants = participantsToAdd.map((id) => ({ id, admin: false }));
 
-    const res = await createGroupChatFn({
-      variables: {
-        input: {
-          name,
-          phrase,
-          participants,
+    try {
+      const res = await createGroupChatFn({
+        variables: {
+          input: {
+            name,
+            phrase,
+            participants,
+          },
         },
-      },
-    });
-    dispatch(resetNewGroupDrawerSectionState());
-    dispatch(resetMainDrawerSectionState());
-    dispatch(setMainDrawerSection());
-    dispatch(upsertChat(res.data.createGroupChat.chat));
-    if (!res.errors) {
-      navigate(`/app/chat/${res.data.createGroupChat.chat.id}`);
-    }
+      });
+      dispatch(resetNewGroupDrawerSectionState());
+      dispatch(resetMainDrawerSectionState());
+      dispatch(setMainDrawerSection());
+      dispatch(upsertChat(res.data.createGroupChat.chat));
+      if (!res.errors) {
+        navigate(`/app/chat/${res.data.createGroupChat.chat.id}`);
+      }
+    } catch (e) {}
   };
 
   return (

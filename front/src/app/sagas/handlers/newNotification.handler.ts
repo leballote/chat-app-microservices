@@ -5,7 +5,6 @@ import {
   removeNotification,
 } from "../../features/appView/notifications/notificationsSlice";
 import { AppNotification } from "../../features/appView/types";
-import { store } from "../../store";
 
 export function* handleNewNotification({
   payload: notification,

@@ -2,7 +2,7 @@ import { RESTDataSource } from "@apollo/datasource-rest";
 import { GraphQLError } from "graphql";
 import { isErrorResponse } from "../types/general.types";
 
-export function HandleError() {
+export function HandleError(extraHandling?: (...args: any[]) => void) {
   return function (
     _target: RESTDataSource,
     _key: string | symbol,
@@ -13,6 +13,7 @@ export function HandleError() {
       try {
         const res = await original.bind(this)(...args);
         if (isErrorResponse(res)) {
+          if (extraHandling) extraHandling(...args);
           throw new GraphQLError(res.error.message, {
             extensions: { code: "ERROR_NOT_400_NOR_500" },
           });
@@ -27,6 +28,7 @@ export function HandleError() {
         ) {
           throw error;
         } else {
+          if (extraHandling) extraHandling(...args);
           throw new GraphQLError("Something went wrong");
         }
       }

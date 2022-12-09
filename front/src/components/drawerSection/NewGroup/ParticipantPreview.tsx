@@ -67,9 +67,7 @@ export default function ({ name, avatar, id, onRemove, isViewerAdmin }: Props) {
           dispatch(closeDetails());
 
           navigate(`/app/chat/${newChat.id}`);
-        } catch (e) {
-          throw e;
-        }
+        } catch (e) {}
       }}
       data-user-id={`${id}`}
       secondaryAction={

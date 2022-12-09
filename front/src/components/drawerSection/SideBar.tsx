@@ -3,7 +3,7 @@ import {
   setContactsDrawerSection,
   setMainDrawerSection,
 } from "../../app/features/appView/sideBarSlice";
-import { SectionName as DrawerSection } from "../../app/features/appView/types";
+import { SideBarSection as DrawerSection } from "../../app/features/appView/types";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import ContactsDrawerSection from "./Contacts/ContactsDrawerSection";
 import MainDrawerView from "./MainDrawerView";

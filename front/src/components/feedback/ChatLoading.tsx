@@ -127,12 +127,12 @@ function ChatFooterLoading({ height }: WithHeight) {
       }}
       gap={2}
     >
-      <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }} disabled>
+      {/* <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }} disabled>
         <ImageIcon />
       </Button>
       <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }} disabled>
         <EmojiEmotionsIcon />
-      </Button>
+      </Button> */}
       <TextField sx={{ width: "50%" }} disabled />
       <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }} disabled>
         <SendIcon />

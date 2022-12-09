@@ -20,8 +20,13 @@ export function* handleGetChat(action: PayloadAction<{ chatId: string }>): any {
     } = response;
     yield put(setCurrentChatValue(chat));
   } catch (error) {
-    const e = error as Error;
-    yield put(setError(e.message));
+    let message;
     yield put(setLoading(false));
+    if ((error as any).message) {
+      message = (error as any).message;
+    } else {
+      message = "something went wrong";
+    }
+    yield put(setError({ message }));
   }
 }

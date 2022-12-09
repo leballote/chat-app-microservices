@@ -41,8 +41,12 @@ export default function LoginPage() {
       return;
     }
 
-    await mutationFunction({ variables: { username, password } });
-    dispatch(getCurrentUserValue());
+    try {
+      const loginResponse = await mutationFunction({
+        variables: { username, password },
+      });
+      dispatch(getCurrentUserValue());
+    } catch (e) {}
   }
 
   useEffect(() => {

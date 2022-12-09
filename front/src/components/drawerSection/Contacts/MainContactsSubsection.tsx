@@ -101,9 +101,7 @@ export default function MainContactsSubsection({ onBackClick }: Props) {
                 if (newChat?.id) {
                   navigate(`/app/chat/${newChat.id}`);
                 }
-              } catch (e) {
-                throw e;
-              }
+              } catch (e) {}
             }}
           />
         ))}

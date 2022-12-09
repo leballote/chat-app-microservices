@@ -1,10 +1,17 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { resetState as resetContactsDrawerSectionState } from "./contactsDrawerSection/mainSectionDrawerSlice";
-import { SectionName } from "./types";
+// import { SideBarSection } from "./types";
 
+//TODO: for some reason I cannot import this; it breaks my application; but just here
+export enum SideBarSection {
+  MAIN,
+  CONTACTS,
+  NEW_GROUP,
+  SETTINGS,
+}
 // Define the initial state using that type
-const initialState: { name: SectionName } = {
-  name: SectionName.MAIN,
+const initialState: { name: SideBarSection } = {
+  name: SideBarSection.MAIN,
 };
 
 export const mainDrawerSlice = createSlice({
@@ -13,25 +20,25 @@ export const mainDrawerSlice = createSlice({
   reducers: {
     //TODO: maybe set payload as the section we want, but we would have to get the reset functions into an object indexed by enum
     setMainDrawerSection(state) {
-      if (state.name != SectionName.MAIN) {
-        state.name = SectionName.MAIN;
+      if (state.name != SideBarSection.MAIN) {
+        state.name = SideBarSection.MAIN;
       }
     },
     setContactsDrawerSection(state) {
-      if (state.name != SectionName.CONTACTS) {
+      if (state.name != SideBarSection.CONTACTS) {
         resetContactsDrawerSectionState();
-        state.name = SectionName.CONTACTS;
+        state.name = SideBarSection.CONTACTS;
       }
     },
     setNewGroupDrawerSection(state) {
       //TODO: reset this state
-      if (state.name != SectionName.NEW_GROUP) {
-        state.name = SectionName.NEW_GROUP;
+      if (state.name != SideBarSection.NEW_GROUP) {
+        state.name = SideBarSection.NEW_GROUP;
       }
     },
     setSettingsDrawerSection(state) {
-      if (state.name != SectionName.SETTINGS) {
-        state.name = SectionName.SETTINGS;
+      if (state.name != SideBarSection.SETTINGS) {
+        state.name = SideBarSection.SETTINGS;
       }
     },
   },

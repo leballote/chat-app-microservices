@@ -11,6 +11,13 @@ import SignupPage from "./pages/SignupPage";
 import ChatAppPage from "./pages/ChatAppPage";
 import LinearDeterminate from "./components/feedback/LinearDeterminate";
 import Typography from "@mui/material/Typography";
+import { triggerNewNotification } from "./app/features/appView/notifications/notificationsSlice";
+import {
+  appNotificationManager,
+  GenericErrorAppNotification,
+  NotificationType,
+} from "./app/features/appView/types";
+import AppNotifications from "./components/notifications/AppNotifications";
 
 const App: React.FunctionComponent = function () {
   const currentUserState = useAppSelector((state) => state.currentUser);
@@ -20,7 +27,6 @@ const App: React.FunctionComponent = function () {
     loading: userLoading,
     error: userError,
   } = currentUserState;
-  const error = userError;
 
   const dispatch = useAppDispatch();
 
@@ -28,26 +34,23 @@ const App: React.FunctionComponent = function () {
     dispatch(getCurrentUserValue());
   }, []);
 
+  useEffect(() => {
+    if (userError) {
+      dispatch(
+        triggerNewNotification(
+          appNotificationManager.createNotification({
+            notification: {
+              notificationType: NotificationType.GENERIC_ERROR,
+              message: `Something went wrong when fetching your information, please try to login again`,
+            } as GenericErrorAppNotification,
+          })
+        )
+      );
+    }
+  }, [userError]);
+
   let component;
-  if (error) {
-    component = (
-      <Container
-        sx={{
-          alignItems: "center",
-          height: "100vh",
-          justifyContent: "center",
-          display: "flex",
-        }}
-      >
-        <Box width={"80%"}>
-          <CssBaseline />
-          <Typography sx={{ fontSize: "3em" }} textAlign="center">
-            Sorry! Something went wrong :{"("}
-          </Typography>
-        </Box>
-      </Container>
-    );
-  } else if (userLoading) {
+  if (userLoading) {
     component = (
       <Container
         sx={{
@@ -78,6 +81,7 @@ const App: React.FunctionComponent = function () {
               <Route path="signup" element={<SignupPage />} />
             </Route>
           </Routes>
+          <AppNotifications />
         </CurrentUserContext.Provider>
       </BrowserRouter>
     );

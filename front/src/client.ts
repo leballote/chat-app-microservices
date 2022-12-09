@@ -14,14 +14,14 @@ const WS_CLIENT_URL =
     ? `ws://${window.location.host}/subs`
     : `wss://${window.location.host}/subs`;
 
-// const wsLink = new GraphQLWsLink(
-//   createClient({
-//     url: WS_CLIENT_URL,
-//     connectionParams: {
-//       credentials: "same-origin",
-//     },
-//   })
-// );
+const wsLink = new GraphQLWsLink(
+  createClient({
+    url: WS_CLIENT_URL,
+    connectionParams: {
+      credentials: "same-origin",
+    },
+  })
+);
 
 const splitLink = split(
   ({ query }) => {
@@ -33,7 +33,7 @@ const splitLink = split(
     );
   },
 
-  // wsLink,
+  wsLink,
 
   httpLink
 );

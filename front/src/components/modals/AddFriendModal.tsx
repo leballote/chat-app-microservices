@@ -9,16 +9,25 @@ import {
   CircularProgress,
   Alert,
 } from "@mui/material";
-import { FormEventHandler, MouseEventHandler } from "react";
+import { FormEventHandler, MouseEventHandler, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
 import { closeAddFriendModal } from "../../app/features/appView/contactsDrawerSection/contactsDrawerSectionSlice";
 import {
   resetSendFriendRequest,
   sendFriendRequest,
+  setSendFriendRequestError,
+  setSendFriendRequestLoading,
+  setSendFriendRequestValue,
 } from "../../app/features/appView/contactsDrawerSection/friendRequestsDrawerSlice";
 import { green } from "@mui/material/colors";
 import DoneIcon from "@mui/icons-material/Done";
+import { triggerNewNotification } from "../../app/features/appView/notifications/notificationsSlice";
+import {
+  appNotificationManager,
+  GenericSuccessAppNotification,
+  NotificationType,
+} from "../../app/features/appView/types";
 
 export default function AddFriendModal() {
   const {
@@ -31,6 +40,24 @@ export default function AddFriendModal() {
   const { addFriendOpen } = useAppSelector(
     (state) => state.contactsDrawerSubsection
   );
+
+  useEffect(() => {
+    if (sendFriendRequestValue) {
+      dispatch(
+        triggerNewNotification(
+          appNotificationManager.createNotification({
+            notification: {
+              notificationType: NotificationType.GENERIC_SUCCESS,
+              message: "Friend request sent",
+            } as GenericSuccessAppNotification,
+          })
+        )
+      );
+      dispatch(setSendFriendRequestValue(null));
+      dispatch(closeAddFriendModal());
+    }
+  }, [sendFriendRequestValue]);
+
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
 

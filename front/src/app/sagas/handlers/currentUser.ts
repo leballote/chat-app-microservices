@@ -15,7 +15,13 @@ export function* handleGetUser(_action: Action): any {
     const { viewer } = data;
     yield put(setCurrentUser(viewer));
   } catch (error) {
+    let message;
     yield put(setLoading(false));
-    yield put(setError(error));
+    if ((error as any).message) {
+      message = (error as any).message;
+    } else {
+      message = "something went wrong";
+    }
+    yield put(setError({ message }));
   }
 }

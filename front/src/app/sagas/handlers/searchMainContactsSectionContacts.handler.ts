@@ -8,7 +8,6 @@ import { store } from "../../store";
 
 export function* handleSearchContact(action: PayloadAction<string>): any {
   const { payload } = action;
-  console.log(payload);
   yield put(setSearchTerm(payload));
   const contactsFiltered = store
     .getState()

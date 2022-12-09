@@ -64,9 +64,11 @@ export default function MainDrawerView(props: Props) {
   }
 
   async function handleLogOut() {
-    await logoutMutationFn();
-    dispatch(resetMainDrawerState());
-    dispatch(getCurrentUserValue());
+    try {
+      await logoutMutationFn();
+      dispatch(resetMainDrawerState());
+      dispatch(getCurrentUserValue());
+    } catch (e) {}
   }
 
   function handleNewGroup() {

@@ -2,16 +2,17 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../store";
 import type { Chat, Message, ChatUser } from "../../../types/chat.types";
 import removeOne from "../../../utils/removeOne";
+import { AppError } from "../types";
 
 //TODO: handle loading sent messages and errored sent messages
 type CurrentChatState = {
   value: Chat | null;
   loading: boolean;
-  error: Error | null;
+  error: AppError;
   messagesBatchSize: number;
   messagesNoBatch: number;
   loadingMessages: boolean;
-  errorMessages: Error | null;
+  errorMessages: AppError;
   participantsToAddIds: string[];
 };
 
@@ -91,14 +92,14 @@ export const currentChatSlice = createSlice({
     ) {},
     requestLeaveGroup(_, _action: PayloadAction<{ chatId: string }>) {},
     requestAddParticipants(_, _action: PayloadAction<AddParticipantInput>) {},
-    loadMessages(_, _action?: PayloadAction<GetMessagesInput>) {},
+    loadMessages(_, _action: PayloadAction<GetMessagesInput>) {},
     setMessagesNoBatch(state, { payload }: PayloadAction<number>) {
       state.messagesNoBatch = payload;
     },
     setLoadingMessages(state, { payload }: PayloadAction<boolean>) {
       state.loadingMessages = payload;
     },
-    setErrorMessages(state, { payload }: PayloadAction<Error | null>) {
+    setErrorMessages(state, { payload }: PayloadAction<AppError>) {
       state.errorMessages = payload;
     },
     unshiftMessage(state, { payload }: PayloadAction<Message>) {

@@ -17,7 +17,7 @@ export default function SearchBar({ onSearch, onKeyDown, value }: Props) {
     <TextField
       sx={{ margin: ".2em .5em 0 .5em" }}
       size="small"
-      placeholder={t("general.search")}
+      placeholder={String(t("general.search"))}
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">

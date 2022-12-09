@@ -16,6 +16,8 @@ import cookieParser from "cookie-parser";
 import { Request, Response } from "express";
 import { isErrorResponse } from "./types/general.types";
 import cookie from "cookie";
+import { appCookieOptions } from "./options";
+import { GraphQLError } from "graphql";
 
 // const PORT = process.env.PORT;
 
@@ -56,13 +58,25 @@ const context: ContextFunction = async ({ req, res, ...moreContext }) => {
       authAPI: new AuthAPI({ cache }),
       getViewer: async function () {
         const token = req.cookies.jwt_token;
-        const authUser = await this.authAPI.authorize(token);
-        if (isErrorResponse(authUser)) {
-          return null;
+        try {
+          const authUser = await this.authAPI.authorize(token);
+          if (token == "" || token == null) {
+            return null;
+          }
+          if (isErrorResponse(authUser)) {
+            res.clearCookie("jwt_token", appCookieOptions);
+            throw new GraphQLError("User doesn't exist");
+          }
+          const viewerRes = await this.userAPI.getUser(authUser.data.user._id);
+          if (isErrorResponse(viewerRes)) {
+            res.clearCookie("jwt_token", appCookieOptions);
+            throw new GraphQLError("User doesn't exist");
+          }
+          return viewerRes.data;
+        } catch (e) {
+          res.clearCookie("jwt_token", appCookieOptions);
+          throw new GraphQLError("User doesn't exist");
         }
-        const viewerRes = await this.userAPI.getUser(authUser.data.user._id);
-        if (isErrorResponse(viewerRes)) return null;
-        return viewerRes.data;
       },
     },
   };

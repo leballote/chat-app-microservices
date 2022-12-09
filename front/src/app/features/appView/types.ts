@@ -3,7 +3,7 @@ import { AutoIncrementIndexCreator } from "../../utils";
 
 export const indexCreator_ = new AutoIncrementIndexCreator();
 
-export enum SectionName {
+export enum SideBarSection {
   MAIN,
   CONTACTS,
   NEW_GROUP,
@@ -30,23 +30,54 @@ export enum ChatDetailsSectionModalSubsection {
   ADD_PARTICIPANTS,
 }
 
+//app notifications
+
 export interface AppNotification {
   notificationType: NotificationType;
   id: number;
 }
 
-export class FriendRequestReceivedAppNotification implements AppNotification {
-  static indexCreator: AutoIncrementIndexCreator = indexCreator_;
+export interface FriendRequestReceivedAppNotification extends AppNotification {
   notificationType: NotificationType.FRIEND_REQUEST_RECEIVED;
-  id: number;
   sender: User;
-  constructor({ sender }: { sender: User }) {
-    this.notificationType = NotificationType.FRIEND_REQUEST_RECEIVED;
-    this.id = FriendRequestReceivedAppNotification.indexCreator.generateIndex();
-    this.sender = sender;
+}
+
+export interface FriendRequestAcceptedAppNotification extends AppNotification {
+  notificationType: NotificationType.FRIEND_REQUEST_ACCEPTED;
+  accepter: User;
+}
+//NOTE: I don't think is a good idea to make a notification for user rejections
+
+export interface GenericSuccessAppNotification extends AppNotification {
+  notificationType: NotificationType.GENERIC_SUCCESS;
+  message: string;
+}
+
+export interface GenericErrorAppNotification extends AppNotification {
+  notificationType: NotificationType.GENERIC_ERROR;
+  message: string;
+}
+
+export class AppNotificationManager {
+  indexCreator: AutoIncrementIndexCreator = indexCreator_;
+
+  createNotification({
+    notification,
+  }: {
+    notification: Omit<AppNotification, "id">;
+  }): AppNotification {
+    return {
+      ...notification,
+      id: this.indexCreator.generateIndex(),
+    };
   }
 }
 
+export const appNotificationManager = new AppNotificationManager();
+
 export enum NotificationType {
   FRIEND_REQUEST_RECEIVED,
+  FRIEND_REQUEST_ACCEPTED,
+  GENERIC_SUCCESS,
+  GENERIC_ERROR,
 }

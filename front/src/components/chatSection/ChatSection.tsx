@@ -1,36 +1,39 @@
-import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
-import Box from "@mui/material/Box";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { useState, useEffect, useContext, useRef } from "react";
+import SendIcon from "@mui/icons-material/Send";
 import {
+  Avatar,
+  Button,
+  IconButton,
   List,
   ListItem,
-  Avatar,
   ListItemAvatar,
   ListItemText,
-  Button,
+  Paper,
 } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import ImageIcon from "@mui/icons-material/Image";
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
-import { Message } from "../../types/chat.types";
-import { ChatContext, CurrentUserContext } from "../../contexts";
-import ChatHeader from "./ChatHeader";
-import { WithHeight } from "../../types/utilTypes";
-import indexArrayByField from "../../utils/indexArrayByField";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import { useContext, useEffect, useRef, useState } from "react";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
+// import ImageIcon from "@mui/icons-material/Image";
+// import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+import { useDispatch } from "react-redux";
 import {
   getValue as getCurrentChatValue,
-  sendMessage,
   loadMessages,
   resetState as resetCurrentChatState,
+  sendMessage,
 } from "../../app/features/appData/currentChatSlice";
 import { resetState as resetChatSectionState } from "../../app/features/appView/chatSectionSlice";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { ChatContext, CurrentUserContext } from "../../contexts";
+import { Message } from "../../types/chat.types";
+import { WithHeight } from "../../types/utilTypes";
 import getScrollHeightGap from "../../utils/getScrollHeightGap";
-import { useDispatch } from "react-redux";
-import ChatDetailsModal from "../modals/ChatDetailsModal";
+import indexArrayByField from "../../utils/indexArrayByField";
 import ChatLoading from "../feedback/ChatLoading";
+import ChatDetailsModal from "../modals/ChatDetailsModal";
+import ChatHeader from "./ChatHeader";
+import { blueGrey } from "@mui/material/colors";
 
 interface Props extends WithHeight {
   messages: Message[];
@@ -168,7 +171,6 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
   );
 }
 
-//TODO: solve this any
 function ChatsFooter({ height }: { height: string | number }) {
   const dispatch = useAppDispatch();
   const chat = useContext(ChatContext);
@@ -223,38 +225,45 @@ function ChatsFooter({ height }: { height: string | number }) {
   }
 
   return (
-    <Box
+    <Paper
+      elevation={4}
       sx={{
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
         padding: "0em",
-        bgcolor: "#CCCCCC",
+        bgcolor: blueGrey[100],
         width: "100%",
         height,
+        gap: 2,
       }}
-      gap={2}
+      // gap={2}
     >
-      <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }}>
+      {/* <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }}>
         <ImageIcon />
       </Button>
       <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }}>
         <EmojiEmotionsIcon />
-      </Button>
+      </Button> */}
       <TextField
-        sx={{ width: "50%" }}
+        sx={{ width: "50%", bgcolor: "white" }}
         // ref={messageTextInput}
         InputProps={{ onKeyDown: handleKeyDown }}
         inputRef={messageTextInput}
       />
       <Button
-        variant="outlined"
-        sx={{ aspectRatio: "1 / 1" }}
+        sx={{
+          aspectRatio: "1 / 1",
+          bgcolor: "whitesmoke",
+          "&:hover": {
+            bgcolor: "#EEEEEE",
+          },
+        }}
         onClick={handleSendClick}
       >
         <SendIcon />
       </Button>
-    </Box>
+    </Paper>
   );
 }
 
@@ -272,7 +281,7 @@ export default function ChatSection() {
   } = useAppSelector((state) => state.currentChat);
 
   if (chatId == undefined) {
-    error = new Error("Chat not defined");
+    error = { message: "Chat not defined" };
   }
 
   useEffect(() => {
@@ -283,7 +292,6 @@ export default function ChatSection() {
 
   useEffect(() => {
     if (error) {
-      console.log("ERROR", error);
       navigate("/app");
       dispatch(resetCurrentChatState());
       dispatch(resetChatSectionState());

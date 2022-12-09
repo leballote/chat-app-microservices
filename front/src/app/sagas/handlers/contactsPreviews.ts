@@ -19,7 +19,13 @@ export function* handleContactsPreviews(action: PayloadAction<string>): any {
     } = data;
     yield put(setContactsPreviewsValue(contacts));
   } catch (error) {
+    let message;
     yield put(setLoading(false));
-    yield put(setError((error as unknown as GraphQLError).message));
+    if ((error as any).message) {
+      message = (error as any).message;
+    } else {
+      message = "something went wrong";
+    }
+    yield put(setError({ message }));
   }
 }

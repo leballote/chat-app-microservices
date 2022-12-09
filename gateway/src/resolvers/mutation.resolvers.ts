@@ -2,6 +2,8 @@ import { UserModelSuccessResponse } from "../types/servicesRest";
 import { isErrorResponse } from "../types/general.types";
 import { MutationResolvers } from "../generated/graphql";
 import { CookieOptions } from "express";
+import { appCookieOptions } from "../options";
+
 import {
   FRIENDSHIP_REQUEST_RECEIVED,
   FRIENDSHIP_RESPONSE_RECEIVED,
@@ -51,13 +53,7 @@ const mutationRelatedResolvers: MutationResolvers = {
 
   login: async (_, { username, password }, { dataSources, req, res }) => {
     const authRes = await dataSources.authAPI.logIn({ username, password });
-    const options: CookieOptions = {
-      maxAge: 1000 * 60 * 60 * 24, //expires in a day
-      httpOnly: true, // cookie is only accessible by the server
-      // secure: process.env.NODE_ENV === "prod", // only transferred over https
-      secure: true,
-      sameSite: "none",
-    };
+    const options: CookieOptions = appCookieOptions;
     if (isErrorResponse(authRes)) {
       throw new GraphQLError(authRes.error.message);
     }
@@ -65,13 +61,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     return authRes.data;
   },
   logout: async (_, __, { res, req }) => {
-    const options: CookieOptions = {
-      maxAge: 1000 * 60 * 60 * 24, //expires in a day
-      httpOnly: true, // cookie is only accessible by the server
-      // secure: process.env.NODE_ENV === "prod", // only transferred over https
-      secure: true,
-      sameSite: "none",
-    };
+    const options: CookieOptions = appCookieOptions;
     res.clearCookie("jwt_token", options);
     return {
       success: true,

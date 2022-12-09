@@ -25,10 +25,12 @@ export function FriendRequestReceivedNotification({
 
   const handleAcceptClick: MouseEventHandler<HTMLButtonElement> = (ev) => {
     dispatch(acceptFriendRequest(sender.id));
+    dispatch(removeNotification({ notificationId }));
   };
 
   const handleRejectClick: MouseEventHandler<HTMLButtonElement> = (ev) => {
     dispatch(rejectFriendRequest(sender.id));
+    dispatch(removeNotification({ notificationId }));
   };
 
   const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {

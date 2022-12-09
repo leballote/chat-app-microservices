@@ -18,7 +18,13 @@ export function* handleFriendRequestsPreviews(): any {
     );
     yield put(setValue(friendshipRequestsReceivedDict));
   } catch (error) {
+    let message;
     yield put(setLoading(false));
-    yield put(setError(error));
+    if ((error as any).message) {
+      message = (error as any).message;
+    } else {
+      message = "something went wrong";
+    }
+    yield put(setError({ message }));
   }
 }

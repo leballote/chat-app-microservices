@@ -9,6 +9,7 @@ import FormatedAvatar from "../../utils/FormatedAvatar";
 import { openDetails } from "../../app/features/appView/chatSectionSlice";
 import { useAppDispatch } from "../../app/hooks";
 import { setValue as setCurrentUserProfilePage } from "../../app/features/appView/currentUserProfilePageSlice";
+import { blueGrey } from "@mui/material/colors";
 
 type BaseChatHeaderProps = {
   name: string;
@@ -98,9 +99,8 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
   return (
     <Box
       sx={{
-        backgroundColor: "#CCCCCC",
+        backgroundColor: blueGrey[100],
         height: height,
-        padding: 0,
       }}
     >
       <Box
@@ -111,7 +111,7 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
           width: "fit-content",
           height: "100%",
           "&:hover": {
-            backgroundColor: "#AAAAAA",
+            backgroundColor: blueGrey[200],
           },
           "&:visited": {
             color: "inherit",
