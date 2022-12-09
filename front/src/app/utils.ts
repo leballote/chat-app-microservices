@@ -6,3 +6,14 @@ export function setMainDrawerSectionAndReset(dispatch: Dispatch) {
   dispatch(resetState());
   dispatch(setMainDrawerSection());
 }
+
+export class AutoIncrementIndexCreator {
+  lastId: number = 0;
+
+  generateIndex() {
+    return this.lastId++;
+  }
+  reduceIndex() {
+    this.lastId--;
+  }
+}

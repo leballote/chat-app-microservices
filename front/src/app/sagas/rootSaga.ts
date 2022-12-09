@@ -43,6 +43,8 @@ import { handleSearchContact } from "./handlers/searchMainContactsSectionContact
 import { handleSearchContactFromNewGroupDrawerSection } from "./handlers/searchNewGroupSectionContacts";
 import { handleSendFriendRequest } from "./handlers/sendFriendRequest.handler";
 import { handleSendMessage } from "./handlers/sendMessage";
+import { handleNewNotification } from "./handlers/newNotification.handler";
+import { triggerNewNotification } from "../features/appView/notifications/notificationsSlice";
 
 export function* watcherSaga() {
   yield takeLatest(getCurrentUserValue.toString(), handleGetUser);
@@ -72,4 +74,5 @@ export function* watcherSaga() {
     handleSearchContactFromNewGroupDrawerSection
   );
   yield takeEvery(searchChats.toString(), handleSearchChats);
+  yield takeEvery(triggerNewNotification.toString(), handleNewNotification);
 }

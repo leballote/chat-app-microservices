@@ -1,14 +1,15 @@
 import { Box, List } from "@mui/material";
-import { useEffect } from "react";
 import * as React from "react";
-import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { useEffect } from "react";
 import {
   acceptFriendRequest,
   getValue as getFriendsRequestsPreviewsValue,
   rejectFriendRequest,
 } from "../../../app/features/appData/friendRequestsPreviewsSlice";
-import FriendRequestPreview from "../../modals/FriendRequestPreview";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import GenericError from "../../feedback/GenericError";
 import GenericPeopleLoading from "../../feedback/GenericPeopleLoading";
+import FriendRequestPreview from "../../modals/FriendRequestPreview";
 
 export default function FriendRequestsContactsDrawerSubsection() {
   const {
@@ -33,12 +34,7 @@ export default function FriendRequestsContactsDrawerSubsection() {
     component = <GenericPeopleLoading numberOfPeople={4} />;
     return component;
   } else if (error) {
-    component = (
-      <div>
-        <h1>Error</h1>
-        <p>{error.message}</p>
-      </div>
-    );
+    component = <GenericError />;
     return component;
   }
 

@@ -18,6 +18,12 @@ import {
   upsertChat,
 } from "../app/features/appData/chatsPreviewsSlice";
 import ErrorChat from "../components/feedback/ErrorChat";
+import AppNotifications from "../components/notifications/AppNotifications";
+import { triggerNewNotification } from "../app/features/appView/notifications/notificationsSlice";
+import {
+  FriendRequestReceivedAppNotification,
+  NotificationType,
+} from "../app/features/appView/types";
 
 const MESSAGE_CREATED = gql`
   subscription {
@@ -125,6 +131,14 @@ export default function ChatAppPage() {
             error: null,
           })
         );
+
+        dispatch(
+          triggerNewNotification(
+            new FriendRequestReceivedAppNotification({
+              sender: requesterUser,
+            })
+          )
+        );
       }
     },
   });
@@ -167,8 +181,9 @@ export default function ChatAppPage() {
       <SideBar />
       <Routes>
         <Route path="chat/:id" element={<ChatSection />} />
-        <Route path="error" element={<ErrorChat />} />
+        <Route path="/app/error" element={<ErrorChat />} />
       </Routes>
+      <AppNotifications />
     </Box>
   ) : null;
 }

@@ -1,3 +1,8 @@
+import { User } from "../../../types/user.types";
+import { AutoIncrementIndexCreator } from "../../utils";
+
+export const indexCreator_ = new AutoIncrementIndexCreator();
+
 export enum SectionName {
   MAIN,
   CONTACTS,
@@ -23,4 +28,25 @@ export enum ContactsSectionDrawerSubsection {
 export enum ChatDetailsSectionModalSubsection {
   MAIN,
   ADD_PARTICIPANTS,
+}
+
+export interface AppNotification {
+  notificationType: NotificationType;
+  id: number;
+}
+
+export class FriendRequestReceivedAppNotification implements AppNotification {
+  static indexCreator: AutoIncrementIndexCreator = indexCreator_;
+  notificationType: NotificationType.FRIEND_REQUEST_RECEIVED;
+  id: number;
+  sender: User;
+  constructor({ sender }: { sender: User }) {
+    this.notificationType = NotificationType.FRIEND_REQUEST_RECEIVED;
+    this.id = FriendRequestReceivedAppNotification.indexCreator.generateIndex();
+    this.sender = sender;
+  }
+}
+
+export enum NotificationType {
+  FRIEND_REQUEST_RECEIVED,
 }

@@ -22,6 +22,7 @@ import sideBarReducer from "./features/appView/sideBarSlice";
 import chatsDrawerSectionReducer from "./features/appView/chatsDrawerSection/chatDrawerSection";
 
 import { watcherSaga } from "./sagas/rootSaga";
+import notificationsReducer from "./features/appView/notifications/notificationsSlice";
 
 const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
@@ -52,6 +53,8 @@ export const store = configureStore({
     currentUserProfilePage: currentUserProfilePageReducer,
     mainSectionDrawer: mainSectionDrawerReducer,
     chatDetailsModalSection: chatDetailsModalReducer,
+
+    notifications: notificationsReducer,
   },
   middleware: (getDefaultMiddleware) => [
     ...getDefaultMiddleware({ thunk: false }),
