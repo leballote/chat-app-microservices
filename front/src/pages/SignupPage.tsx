@@ -51,7 +51,7 @@ export default function SignupPage() {
   }, [user]);
 
   //TODO client side validation
-  function handleSubmit(ev: React.FormEvent<HTMLInputElement>) {
+  async function handleSubmit(ev: React.FormEvent<HTMLInputElement>) {
     ev.preventDefault();
     const username = usernameInput.current?.value;
     const name = nameInput.current?.value;
@@ -79,7 +79,11 @@ export default function SignupPage() {
     }
 
     if (username && password && confirmPassword && name && email) {
-      mutationFunction({ variables: { input: inputs } });
+      try {
+        await mutationFunction({ variables: { input: inputs } });
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
   return (
@@ -111,21 +115,30 @@ export default function SignupPage() {
           <TextField
             label={t("user.username")}
             required
+            inputProps={{ maxLength: 60 }}
             inputRef={usernameInput}
           />
           <TextField label={t("user.fullName")} required inputRef={nameInput} />
-          <TextField label={t("user.email")} required inputRef={emailInput} />
+          <TextField
+            label={t("user.email")}
+            type="email"
+            required
+            inputProps={{ maxLength: 320 }}
+            inputRef={emailInput}
+          />
 
           <TextField
             label={t("user.password")}
             required
             type="password"
             inputRef={passwordInput}
+            inputProps={{ maxLength: 300 }}
           />
           <TextField
             label={t("signupPage.confirmPassword")}
             required
             type="password"
+            inputProps={{ maxLength: 300 }}
             inputRef={confirmPasswordInput}
           />
           <Button type="submit" variant="outlined">

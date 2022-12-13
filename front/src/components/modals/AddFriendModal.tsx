@@ -111,6 +111,7 @@ export default function AddFriendModal() {
             fullWidth
             name="email"
             variant="standard"
+            inputProps={{ maxLength: 320 }}
           />
           <DialogActions>
             <Button

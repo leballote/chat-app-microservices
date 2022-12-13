@@ -124,11 +124,13 @@ export default function SetTitleAndAvatarDrawerSubsection() {
       <TextField
         sx={{ margin: ".5em 1em" }}
         label={t("app.drawer.newGroup.groupName")}
+        inputProps={{ maxLength: 80 }}
         name="name"
         required
       />
       <TextField
         sx={{ margin: ".5em 1em" }}
+        inputProps={{ maxLength: 200 }}
         label={t("app.drawer.newGroup.groupPhrase")}
         name="phrase"
         size="small"

@@ -84,6 +84,7 @@ export default function LoginPage() {
             label={t("user.username")}
             required
             inputRef={usernameInput}
+            inputProps={{ maxLength: 60 }}
           />
 
           <TextField
@@ -92,6 +93,7 @@ export default function LoginPage() {
             required
             type="password"
             inputRef={passwordInput}
+            inputProps={{ maxLength: 300 }}
           />
           <Button type="submit" variant="outlined">
             {t("loginPage.loginButton")}

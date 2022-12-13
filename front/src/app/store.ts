@@ -24,6 +24,10 @@ import chatsDrawerSectionReducer from "./features/appView/chatsDrawerSection/cha
 import { watcherSaga } from "./sagas/rootSaga";
 import notificationsReducer from "./features/appView/notifications/notificationsSlice";
 
+// const combinedReducer = combineReducers({
+
+// })
+
 const sagaMiddleware = createSagaMiddleware();
 export const store = configureStore({
   reducer: {

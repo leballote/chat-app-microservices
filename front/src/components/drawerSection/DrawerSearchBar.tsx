@@ -1,5 +1,5 @@
 import TextField from "@mui/material/TextField";
-import { ChangeEvent } from "react";
+import { ChangeEvent, KeyboardEventHandler } from "react";
 
 import { InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
@@ -8,7 +8,7 @@ import { useTranslation } from "react-i18next";
 interface Props {
   value?: string;
   onSearch: (ev: ChangeEvent<HTMLInputElement>) => void;
-  onKeyDown: (ev: KeyboardEvent) => void;
+  onKeyDown: KeyboardEventHandler<HTMLDivElement>;
 }
 
 export default function SearchBar({ onSearch, onKeyDown, value }: Props) {
@@ -25,10 +25,11 @@ export default function SearchBar({ onSearch, onKeyDown, value }: Props) {
           </InputAdornment>
         ),
       }}
+      inputProps={{ maxLength: 100 }}
       // value={value}
       onChange={onSearch}
       //TODO: check what is going on with this event
-      onKeyDown={onKeyDown as any}
+      onKeyDown={onKeyDown}
     />
   );
 }

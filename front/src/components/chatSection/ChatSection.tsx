@@ -2,7 +2,6 @@ import SendIcon from "@mui/icons-material/Send";
 import {
   Avatar,
   Button,
-  IconButton,
   List,
   ListItem,
   ListItemAvatar,
@@ -249,6 +248,7 @@ function ChatsFooter({ height }: { height: string | number }) {
         sx={{ width: "50%", bgcolor: "white" }}
         // ref={messageTextInput}
         InputProps={{ onKeyDown: handleKeyDown }}
+        inputProps={{ maxLength: 1000 }}
         inputRef={messageTextInput}
       />
       <Button
