@@ -2,6 +2,7 @@ require("./utils/validateEnvVariables")();
 
 const express = require("express");
 const mongoose = require("mongoose");
+const initModels = require("./utils/modelsInit");
 mongoose.Schema.Types.String.checkRequired((v) => typeof v === "string");
 
 const PORT = process.env.PORT;
@@ -17,8 +18,11 @@ app.use(userRouter);
 app.use(friendshipRouter);
 app.use(friendshipRequestRouter);
 
-mongoose.connect(MONGODB_CONNECTION_STRING).then(
-  app.listen(PORT, () => {
-    console.log(`listening on port ${PORT}`);
-  })
-);
+mongoose
+  .connect(MONGODB_CONNECTION_STRING)
+  .then(initModels())
+  .then(
+    app.listen(PORT, () => {
+      console.log(`listening on port ${PORT}`);
+    })
+  );

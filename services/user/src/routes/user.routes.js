@@ -10,6 +10,20 @@ const errors = {
 router.post("/user", async (req, res) => {
   const { id, username, name, birthDate, email, phrase, avatar } = req.body;
   try {
+    const alreadyExistingUser = await User.findOne({
+      $or: [{ username }, { email }],
+    });
+    if (alreadyExistingUser) {
+      if (email && alreadyExistingUser.email == email) {
+        return res
+          .status(400)
+          .send({ error: { message: "Email already in usage" } });
+      } else if (username && alreadyExistingUser.username == username) {
+        return res
+          .status(400)
+          .send({ error: { message: "User already in usage" } });
+      }
+    }
     const user = await User.create({
       _id: id,
       username,
@@ -24,6 +38,7 @@ router.post("/user", async (req, res) => {
     });
     return res.send({ data: user });
   } catch (e) {
+    // return res.status(400).send({ debugError: e });
     return res.status(500).send(errors.serverError);
   }
 });

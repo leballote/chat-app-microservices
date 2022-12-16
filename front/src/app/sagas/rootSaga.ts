@@ -45,6 +45,8 @@ import { handleSendFriendRequest } from "./handlers/sendFriendRequest.handler";
 import { handleSendMessage } from "./handlers/sendMessage";
 import { handleNewNotification } from "./handlers/newNotification.handler";
 import { triggerNewNotification } from "../features/appView/notifications/notificationsSlice";
+import { triggerLogout } from "../features/appData/authSlice";
+import { handleLogout } from "./handlers/logout.handle";
 
 export function* watcherSaga() {
   yield takeLatest(getCurrentUserValue.toString(), handleGetUser);
@@ -75,4 +77,5 @@ export function* watcherSaga() {
   );
   yield takeEvery(searchChats.toString(), handleSearchChats);
   yield takeEvery(triggerNewNotification.toString(), handleNewNotification);
+  yield takeEvery(triggerLogout.toString(), handleLogout);
 }

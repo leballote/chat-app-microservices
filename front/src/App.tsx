@@ -26,6 +26,7 @@ const App: React.FunctionComponent = function () {
     value: currentUser,
     loading: userLoading,
     error: userError,
+    firstFetch: userFirstFetch,
   } = currentUserState;
 
   const dispatch = useAppDispatch();
@@ -50,7 +51,7 @@ const App: React.FunctionComponent = function () {
   }, [userError]);
 
   let component;
-  if (userLoading) {
+  if (!userFirstFetch) {
     component = (
       <Container
         sx={{

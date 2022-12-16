@@ -8,10 +8,16 @@ type UserState = {
   value: User;
   loading: boolean;
   error: Error | null;
+  firstFetch: boolean;
 };
 
 // Define the initial state using that type
-const initialState: UserState = { value: null, loading: true, error: null };
+const initialState: UserState = {
+  value: null,
+  loading: false,
+  error: null,
+  firstFetch: false,
+};
 
 export const userSlice = createSlice({
   name: "currentUser",
@@ -29,10 +35,14 @@ export const userSlice = createSlice({
     setError(state, { payload }) {
       state.error = payload;
     },
+    setFirstFetch(state, { payload }) {
+      state.firstFetch = payload;
+    },
   },
 });
 
-export const { setValue, getValue, setLoading, setError } = userSlice.actions;
+export const { setValue, getValue, setLoading, setError, setFirstFetch } =
+  userSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectCurrentUser = (state: RootState) => state.currentUser;

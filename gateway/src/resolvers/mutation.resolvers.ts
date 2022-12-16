@@ -18,15 +18,6 @@ const mutationRelatedResolvers: MutationResolvers = {
     { input: { username, name, email, password } },
     { dataSources }
   ) => {
-    //TODO: check if there is already a user with that username in auth or userRes, we'll mock it up right now
-    //
-
-    const alreadyUser = false;
-    const alreadyAuthUser = false;
-    if (alreadyAuthUser || alreadyUser) {
-      throw new GraphQLError("This user already exists");
-    }
-
     const authPostRes = await dataSources.authAPI.signUp({
       username,
       password,
@@ -71,15 +62,17 @@ const mutationRelatedResolvers: MutationResolvers = {
   createMessage: async (_, { input }, { dataSources }) => {
     const { chatId, content, sentAt, sentById } = input;
     const viewer = await dataSources.getViewer();
+    console.log("VIEWER", viewer);
     if (!viewer) {
       throw new GraphQLError("Not logged in user");
     }
+    //TODO: take away userId
     const createMessageRes = await dataSources.chatAPI.createMessage({
       chatId,
       userId: viewer._id,
       content,
       sentAt,
-      sentBy: sentById,
+      sentBy: viewer._id,
     });
     if (isErrorResponse(createMessageRes)) {
       throw new GraphQLError(createMessageRes.error.message);

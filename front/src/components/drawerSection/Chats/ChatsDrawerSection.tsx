@@ -40,11 +40,13 @@ export default function ChatDrawerSection() {
   function handleSearch(ev: ChangeEvent<HTMLInputElement>) {
     dispatch(searchChats(ev.target.value));
   }
-  function handleEscapeOnSearch(ev: KeyboardEvent) {
+  const handleEscapeOnSearch: React.KeyboardEventHandler<HTMLDivElement> = (
+    ev
+  ) => {
     if (ev.key === "Escape") {
       dispatch(searchChats(""));
     }
-  }
+  };
 
   let component: React.ReactElement;
   if (loading) {

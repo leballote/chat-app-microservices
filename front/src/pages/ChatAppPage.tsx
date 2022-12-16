@@ -1,7 +1,7 @@
-import { gql, useSubscription } from "@apollo/client";
+import { gql, useApolloClient, useSubscription } from "@apollo/client";
 import Box from "@mui/material/Box";
 import i18next from "i18next";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import {
   getChatPreview,
@@ -21,6 +21,7 @@ import {
   NotificationType,
 } from "../app/features/appView/types";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import { wsLink } from "../client";
 import ChatSection from "../components/chatSection/ChatSection";
 import SideBar from "../components/drawerSection/SideBar";
 import ErrorChat from "../components/feedback/ErrorChat";
@@ -88,16 +89,29 @@ const FRIENDSHIP_RESPONSE_RECEIVED = gql`
 `;
 
 export default function ChatAppPage() {
-  const user = useContext(CurrentUserContext);
+  // const user = useContext(CurrentUserContext);
+  const user = useAppSelector((state) => state.currentUser.value);
+  // const chatsPreviews = useAppSelector((state) => state.chatsPreviews.value);
   const { value: chats } = useAppSelector((state) => state.chatsPreviews);
+  const { connected } = useAppSelector((state) => state.wsConnection);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const currentChatState = useAppSelector((state) => state.currentChat);
+  useEffect(() => {
+    return () => {
+      wsLink.client.terminate();
+    };
+  }, []);
 
   useSubscription(MESSAGE_CREATED, {
+    fetchPolicy: "no-cache",
+    onComplete: () => {
+      console.log("PPPPUEDE SER");
+    },
     onData: ({ data }) => {
-      const chatId = data.data?.messageCreated.message.chat.id;
+      console.log("DATA, MESSAGE_CREATED: ", data.data.messageCreated);
+      const chatId = data.data?.messageCreated.message?.chat.id;
       if (data.data?.messageCreated.message) {
         if (
           data.data?.messageCreated.message.chat.id ==
@@ -122,6 +136,7 @@ export default function ChatAppPage() {
   });
 
   useSubscription(FRIENDSHIP_REQUEST_RECEIVED, {
+    fetchPolicy: "no-cache",
     onData: ({ data }) => {
       const friendshipRequestReceived = data.data?.friendshipRequestReceived;
       const { accepterUser, requesterUser } = friendshipRequestReceived;
@@ -149,6 +164,7 @@ export default function ChatAppPage() {
   });
 
   useSubscription(FRIENDSHIP_RESPONSE_RECEIVED, {
+    fetchPolicy: "no-cache",
     onData: ({ data }) => {
       const friendshipResponseReceived = data.data?.friendshipResponseReceived;
       const { accepterUser, requesterUser, accept } =
@@ -196,7 +212,10 @@ export default function ChatAppPage() {
     <Box sx={{ display: "flex" }}>
       <SideBar />
       <Routes>
-        <Route path="chat/:id" element={<ChatSection />} />
+        <Route
+          path="chat/:id"
+          element={<ChatSection chatFooterLoading={!connected} />}
+        />
         <Route path="/app/error" element={<ErrorChat />} />
       </Routes>
     </Box>

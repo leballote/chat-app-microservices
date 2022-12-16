@@ -60,11 +60,13 @@ export default function MainContactsSubsection({ onBackClick }: Props) {
   function handleSearch(ev: ChangeEvent<HTMLInputElement>) {
     dispatch(searchContacts(ev.target.value));
   }
-  function handleEscapeOnSearch(ev: KeyboardEvent) {
+  const handleEscapeOnSearch: React.KeyboardEventHandler<HTMLDivElement> = (
+    ev
+  ) => {
     if (ev.key === "Escape") {
       dispatch(searchContacts(""));
     }
-  }
+  };
 
   useEffect(() => {
     if (getOrCreateChatError) {

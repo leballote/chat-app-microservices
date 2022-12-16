@@ -1,0 +1,6 @@
+[subscription not established]
+Steps to replicate:
+- create an account
+- send a friendship request from that account
+- the other person accepts the friendship
+- finnally the first person sends a message to the accepter, it doesn't get reflected

@@ -95,11 +95,14 @@ const wsServer = new WebSocketServer({
 const serverCleanup = useServer(
   {
     schema,
-    context: async (ctx) => {
+    // onSubscribe: async (...args) => {
+    // },
+    context: async (ctx, msg, args) => {
       const { cache } = server;
       const { jwt_token } = ctx.extra.request.headers.cookie
         ? cookie.parse(ctx.extra.request.headers.cookie)
         : { jwt_token: null };
+
       let userContext = { user: null };
 
       const authRes = await new AuthAPI().authorize(jwt_token);
@@ -109,6 +112,14 @@ const serverCleanup = useServer(
         } = authRes;
         userContext.user = user;
       }
+      const now = new Date();
+      console.group("subs");
+      console.log(
+        `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
+        "AUTH_RES",
+        authRes
+      );
+      console.groupEnd();
       return {
         dataSources: {
           chatAPI: new ChatAPI({ cache }),

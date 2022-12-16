@@ -4,16 +4,19 @@ import {
   setValue as setCurrentUser,
   setLoading,
   setError,
+  setFirstFetch,
 } from "../../features/appData/currentUserSlice";
 import { requestGetUser } from "../requests/currentUser";
 
 export function* handleGetUser(_action: Action): any {
   try {
-    put(setLoading(true));
+    yield put(setError(null));
+    yield put(setLoading(true));
     const response = yield call(requestGetUser);
     const { data } = response;
     const { viewer } = data;
     yield put(setCurrentUser(viewer));
+    yield put(setFirstFetch(true));
   } catch (error) {
     let message;
     yield put(setLoading(false));
@@ -23,5 +26,6 @@ export function* handleGetUser(_action: Action): any {
       message = "something went wrong";
     }
     yield put(setError({ message }));
+    yield put(setFirstFetch(true));
   }
 }

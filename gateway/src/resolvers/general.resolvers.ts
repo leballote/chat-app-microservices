@@ -249,7 +249,6 @@ const resolvers: Resolvers = {
       if (isErrorResponse(chatRes)) {
         throw new GraphQLError(chatRes.error.message);
       }
-      console.log(chatRes.data);
 
       return chatRes.data;
     },

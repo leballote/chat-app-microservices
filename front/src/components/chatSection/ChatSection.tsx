@@ -170,7 +170,10 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
   );
 }
 
-function ChatsFooter({ height }: { height: string | number }) {
+type ChatFooterProps = {
+  loading?: boolean;
+} & WithHeight;
+function ChatFooter({ height, loading = false }: ChatFooterProps) {
   const dispatch = useAppDispatch();
   const chat = useContext(ChatContext);
   if (!chat) return null;
@@ -223,6 +226,10 @@ function ChatsFooter({ height }: { height: string | number }) {
     }
   }
 
+  useEffect(() => {
+    messageTextInput.current?.focus();
+  }, []);
+
   return (
     <Paper
       elevation={4}
@@ -236,7 +243,6 @@ function ChatsFooter({ height }: { height: string | number }) {
         height,
         gap: 2,
       }}
-      // gap={2}
     >
       {/* <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }}>
         <ImageIcon />
@@ -250,6 +256,7 @@ function ChatsFooter({ height }: { height: string | number }) {
         InputProps={{ onKeyDown: handleKeyDown }}
         inputProps={{ maxLength: 1000 }}
         inputRef={messageTextInput}
+        disabled={loading}
       />
       <Button
         sx={{
@@ -260,14 +267,20 @@ function ChatsFooter({ height }: { height: string | number }) {
           },
         }}
         onClick={handleSendClick}
+        disabled={loading}
       >
         <SendIcon />
       </Button>
     </Paper>
   );
 }
+type ChatSectionProps = {
+  chatFooterLoading?: boolean;
+};
 
-export default function ChatSection() {
+export default function ChatSection({
+  chatFooterLoading = false,
+}: ChatSectionProps) {
   const { id } = useParams();
   const dispatch = useAppDispatch();
   const chatAreaRef = useRef<HTMLElement>(null);
@@ -284,6 +297,8 @@ export default function ChatSection() {
     error = { message: "Chat not defined" };
   }
 
+  const { connected } = useAppSelector((state) => state.wsConnection);
+
   useEffect(() => {
     if (chatId) {
       dispatch(getCurrentChatValue({ chatId }));
@@ -299,7 +314,7 @@ export default function ChatSection() {
   }, [error, chat, loading]);
 
   let component;
-  if (loading) {
+  if (loading || !connected) {
     component = <ChatLoading />;
   } else if (error) {
     component = <Navigate to={"/chatError"} />;
@@ -322,7 +337,7 @@ export default function ChatSection() {
             height={"70vh"}
             chatAreaRef={chatAreaRef}
           />
-          <ChatsFooter height={"20vh"} />
+          <ChatFooter height={"20vh"} loading={chatFooterLoading} />
         </ChatContext.Provider>
         <ChatDetailsModal />
       </Box>

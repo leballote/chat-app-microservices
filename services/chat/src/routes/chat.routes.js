@@ -96,7 +96,7 @@ router.post("/chat", async (req, res) => {
     const chatRels = [];
     for (const { id, admin = false } of participants) {
       const chatRel = {
-        user: { id, admin, participantSince: chat.createdAt },
+        user: { id, admin, participantSince: chat.createdAt, status: "active" },
         chat: { id: chat._id },
       };
       chatRels.push(chatRel);
@@ -291,6 +291,13 @@ router.delete("/chat/:id", async (req, res) => {
   const { id } = req.params;
   try {
     const chat = await Chat.findByIdAndDelete(id);
+    // const chat = await Chat.findById(id);
+    // const chat = await Chat.findByIdAndUpdate(
+    //   id,
+    //   { status: "former" },
+    //   { new: true }
+    // );
+
     return res.status(204).send({ data: chat.toObject() });
   } catch (e) {
     return res.status(500).send(errors.serverError);

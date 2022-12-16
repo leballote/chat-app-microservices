@@ -24,6 +24,7 @@ import {
   setNewGroupDrawerSection,
   setSettingsDrawerSection,
 } from "../../app/features/appView/sideBarSlice";
+import { triggerLogout } from "../../app/features/appData/authSlice";
 
 interface Props {
   onContactsClick: (ev: React.MouseEvent<HTMLElement>) => void;
@@ -38,18 +39,26 @@ export default function MainDrawerView(props: Props) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const LOGOUT = gql`
-    mutation {
-      logout {
-        success
-      }
-    }
-  `;
-  const [logoutMutationFn, { loading: loadingLogOut, error: errorLogOut }] =
-    useMutation(LOGOUT);
+  // const LOGOUT = gql`
+  //   mutation {
+  //     logout {
+  //       success
+  //     }
+  //   }
+  // `;
+  // const [logoutMutationFn, { loading: loadingLogOut, error: errorLogOut }] =
+  //   useMutation(LOGOUT);
   const { moreDropdownActive: moreMenuOpen } = useAppSelector(
     (state) => state.mainSectionDrawer
   );
+
+  const {
+    logoutAction: {
+      error: logoutError,
+      loading: logoutLoading,
+      value: logoutResponse,
+    },
+  } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     setAnchorEl(anchorRef.current);
@@ -64,11 +73,11 @@ export default function MainDrawerView(props: Props) {
   }
 
   async function handleLogOut() {
-    try {
-      await logoutMutationFn();
-      dispatch(resetMainDrawerState());
-      dispatch(getCurrentUserValue());
-    } catch (e) {}
+    // try {
+    //   await logoutMutationFn();
+    //   dispatch(getCurrentUserValue());
+    // } catch (e) {}
+    dispatch(triggerLogout());
   }
 
   function handleNewGroup() {
@@ -80,6 +89,12 @@ export default function MainDrawerView(props: Props) {
     dispatch(resetMainDrawerState());
     dispatch(setSettingsDrawerSection());
   }
+
+  // useEffect(() => {
+  //   if (logoutResponse?.success) {
+  //     dispatch(getCurrentUserValue());
+  //   }
+  // }, [logoutResponse]);
 
   return userInfo ? (
     <>

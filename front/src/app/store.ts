@@ -1,4 +1,9 @@
-import { configureStore } from "@reduxjs/toolkit";
+import {
+  configureStore,
+  combineReducers,
+  Action,
+  Reducer,
+} from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
 import chatsPreviewsReducer from "./features/appData/chatsPreviewsSlice";
 import contactsPreviewsReducer from "./features/appData/contactsPreviewsSlice";
@@ -23,50 +28,68 @@ import chatsDrawerSectionReducer from "./features/appView/chatsDrawerSection/cha
 
 import { watcherSaga } from "./sagas/rootSaga";
 import notificationsReducer from "./features/appView/notifications/notificationsSlice";
+import authReducer from "./features/appData/authSlice";
+import wsConnectionReducer from "./features/appData/wsConnectionSlice";
 
-// const combinedReducer = combineReducers({
+const combinedReducer = combineReducers({
+  //appData
+  currentUser: userReducer,
 
-// })
+  currentChat: currentChatReducer,
 
-const sagaMiddleware = createSagaMiddleware();
-export const store = configureStore({
-  reducer: {
-    //appData
-    currentUser: userReducer,
+  chatsPreviews: chatsPreviewsReducer,
 
-    currentChat: currentChatReducer,
+  contactsPreviews: contactsPreviewsReducer,
 
-    chatsPreviews: chatsPreviewsReducer,
+  settingsSection: settingsSectionReducer,
+  friendRequestsPreviews: friendRequestsPreviewsReducer,
+  //appView
+  chatSection: chatSectionReducer,
 
-    contactsPreviews: contactsPreviewsReducer,
+  sideBar: sideBarReducer,
 
-    settingsSection: settingsSectionReducer,
-    friendRequestsPreviews: friendRequestsPreviewsReducer,
-    //appView
-    chatSection: chatSectionReducer,
+  contactsDrawerSubsection: contactsDrawerSectionReducer,
+  chatsDrawerSubsection: chatsDrawerSectionReducer,
+  mainContactsDrawerSubsection: mainContactsDrawerSubsectionReducer,
+  friendshipRequestsDrawerSubsection: friendshipRequestsDrawerSubsectionReducer,
 
-    sideBar: sideBarReducer,
+  newGroupSectionDrawer: newGroupSectionDrawerReducer,
+  currentUserProfilePage: currentUserProfilePageReducer,
+  mainSectionDrawer: mainSectionDrawerReducer,
+  chatDetailsModalSection: chatDetailsModalReducer,
 
-    contactsDrawerSubsection: contactsDrawerSectionReducer,
-    chatsDrawerSubsection: chatsDrawerSectionReducer,
-    mainContactsDrawerSubsection: mainContactsDrawerSubsectionReducer,
-    friendshipRequestsDrawerSubsection:
-      friendshipRequestsDrawerSubsectionReducer,
-
-    newGroupSectionDrawer: newGroupSectionDrawerReducer,
-    currentUserProfilePage: currentUserProfilePageReducer,
-    mainSectionDrawer: mainSectionDrawerReducer,
-    chatDetailsModalSection: chatDetailsModalReducer,
-
-    notifications: notificationsReducer,
-  },
-  middleware: (getDefaultMiddleware) => [
-    ...getDefaultMiddleware({ thunk: false }),
-    sagaMiddleware,
-  ],
+  notifications: notificationsReducer,
+  auth: authReducer,
+  wsConnection: wsConnectionReducer,
 });
 
-sagaMiddleware.run(watcherSaga);
+function customCreateStore() {
+  const rootReducer: typeof combinedReducer = (state, action) => {
+    if (action.type === "root/resetState") {
+      return { ...getInitialState() };
+    }
+    return combinedReducer(state, action);
+  };
+
+  const sagaMiddleware = createSagaMiddleware();
+  const store = configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) => [
+      ...getDefaultMiddleware({ thunk: false }),
+      sagaMiddleware,
+    ],
+  });
+
+  sagaMiddleware.run(watcherSaga);
+
+  const initialState = store.getState();
+  function getInitialState() {
+    return initialState;
+  }
+  return store;
+}
+
+export const store = customCreateStore();
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;

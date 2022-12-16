@@ -8,11 +8,13 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
+import { createClient } from "graphql-ws";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { getValue as getCurrentUserValue } from "../app/features/appData/currentUserSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
+import client, { wsClient, wsLink } from "../client";
 
 const LOGIN = gql`
   mutation Login($username: String!, $password: String!) {
@@ -26,7 +28,9 @@ export default function LoginPage() {
   const usernameInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
   //TODO: move this into a saga
-  const [mutationFunction, { data, loading, error }] = useMutation(LOGIN);
+  const [mutationFunction, { data, loading, error }] = useMutation(LOGIN, {
+    fetchPolicy: "no-cache",
+  });
   // const user = useContext(CurrentUserContext);
   const user = useAppSelector((state) => state.currentUser.value);
   const dispatch = useAppDispatch();

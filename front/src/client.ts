@@ -9,19 +9,31 @@ const httpLink = new HttpLink({
   credentials: "same-origin",
 });
 
+import { store } from "./app/store";
+import { setWsConnected } from "./app/features/appData/wsConnectionSlice";
+
 const WS_CLIENT_URL =
   window.location.protocol == "http:"
     ? `ws://${window.location.host}/subs`
     : `wss://${window.location.host}/subs`;
 
-const wsLink = new GraphQLWsLink(
-  createClient({
-    url: WS_CLIENT_URL,
-    connectionParams: {
-      credentials: "same-origin",
+export const wsClient = createClient({
+  url: WS_CLIENT_URL,
+
+  on: {
+    closed: () => {
+      store.dispatch(setWsConnected(false));
     },
-  })
-);
+    connected: () => {
+      store.dispatch(setWsConnected(true));
+    },
+  },
+  connectionParams: {
+    credentials: "same-origin",
+  },
+});
+
+const wsLink = new GraphQLWsLink(wsClient);
 
 const splitLink = split(
   ({ query }) => {
@@ -45,5 +57,7 @@ const client = new ApolloClient({
 
   cache: new InMemoryCache(),
 });
+
+export { wsLink, httpLink };
 
 export default client;
