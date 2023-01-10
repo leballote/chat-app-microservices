@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createNamespacedActionCreator } from "../../utils";
 
 type ProfiledUser = {
   id: string;
@@ -26,10 +27,6 @@ export const currentUserProfilePage = createSlice({
   name: "currentUserProfilePage",
   initialState,
   reducers: {
-    getValue(state, _action: PayloadAction<string>) {
-      //TODO: not sure if this is needed
-      state.loading = true;
-    },
     setValue(state, { payload }: PayloadAction<ProfiledUser | null>) {
       state.value = payload;
       state.loading = false;
@@ -46,7 +43,10 @@ export const currentUserProfilePage = createSlice({
   },
 });
 
-export const { setValue, getValue, setLoading, setError, resetState } =
+const sliceCreateAction = createNamespacedActionCreator(currentUserProfilePage);
+
+export const getValue = sliceCreateAction<string>("getValue");
+export const { setValue, setLoading, setError, resetState } =
   currentUserProfilePage.actions;
 
 export default currentUserProfilePage.reducer;

@@ -1,21 +1,7 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
+import { GET_MORE_MESSAGES } from "../../graphql/queries";
 import { store } from "../../store";
 
-const GET_USER_DATA = gql`
-  query GetUser($input: GetMessagesInput!) {
-    messages(input: $input) {
-      id
-      content
-      sentAt
-      sentBy {
-        id
-      }
-    }
-  }
-`;
-
-//TODO: solve this any
 export async function loadMessages(action?: {
   limit?: number;
   start?: string;
@@ -23,10 +9,9 @@ export async function loadMessages(action?: {
 }): Promise<any> {
   const limit = action?.limit;
   const offset = action?.offset;
-  const { messagesBatchSize, messagesNoBatch, value } =
-    store.getState().currentChat;
+  const { messagesBatchSize, value } = store.getState().currentChat;
   return client.query({
-    query: GET_USER_DATA,
+    query: GET_MORE_MESSAGES,
     fetchPolicy: "no-cache",
     variables: {
       input: {

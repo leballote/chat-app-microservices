@@ -11,13 +11,14 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch } from "../../../app/hooks";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
-import { useMutation, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { setMainSubsection } from "../../../app/features/appData/settingsSectionSlice";
+import { SET_LANGUAGE } from "../../../app/graphql/mutations";
 
 const LngAbbreviationMapping: { [code: string]: string } = {
   en: "English",
-  es: "Spanish",
-  de: "German",
+  es: "Español",
+  de: "Deutsch",
 };
 
 const languageCodeNamePairs = (["de", "en", "es"] ?? [])
@@ -26,24 +27,14 @@ const languageCodeNamePairs = (["de", "en", "es"] ?? [])
       ? [[code, LngAbbreviationMapping[code]]]
       : []
   )
-  .sort(([code1, language1], [code2, language2]) => {
+  .sort(([, language1], [, language2]) => {
     return language1 > language2 ? 1 : -1;
   });
-
-const SET_LANGUAGE = gql`
-  mutation SetLanguage($input: SetLanguageInput) {
-    setLanguage(input: $input) {
-      language
-      success
-    }
-  }
-`;
 
 export default function LanguageSettingsSubsection() {
   //TODO: change for const
   const dispatch = useAppDispatch();
-  const [setLanguageMutationFn, { loading, data, error }] =
-    useMutation(SET_LANGUAGE);
+  const [setLanguageMutationFn] = useMutation(SET_LANGUAGE);
   const { t } = useTranslation();
 
   async function handleBackClick() {

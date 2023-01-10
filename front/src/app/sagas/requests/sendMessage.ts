@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
+import { SEND_MESSAGE } from "../../graphql/mutations";
 
 type MessageInput = {
   content: string;
@@ -15,20 +15,6 @@ export async function requestSendMessage({
   sentBy,
   sentAt,
 }: MessageInput): Promise<any> {
-  const SEND_MESSAGE = gql`
-    mutation CreateMessage($input: CreateMessageInput!) {
-      createMessage(input: $input) {
-        message {
-          id
-          content
-          sentAt
-          sentBy {
-            id
-          }
-        }
-      }
-    }
-  `;
   return await client.mutate({
     mutation: SEND_MESSAGE,
     variables: {

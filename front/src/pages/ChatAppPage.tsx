@@ -1,7 +1,7 @@
-import { gql, useApolloClient, useSubscription } from "@apollo/client";
+import { useSubscription } from "@apollo/client";
 import Box from "@mui/material/Box";
 import i18next from "i18next";
-import { useContext, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import {
   getChatPreview,
@@ -15,81 +15,24 @@ import {
 } from "../app/features/appData/friendRequestsPreviewsSlice";
 import { triggerNewNotification } from "../app/features/appView/notifications/notificationsSlice";
 import {
-  appNotificationManager,
   FriendRequestReceivedAppNotification,
   FriendRequestAcceptedAppNotification,
   NotificationType,
 } from "../app/features/appView/types";
+import { appNotificationManager } from "../app/features/appView/utils";
+import {
+  FRIENDSHIP_REQUEST_RECEIVED,
+  FRIENDSHIP_RESPONSE_RECEIVED,
+  MESSAGE_CREATED,
+} from "../app/graphql/subscriptions";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { wsLink } from "../client";
 import ChatSection from "../components/chatSection/ChatSection";
 import SideBar from "../components/drawerSection/SideBar";
 import ErrorChat from "../components/feedback/ErrorChat";
-import AppNotifications from "../components/notifications/AppNotifications";
-import { CurrentUserContext } from "../contexts";
-
-const MESSAGE_CREATED = gql`
-  subscription {
-    messageCreated {
-      message {
-        id
-        content
-        sentAt
-        sentBy {
-          id
-        }
-        chat {
-          id
-        }
-      }
-    }
-  }
-`;
-
-const FRIENDSHIP_REQUEST_RECEIVED = gql`
-  subscription FriendshipRequestReceived {
-    friendshipRequestReceived {
-      requesterUser {
-        id
-        name
-        username
-        avatar
-        phrase
-      }
-      accepterUser {
-        id
-        name
-        username
-        avatar
-        phrase
-      }
-    }
-  }
-`;
-const FRIENDSHIP_RESPONSE_RECEIVED = gql`
-  subscription FriendshipResponseRecevied {
-    friendshipResponseReceived {
-      accepterUser {
-        id
-        name
-        username
-        avatar
-        phrase
-      }
-      requesterUser {
-        id
-        name
-        username
-        avatar
-        phrase
-      }
-      accept
-    }
-  }
-`;
 
 export default function ChatAppPage() {
-  // const user = useContext(CurrentUserContext);
+  // const {value: user} = useAppSelector(state => state.currentUser);
   const user = useAppSelector((state) => state.currentUser.value);
   // const chatsPreviews = useAppSelector((state) => state.chatsPreviews.value);
   const { value: chats } = useAppSelector((state) => state.chatsPreviews);

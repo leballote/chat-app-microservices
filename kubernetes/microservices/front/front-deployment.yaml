@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front-deployment
+  labels:
+    microservice: front
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front
+  template:
+    metadata:
+      name: front
+      labels:
+        app: front
+    spec:
+      volumes:
+        - name: nginx-config-volume
+          configMap:
+            name: nginx-configmap
+        - name: nginx-ssl-cert-volume
+          configMap:
+            name: nginx-ssl-cert-configmap
+        - name: nginx-ssl-key-volume
+          secret:
+            secretName: nginx-ssl-key-secret
+      containers:
+        - name: front
+          image: leballote/chat_front
+          env:
+            # - name: PORT
+            #   valueFrom:
+            #     configMapKeyRef:
+            #       name: chat-micro-configmap
+            #       key: port
+            - name: FRONT_DOMAIN
+              valueFrom:
+                configMapKeyRef:
+                  name: front-general-configmap
+                  key: front_domain
+            - name: WS_PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                  name: front-general-configmap
+                  key: ws_protocol
+            - name: VITE_GRAPHQL_WS_URL
+              value: "$(ws_protocol)://$(FRONT_DOMAIN)/subs"
+          # command: ["tail", "-f", "/dev/null"]
+          volumeMounts:
+            - name: nginx-config-volume
+              mountPath: /etc/nginx/conf.d/
+              readOnly: true
+            - name: nginx-ssl-key-volume
+              mountPath: /etc/ssl/private/
+            - name: nginx-ssl-cert-volume
+              mountPath: /etc/ssl/certs/
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 443
+              name: https
+              protocol: TCP

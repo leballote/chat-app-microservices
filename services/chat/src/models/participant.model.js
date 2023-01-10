@@ -7,19 +7,6 @@ const participantSchema = new mongoose.Schema({
       id: { type: String, required: true },
       admin: { type: Boolean, required: true },
       participantSince: { type: mongoose.SchemaTypes.Date, required: true },
-      // status: {
-      //   type: String,
-      //   required: true,
-      //   default: "active",
-      //   validate: {
-      //     validator(status) {
-      //       return ["former", "active"].includes(status);
-      //     },
-      //     message() {
-      //       return "Not valid status";
-      //     },
-      //   },
-      // },
     },
     required: true,
   },

@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
+import { REMOVE_FRIEND } from "../../graphql/mutations";
 
 type RemoveFriendInput = {
   userToRemoveId: string;
@@ -9,17 +9,6 @@ type RemoveFriendInput = {
 export async function removeFriend({
   userToRemoveId,
 }: RemoveFriendInput): Promise<any> {
-  const REMOVE_FRIEND = gql`
-    mutation RemoveFriendship($input: RemoveFriendshipInput!) {
-      removeFriendship(input: $input) {
-        userRemoved {
-          id
-          username
-        }
-      }
-    }
-  `;
-
   return await client.mutate({
     mutation: REMOVE_FRIEND,
     variables: {

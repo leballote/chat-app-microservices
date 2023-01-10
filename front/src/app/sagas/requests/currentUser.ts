@@ -1,21 +1,5 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
-
-const GET_USER_DATA = gql`
-  query GetUser {
-    viewer {
-      id
-      username
-      name
-      phrase
-      status
-      avatar
-      settings {
-        language
-      }
-    }
-  }
-`;
+import { GET_USER_DATA } from "../../graphql/queries";
 
 //TODO: solve this any
 export async function requestGetUser(): Promise<any> {

@@ -20,6 +20,6 @@ export function* handleSendMessage(action: PayloadAction<MessageInput>): any {
     } = data;
     // yield put(pushMessage(message));
   } catch (error) {
-    //TODO: see how to handle this error
+    // TODO: see how to handle this error
   }
 }

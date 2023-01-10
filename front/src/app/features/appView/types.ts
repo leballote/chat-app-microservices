@@ -1,7 +1,4 @@
 import { User } from "../../../types/user.types";
-import { AutoIncrementIndexCreator } from "../../utils";
-
-export const indexCreator_ = new AutoIncrementIndexCreator();
 
 export enum SideBarSection {
   MAIN,
@@ -57,23 +54,6 @@ export interface GenericErrorAppNotification extends AppNotification {
   notificationType: NotificationType.GENERIC_ERROR;
   message: string;
 }
-
-export class AppNotificationManager {
-  indexCreator: AutoIncrementIndexCreator = indexCreator_;
-
-  createNotification({
-    notification,
-  }: {
-    notification: Omit<AppNotification, "id">;
-  }): AppNotification {
-    return {
-      ...notification,
-      id: this.indexCreator.generateIndex(),
-    };
-  }
-}
-
-export const appNotificationManager = new AppNotificationManager();
 
 export enum NotificationType {
   FRIEND_REQUEST_RECEIVED,

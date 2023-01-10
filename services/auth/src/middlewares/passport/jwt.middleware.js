@@ -1,4 +1,5 @@
 const passport = require("passport");
+const { appErrors } = require("../../errors");
 const JwtStrategy = require("passport-jwt").Strategy;
 const ExtractJwt = require("passport-jwt").ExtractJwt;
 const AuthUser = require("../../models/auth.model");
@@ -14,22 +15,21 @@ passport.use(
   new JwtStrategy(opts, async function (payload, done) {
     try {
       const user = await AuthUser.findOne({ username: payload.user.username });
-      if (!user)
-        return done(null, false, { error: { message: "User not found" } });
+      if (!user) return done(null, false, appErrors.authenticationError());
       return done(null, user);
     } catch (error) {
-      done(error);
+      done(appErrors.serverError());
     }
   })
 );
 
 function jwtMiddleware(req, res, next) {
-  const pre = passport.authenticate("jwt", function (err, user, info) {
+  const pre = passport.authenticate("jwt", function (err, user) {
     if (err) {
-      return res.send({ error: { message: "Server error" } });
+      return res.send(appErrors.serverError());
     }
     if (!user) {
-      return res.send({ error: { message: "Unauthorized" } });
+      return res.send(appErrors.authenticationError());
     }
 
     req.login(user, { session: false }, function (err) {

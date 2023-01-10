@@ -5,10 +5,7 @@ import ListItemText from "@mui/material/ListItemText";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
 
-import {
-  Link as RouterLink,
-  LinkProps as RouterLinkProps,
-} from "react-router-dom";
+import { Link as RouterLink } from "react-router-dom";
 
 export interface Props {
   id: string;
@@ -25,20 +22,14 @@ export interface Props {
   };
 }
 
-export default function ChatPreview({
-  id,
-  avatar,
-  type,
-  name,
-  to,
-  lastMessage,
-}: Props) {
+export default function ChatPreview({ id, avatar, name, lastMessage }: Props) {
   let previewSection: React.ReactElement;
-  let { sentBy, content, sentAt } = lastMessage || {
-    sentBy: "",
+  const { content } = lastMessage || {
     content: "",
     sentAt: "",
   };
+
+  let { sentAt } = lastMessage || { sentAt: "" };
   if (typeof sentAt === "string") sentAt = new Date(sentAt);
   if (lastMessage) {
     previewSection = (

@@ -3,7 +3,6 @@ import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { CurrentUserContext } from "./contexts";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
 import { getValue as getCurrentUserValue } from "./app/features/appData/currentUserSlice";
 import LoginPage from "./pages/LoginPage";
@@ -13,10 +12,10 @@ import LinearDeterminate from "./components/feedback/LinearDeterminate";
 import Typography from "@mui/material/Typography";
 import { triggerNewNotification } from "./app/features/appView/notifications/notificationsSlice";
 import {
-  appNotificationManager,
   GenericErrorAppNotification,
   NotificationType,
 } from "./app/features/appView/types";
+import { appNotificationManager } from "./app/features/appView/utils";
 import AppNotifications from "./components/notifications/AppNotifications";
 
 const App: React.FunctionComponent = function () {
@@ -74,16 +73,14 @@ const App: React.FunctionComponent = function () {
     component = (
       <BrowserRouter>
         <CssBaseline />
-        <CurrentUserContext.Provider value={currentUser}>
-          <Routes>
-            <Route path="/app/*" element={<ChatAppPage />} />
-            <Route path="/auth">
-              <Route path="login" element={<LoginPage />} />
-              <Route path="signup" element={<SignupPage />} />
-            </Route>
-          </Routes>
-          <AppNotifications />
-        </CurrentUserContext.Provider>
+        <Routes>
+          <Route path="/app/*" element={<ChatAppPage />} />
+          <Route path="/auth">
+            <Route path="login" element={<LoginPage />} />
+            <Route path="signup" element={<SignupPage />} />
+          </Route>
+        </Routes>
+        <AppNotifications />
       </BrowserRouter>
     );
   }

@@ -5,7 +5,7 @@ export type WsConnectionState = {
 };
 
 const initialState: WsConnectionState = {
-  connected: true,
+  connected: false,
 };
 
 export const wsConnectionSlice = createSlice({

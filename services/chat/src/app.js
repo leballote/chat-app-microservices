@@ -1,6 +1,7 @@
 require("./utils/validateEnvVariables")();
 
 const express = require("express");
+const appLogger = require("./middlewares/appLogger.middleware");
 const mongoose = require("mongoose");
 mongoose.Schema.Types.String.checkRequired((v) => typeof v === "string");
 
@@ -13,6 +14,7 @@ const MONGODB_CONNECTION_STRING = process.env.MONGODB_CONNECTION_STRING;
 const app = express();
 
 app.use(express.json());
+app.use(appLogger);
 app.use(chatRouter);
 app.use("/participant", participantRouter);
 app.use(messageRouter);

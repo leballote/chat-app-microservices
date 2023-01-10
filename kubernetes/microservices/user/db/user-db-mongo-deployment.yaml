@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-db-mongo-deployment
+  labels:
+    app: user-db-mongo
+spec:
+  #TODO: you can only mount one volume in this manner, which only allow for one replica
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-db-mongo
+  template:
+    metadata:
+      name: user-db-mongo-pod
+      labels:
+        app: user-db-mongo
+    spec:
+      volumes:
+        - name: user-db-mongo-data
+          persistentVolumeClaim:
+            claimName: user-db-mongo-pvc
+      containers:
+        - image: mongo
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-mongo-secrets
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-mongo-secrets
+                  key: password
+          name: mongodb
+          volumeMounts:
+            - name: user-db-mongo-data
+              mountPath: /data/db
+          ports:
+            - containerPort: 27017
+              protocol: TCP

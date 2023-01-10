@@ -2,14 +2,14 @@ const Chat = require("../models/chat.model");
 const Participant = require("../models/participant.model");
 const IndividualRel = require("../models/individualRel.model");
 const { default: mongoose } = require("mongoose");
+const { appErrors } = require("../errors");
 
 const router = require("express").Router();
 
 const errors = {
-  serverError: { error: { message: "Server Error" } },
+  serverError: appErrors.serverError(),
 };
 
-//TODO: I think this could have been way easier with two models for individual chats and group chats
 router.post("/chat", async (req, res) => {
   const { name, type, phrase } = req.body;
   const chatData = { name, type, phrase };

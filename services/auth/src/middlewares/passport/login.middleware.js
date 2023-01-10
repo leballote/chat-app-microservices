@@ -1,7 +1,7 @@
 const passport = require("passport");
 const AuthUser = require("../../models/auth.model");
 const jwt = require("jsonwebtoken");
-const passportLocalMongooseErrors = require("passport-local-mongoose/lib/errors");
+const { appErrors } = require("../../errors");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -9,15 +9,39 @@ passport.use("login", AuthUser.createStrategy());
 
 function loginMiddleware(req, res, next) {
   const pre = passport.authenticate("login", (err, user, info) => {
-    //TODO: I don't know if I want't to send any message info that comes from local-passport-mongoose, but I'll let it like this
-    if (info?.name in passportLocalMongooseErrors) {
-      return res.status(400).send({ error: { message: info?.message } });
+    if (req.body.username === "" || req.body.password === "") {
+      return res.status(401).send(appErrors.missingCredentialsError());
+    }
+    if (req.body.password === "") {
+      return res.status(401).send(appErrors.missingPasswordError());
+    }
+    if (
+      info.name === "IncorrectPasswordError" ||
+      info.name === "IncorrectUsernameError"
+    ) {
+      return res.status(401).send(appErrors.incorrectCredentialsError());
+    }
+    if (info.name === "MissingUsernameError") {
+      return res.status(400).send(appErrors.missingCredentialsError());
+    }
+    if (info.name === "MissingPasswordError") {
+      return res.status(400).send(appErrors.missingCredentialsError());
+    }
+    if (info.name === "AttemptTooSoonError") {
+      return res.status(401).send(appErrors.attemptTooSoonError());
+    }
+    if (info.name === "TooManyAttemptsError") {
+      return res.status(429).send(appErrors.tooManyAttemptsError());
     }
 
-    if (err || !user) {
-      return res
-        .status(400)
-        .send({ error: { message: "Something went wrong" } });
+    console.log({ ERROR: err, USER: user, INFO: info });
+
+    if (err) {
+      return res.status(500).send(appErrors.serverError());
+    }
+
+    if (!user) {
+      return res.status(404).send(appErrors.authenticationError());
     }
 
     req.login(user, { session: false }, async (error) => {

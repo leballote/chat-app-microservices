@@ -6,12 +6,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import { useTranslation } from "react-i18next";
 
 interface Props {
-  value?: string;
   onSearch: (ev: ChangeEvent<HTMLInputElement>) => void;
   onKeyDown: KeyboardEventHandler<HTMLDivElement>;
 }
 
-export default function SearchBar({ onSearch, onKeyDown, value }: Props) {
+export default function SearchBar({ onSearch, onKeyDown }: Props) {
   const { t } = useTranslation();
   return (
     <TextField

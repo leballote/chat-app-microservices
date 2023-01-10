@@ -1,7 +1,10 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const AuthUser = require("../../models/auth.model");
-const { Error: MongooseError } = require("mongoose");
+const { appErrors } = require("../../errors");
+const {
+  handleMongooseSignupErrors,
+} = require("../../errors/handleMongooseErrors");
 
 passport.use(
   "signup",
@@ -25,29 +28,12 @@ passport.use(
 
 function signupMiddleware(req, res, next) {
   const pre = passport.authenticate("signup", function (err, user) {
-    if (err?.code === 11000) {
-      return res
-        .status(400)
-        .send({ error: { message: "Username already exists" } });
-    }
-
-    if (err?.publicMessage) {
-      return res.status(400).send({ error: { message: err.publicMessage } });
-    }
-
-    if (err instanceof MongooseError.ValidationError) {
-      if (err.errors.password) {
-        return res
-          .status(400)
-          .send({ error: { message: err.errors.password.message } });
-      }
-      //TODO: if there is a validation error, see what provides more information and wether it is possible tu just send the messages
-      const errorValue = Object.values(err)[0];
-      return res.status(400).send({ error: { message: errorValue.message } });
+    if (handleMongooseSignupErrors(err, req, res)) {
+      return;
     }
 
     if (err || !user) {
-      return res.status(500).send({ error: { message: "Another error" } });
+      return res.status(500).send(appErrors.serverError());
     }
     req.login(user, { session: false }, (err) => {
       if (err) next(err);

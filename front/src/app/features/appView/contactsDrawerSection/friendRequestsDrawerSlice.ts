@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createNamespacedActionCreator } from "../../../utils";
 
 export type FriendsRequestsSubsectionState = {
   sendFriendRequest: {
@@ -23,19 +24,11 @@ const initialState: FriendsRequestsSubsectionState = {
   },
 };
 
-export const contactsDrawerSection = createSlice({
+export const contactsDrawerSectionSlice = createSlice({
   name: "friendsRequestsSubsection",
   initialState,
   reducers: {
     //TODO: this type could be more specific
-    sendFriendRequest(
-      _,
-      _action: PayloadAction<{
-        userToAdd?: string;
-        userToAddEmail?: string;
-        userToAddUsername?: string;
-      }>
-    ) {},
     setSendFriendRequestValue(
       state,
       { payload }: PayloadAction<AddedFriend | null>
@@ -59,14 +52,21 @@ export const contactsDrawerSection = createSlice({
     },
   },
 });
+const createSliceAction = createNamespacedActionCreator(
+  contactsDrawerSectionSlice
+);
+export const sendFriendRequest = createSliceAction<{
+  userToAdd?: string;
+  userToAddEmail?: string;
+  userToAddUsername?: string;
+}>("sendFriendRequest");
 
 export const {
   resetState,
   setSendFriendRequestValue,
   setSendFriendRequestLoading,
   setSendFriendRequestError,
-  sendFriendRequest,
   resetSendFriendRequest,
-} = contactsDrawerSection.actions;
+} = contactsDrawerSectionSlice.actions;
 
-export default contactsDrawerSection.reducer;
+export default contactsDrawerSectionSlice.reducer;

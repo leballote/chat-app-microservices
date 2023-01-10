@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: graphql-gateway-configmap
+data:
+  port: "4000"
+  chat_uri: "http://chat-micro-svc:6000"
+  user_uri: "http://user-micro-svc:6001"
+  auth_uri: "http://auth-micro-svc:6002"

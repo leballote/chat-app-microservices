@@ -15,13 +15,6 @@ export const chatDetailsModalSection = createSlice({
   name: "chatDetailsModalSection",
   initialState,
   reducers: {
-    //TODO: check if it is better to put the open | close, state here or in chat section
-    // open(state) {
-    //   state.open = true;
-    // },
-    // close(state) {
-    //   state.open = false;
-    // },
     setMainSubsection(state) {
       state.section = Subsection.MAIN;
     },

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { AppError } from "../types";
 
 type AuthState = {
@@ -25,7 +25,6 @@ export const authSlice = createSlice({
   name: "chatDetailsModalSection",
   initialState,
   reducers: {
-    triggerLogout() {},
     setLogoutActionValue(
       state,
       { payload }: PayloadAction<LogoutResponse | null>
@@ -41,8 +40,9 @@ export const authSlice = createSlice({
   },
 });
 
+export const triggerLogout = createAction(`${authSlice.name}/triggerLogout`);
+
 export const {
-  triggerLogout,
   setLogoutActionError,
   setLogoutActionValue,
   setLououtActionLoading,

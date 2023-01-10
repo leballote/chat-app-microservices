@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ContactPreview } from "../../../types/user.types";
 import type { RootState } from "../../store";
 
@@ -22,10 +22,6 @@ export const contactsPreviewsSlice = createSlice({
   name: "contactsPreviews",
   initialState,
   reducers: {
-    getValue(state, _action: PayloadAction<string>) {
-      state.loading = true;
-    },
-    requestRemoveFriend(_, _action: PayloadAction<string>) {},
     setValue(state, { payload }) {
       state.value = payload;
       state.firstFetch = true;
@@ -56,15 +52,20 @@ export const contactsPreviewsSlice = createSlice({
   },
 });
 
+export const getValue = createAction<string>(
+  `${contactsPreviewsSlice.name}/getValue`
+);
+export const requestRemoveFriend = createAction<string>(
+  `${contactsPreviewsSlice.name}/requestRmoveFriend`
+);
+
 export const {
   setValue,
-  getValue,
   setLoading,
   setError,
   resetState,
   addContact,
   removeContact,
-  requestRemoveFriend,
 } = contactsPreviewsSlice.actions;
 
 export const selectContactsPreviews = (state: RootState) =>

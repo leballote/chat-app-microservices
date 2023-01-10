@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-db-mongo-deployment
+  labels:
+    app: chat-db-mongo
+spec:
+  #TODO: you can only mount one volume in this manner, which only allow for one replica
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-db-mongo
+  template:
+    metadata:
+      name: chat-db-mongo-pod
+      labels:
+        app: chat-db-mongo
+    spec:
+      volumes:
+        - name: chat-db-mongo-data
+          persistentVolumeClaim:
+            claimName: chat-db-mongo-pvc
+      containers:
+        - image: mongo
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: chat-db-mongo-secrets
+                  key: username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chat-db-mongo-secrets
+                  key: password
+          name: mongodb
+          volumeMounts:
+            - name: chat-db-mongo-data
+              mountPath: /data/db
+          ports:
+            - containerPort: 27017
+              protocol: TCP

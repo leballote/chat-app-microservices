@@ -7,7 +7,7 @@ import {
   DialogContent,
   Avatar,
 } from "@mui/material";
-import { MouseEventHandler, useContext } from "react";
+import { MouseEventHandler, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
 import { Chat } from "../../types/chat.types";
@@ -15,8 +15,10 @@ import { red } from "@mui/material/colors";
 import { closeDetails } from "../../app/features/appView/chatSectionSlice";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { useDispatch } from "react-redux";
-import { requestRemoveFriend } from "../../app/features/appData/contactsPreviewsSlice";
-import { CurrentUserContext } from "../../contexts";
+import {
+  getValue as getContactsPreviewsValue,
+  requestRemoveFriend,
+} from "../../app/features/appData/contactsPreviewsSlice";
 import GroupDetailsMainSubsection from "./GroupDetailsMainSubsection";
 import AddParticipantsModalSubsection from "./AddParticipantsModalSubsection";
 import { setSubsection } from "../../app/features/appView/chatDetailsModal/chatDetailsModalSlice";
@@ -92,14 +94,23 @@ function IndividualChatDetails({
   participants,
 }: Omit<Chat, "type">) {
   const dispatch = useDispatch();
-  const viewer = useContext(CurrentUserContext);
+
+  const { value: viewer } = useAppSelector((state) => state.currentUser);
   // const {
   //   error,
   //   loading,
   //   value: userProfile,
   // } = useAppSelector((state) => state.currentUserProfilePage);
-  const { value: contacts } = useAppSelector((state) => state.contactsPreviews);
+  const { value: contacts, firstFetch } = useAppSelector(
+    (state) => state.contactsPreviews
+  );
   const otherParticipant = participants.filter((el) => el.id != viewer?.id)[0];
+
+  useEffect(() => {
+    if (!firstFetch) {
+      dispatch(getContactsPreviewsValue(""));
+    }
+  }, []);
 
   const handleRemoveFriendClick: MouseEventHandler<HTMLButtonElement> = (
     ev

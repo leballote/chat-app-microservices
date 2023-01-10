@@ -1,16 +1,6 @@
-import { gql } from "@apollo/client";
 import { PayloadAction } from "@reduxjs/toolkit";
 import client from "../../../client";
-
-const REMOVE_PARTICIPANT = gql`
-  mutation RemoveParticipant($input: RemoveParticipantInput!) {
-    removeParticipant(input: $input) {
-      chatId
-      participantId
-      success
-    }
-  }
-`;
+import { REMOVE_PARTICIPANT } from "../../graphql/mutations";
 
 export async function removeParticipant({
   payload,

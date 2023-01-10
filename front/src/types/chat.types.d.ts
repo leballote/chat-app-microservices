@@ -1,6 +1,11 @@
 export type Message = {
   id: string;
-  sentBy: { id: string };
+  sentBy: {
+    id: string;
+    name: string;
+    avatar: string;
+    status: boolean;
+  };
   sentAt: string;
   content: string;
 };
@@ -41,8 +46,6 @@ export type ChatPreview = {
     };
   };
 };
-
-export type ChatContextType = Omit<Chat, "messages">;
 
 export type ChatDataResponse = {
   data: Chat;

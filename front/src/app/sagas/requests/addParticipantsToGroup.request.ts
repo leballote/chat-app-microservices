@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
+import { ADD_PARTICIPANT } from "../../graphql/mutations";
 
 type AddParticipantInput = {
   chatId: string;
@@ -16,24 +16,6 @@ export async function addParticipants({
   chatId,
   participants,
 }: AddParticipantInput): Promise<any> {
-  const ADD_PARTICIPANT = gql`
-    mutation AddParticipants($input: AddParticipantsInput!) {
-      addParticipants(input: $input) {
-        chatModified {
-          participants {
-            id
-            username
-            name
-            phrase
-            status
-            avatar
-            admin
-          }
-        }
-      }
-    }
-  `;
-
   return await client.mutate({
     mutation: ADD_PARTICIPANT,
     variables: {

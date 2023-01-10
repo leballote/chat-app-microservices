@@ -1,5 +1,6 @@
-import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
-import { indexCreator_ } from "../types";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createNamespacedActionCreator } from "../../../utils";
+import { indexCreator_ } from "../utils";
 import { AppNotification } from "../types";
 
 export type NotificationsState = {
@@ -15,7 +16,6 @@ export const notificationsSlice = createSlice({
   name: "notifications",
   initialState,
   reducers: {
-    triggerNewNotification(_state, _action: PayloadAction<AppNotification>) {},
     pushNotification(state, { payload }: PayloadAction<AppNotification>) {
       state.notifications.push(payload);
     },
@@ -36,12 +36,13 @@ export const notificationsSlice = createSlice({
     },
   },
 });
+const sliceCreateAction = createNamespacedActionCreator(notificationsSlice);
 
-export const {
-  removeNotification,
-  pushNotification,
-  triggerNewNotification,
-  resetState,
-} = notificationsSlice.actions;
+export const triggerNewNotification = sliceCreateAction<AppNotification>(
+  "triggerNewNotification"
+);
+
+export const { removeNotification, pushNotification, resetState } =
+  notificationsSlice.actions;
 
 export default notificationsSlice.reducer;

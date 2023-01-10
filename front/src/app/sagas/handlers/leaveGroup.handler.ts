@@ -1,4 +1,4 @@
-import { call, put } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { leaveGroupRequest } from "../requests/leaveGroup.request";
 import { getValue } from "../../features/appData/currentChatSlice";
@@ -17,7 +17,7 @@ export function* handleLeaveGroup(
     const { data } = response;
     const { leaveGroupChat } = data;
     yield put(removeChat({ chatId }));
-    const currentChatId = store.getState().currentChat.value?.id;
+    const currentChatId = yield select((state) => state.currentChat.value?.id);
 
     if (currentChatId && currentChatId == chatId) {
       yield put(getValue({ chatId: currentChatId }));

@@ -3,6 +3,7 @@ import type { RootState } from "../../store";
 import type { Chat, Message, ChatUser } from "../../../types/chat.types";
 import removeOne from "../../../utils/removeOne";
 import { AppError } from "../types";
+import { createNamespacedActionCreator } from "../../utils";
 
 //TODO: handle loading sent messages and errored sent messages
 type CurrentChatState = {
@@ -57,10 +58,6 @@ export const currentChatSlice = createSlice({
   name: "currentChat",
   initialState,
   reducers: {
-    getValue(state, _action: PayloadAction<{ chatId: string }>) {
-      state.loading = true;
-    },
-    sendMessage(_, _action: PayloadAction<SendMessageInput>) {},
     addParticipants(state, { payload }: PayloadAction<ChatUser[]>) {
       if (state.value?.participants) {
         const participantsIds = state.value.participants.map(
@@ -86,13 +83,7 @@ export const currentChatSlice = createSlice({
         );
       }
     },
-    requestRemoveParticipant(
-      _,
-      _action: PayloadAction<{ chatId: string; participantId: string }>
-    ) {},
-    requestLeaveGroup(_, _action: PayloadAction<{ chatId: string }>) {},
-    requestAddParticipants(_, _action: PayloadAction<AddParticipantInput>) {},
-    loadMessages(_, _action: PayloadAction<GetMessagesInput>) {},
+
     setMessagesNoBatch(state, { payload }: PayloadAction<number>) {
       state.messagesNoBatch = payload;
     },
@@ -150,30 +141,40 @@ export const currentChatSlice = createSlice({
   },
 });
 
+const sliceCreateAction = createNamespacedActionCreator(currentChatSlice);
+
+export const getValue = sliceCreateAction<{ chatId: string }>("getValue");
+export const sendMessage = sliceCreateAction<SendMessageInput>("sendMessage");
+export const requestRemoveParticipant = sliceCreateAction<{
+  chatId: string;
+  participantId: string;
+}>("requestRemoveParticipant");
+export const requestLeaveGroup = sliceCreateAction<{ chatId: string }>(
+  "requestLeaveGroup"
+);
+export const requestAddParticipants = sliceCreateAction<AddParticipantInput>(
+  "requestAddParticipants"
+);
+export const loadMessages = sliceCreateAction<GetMessagesInput>("loadMessages");
+
 export const {
   setValue,
-  getValue,
   setLoading,
   setError,
   // getInitialMessages,
   unshiftMessage,
-  sendMessage,
   setMessages,
   setLoadingMessages,
   setErrorMessages,
-  loadMessages,
   setMessagesNoBatch,
   appendMessages,
   removeParticipant,
-  requestRemoveParticipant,
-  requestLeaveGroup,
-  resetState,
   addParticipantToAdd,
   removeParticipantToAdd,
-  requestAddParticipants,
   addParticipants,
   setParticipants,
   resetParticipantsToAdd,
+  resetState,
 } = currentChatSlice.actions;
 
 export const selectCurrentChat = (state: RootState) => state.currentChat;

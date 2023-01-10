@@ -6,7 +6,7 @@ type Translation = {
   translation: {
     app: {
       drawer: {
-        general: {};
+        // general: {};
         main: {
           newGroup: string;
           logout: string;
@@ -46,7 +46,7 @@ type Translation = {
           };
         };
       };
-      chat: {};
+      // chat: {};
     };
     general: {
       search: string;
@@ -86,7 +86,7 @@ const resources: { [language: string]: Translation } = {
     translation: {
       app: {
         drawer: {
-          general: {},
+          // general: {},
           main: {
             newGroup: "Nuevo grupo",
             logout: "Cerrar sesión",
@@ -126,7 +126,7 @@ const resources: { [language: string]: Translation } = {
             },
           },
         },
-        chat: {},
+        // chat: {},
       },
       general: {
         search: "Buscar",
@@ -164,7 +164,7 @@ const resources: { [language: string]: Translation } = {
     translation: {
       app: {
         drawer: {
-          general: {},
+          // general: {},
           main: {
             newGroup: "New group",
             logout: "Log out",
@@ -204,7 +204,7 @@ const resources: { [language: string]: Translation } = {
             },
           },
         },
-        chat: {},
+        // chat: {},
       },
       general: {
         search: "Search",
@@ -242,7 +242,7 @@ const resources: { [language: string]: Translation } = {
     translation: {
       app: {
         drawer: {
-          general: {},
+          // general: {},
           main: {
             newGroup: "Neue Gruppe",
             logout: "Abmelden",
@@ -282,7 +282,7 @@ const resources: { [language: string]: Translation } = {
             },
           },
         },
-        chat: {},
+        // chat: {},
       },
       general: {
         search: "Suche",

@@ -1,16 +1,19 @@
 import { PayloadAction } from "@reduxjs/toolkit";
-import { put } from "redux-saga/effects";
+import { put, select } from "redux-saga/effects";
+import { ChatPreview } from "../../../types/chat.types";
 import {
   setChatsShown,
   setSearchTerm,
 } from "../../features/appView/chatsDrawerSection/chatDrawerSection";
-import { store } from "../../store";
 
 export function* handleSearchChats(action: PayloadAction<string>): any {
   const { payload } = action;
   yield put(setSearchTerm(payload));
+  const chatsPreviews: ChatPreview[] = yield select(
+    (state) => state.chatsPreviews.value
+  );
 
-  const chatsFiltered = Object.entries(store.getState().chatsPreviews.value)
+  const chatsFiltered = Object.entries(chatsPreviews)
     .filter(([, val]) => {
       return val.name.includes(payload);
     })

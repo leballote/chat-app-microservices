@@ -3,10 +3,7 @@ import ChatPreview, { Props as ChatPreviewProps } from "./ChatPreview";
 import DrawerSearchBar from "../DrawerSearchBar";
 import { ChangeEvent, useEffect } from "react";
 import * as React from "react";
-import {
-  getValue as getChatsPreviewsValue,
-  setSearchTerm,
-} from "../../../app/features/appData/chatsPreviewsSlice";
+import { getValue as getChatsPreviewsValue } from "../../../app/features/appData/chatsPreviewsSlice";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { useTranslation } from "react-i18next";
 import GenericPeopleLoading from "../../feedback/GenericPeopleLoading";
@@ -14,12 +11,13 @@ import GenericError from "../../feedback/GenericError";
 import { searchChats } from "../../../app/features/appView/chatsDrawerSection/chatDrawerSection";
 
 export default function ChatDrawerSection() {
-  let {
+  const {
     value: chats_,
     loading,
     error,
   } = useAppSelector((state) => state.chatsPreviews);
-  let { searchTerm: chatSearched, chatsShown } = useAppSelector(
+
+  const { searchTerm: chatSearched, chatsShown } = useAppSelector(
     (state) => state.chatsDrawerSubsection
   );
 
@@ -75,7 +73,6 @@ export default function ChatDrawerSection() {
         {t("user.chats")}
       </Typography>
       <DrawerSearchBar
-        value={chatSearched}
         onSearch={handleSearch}
         onKeyDown={handleEscapeOnSearch}
       />

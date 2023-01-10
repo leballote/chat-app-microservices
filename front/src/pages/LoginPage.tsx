@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   TextField,
   Stack,
@@ -8,21 +8,12 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
-import { createClient } from "graphql-ws";
 import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { getValue as getCurrentUserValue } from "../app/features/appData/currentUserSlice";
+import { LOGIN } from "../app/graphql/mutations";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import client, { wsClient, wsLink } from "../client";
-
-const LOGIN = gql`
-  mutation Login($username: String!, $password: String!) {
-    login(username: $username, password: $password) {
-      success
-    }
-  }
-`;
 
 export default function LoginPage() {
   const usernameInput = useRef<HTMLInputElement>(null);
@@ -31,7 +22,7 @@ export default function LoginPage() {
   const [mutationFunction, { data, loading, error }] = useMutation(LOGIN, {
     fetchPolicy: "no-cache",
   });
-  // const user = useContext(CurrentUserContext);
+  // const {value: user} = useAppSelector(state => state.currentUser);
   const user = useAppSelector((state) => state.currentUser.value);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();

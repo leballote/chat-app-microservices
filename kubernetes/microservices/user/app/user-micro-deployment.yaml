@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-micro-deployment
+  labels:
+    microservice: user
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-micro
+  template:
+    metadata:
+      name: user-micro-pod
+      labels:
+        app: user-micro
+    spec:
+      containers:
+        - name: user-micro
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: user-micro-configmap
+                  key: port
+            - name: MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-mongo-secrets
+                  key: username
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: user-db-mongo-secrets
+                  key: password
+            - name: MONGODB_CONNECTION_STRING
+              value: "mongodb://$(MONGODB_USERNAME):$(MONGODB_PASSWORD)@user-db-mongo-svc:27017"
+          image: leballote/user_service
+          # command: ["tail", "-f", "/dev/null"]
+          # resources:
+          #   limits:
+          #     memory: 512Mi
+          #     cpu: "1"
+          #   requests:
+          #     memory: 256Mi
+          #     cpu: "0.2"
+          ports:
+            - containerPort: 6001
+              name: user-port
+              protocol: TCP

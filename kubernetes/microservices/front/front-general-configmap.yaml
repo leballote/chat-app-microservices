@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: front-general-configmap
+data:
+  graphql_domain: graphql-gateway-svc
+  front_domain: front-svc
+  ws_protocol: wss

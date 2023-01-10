@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
+import { GET_CHATS_PREVIEWS_DATA } from "../../graphql/queries";
 
 //this should include a searcht term
 
@@ -8,28 +8,7 @@ export async function requestGetChatsPreviews(
   searchTerm: string
 ): Promise<any> {
   //in the query should be a search term
-  const GET_CHATS_PREVIEWS_DATA = gql`
-    query GetChatPreviews {
-      viewer {
-        id
-        chats {
-          id
-          type
-          name
-          avatar
-          lastActionDate
-          lastMessage {
-            id
-            content
-            sentAt
-            sentBy {
-              id
-            }
-          }
-        }
-      }
-    }
-  `;
+
   return client.query({
     query: GET_CHATS_PREVIEWS_DATA,
   });

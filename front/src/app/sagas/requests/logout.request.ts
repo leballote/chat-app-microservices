@@ -1,13 +1,5 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
-
-const LOGOUT = gql`
-  mutation {
-    logout {
-      success
-    }
-  }
-`;
+import { LOGOUT } from "../../graphql/mutations";
 
 export async function logoutRequest(): Promise<any> {
   return client.mutate({

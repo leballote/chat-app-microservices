@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ContactPreview } from "../../../../types/user.types";
+import { createNamespacedActionCreator } from "../../../utils";
 
 export type DrawerSectionContacts = {
   contactsShown: ContactPreview[];
@@ -12,11 +13,10 @@ const initialState: DrawerSectionContacts = {
   searchTerm: "",
 };
 
-export const contactsDrawerSection = createSlice({
+export const mainContactsDrawerSubsectionSlice = createSlice({
   name: "mainContactsSubsection",
   initialState,
   reducers: {
-    searchContacts(_state, _action: PayloadAction<string>) {},
     setContactsShown(state, { payload }: PayloadAction<ContactPreview[]>) {
       state.contactsShown = payload;
     },
@@ -29,7 +29,13 @@ export const contactsDrawerSection = createSlice({
   },
 });
 
-export const { setContactsShown, searchContacts, setSearchTerm, resetState } =
-  contactsDrawerSection.actions;
+const sliceCreateAction = createNamespacedActionCreator(
+  mainContactsDrawerSubsectionSlice
+);
 
-export default contactsDrawerSection.reducer;
+export const searchContacts = sliceCreateAction<string>("searchContacts");
+
+export const { setContactsShown, setSearchTerm, resetState } =
+  mainContactsDrawerSubsectionSlice.actions;
+
+export default mainContactsDrawerSubsectionSlice.reducer;

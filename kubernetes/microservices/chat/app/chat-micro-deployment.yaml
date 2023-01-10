@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chat-micro-deployment
+  labels:
+    microservice: chat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chat-micro
+  template:
+    metadata:
+      name: chat-micro
+      labels:
+        app: chat-micro
+    spec:
+      containers:
+        - name: chat-micro
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: chat-micro-configmap
+                  key: port
+            - name: MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: chat-db-mongo-secrets
+                  key: username
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chat-db-mongo-secrets
+                  key: password
+            - name: MONGODB_CONNECTION_STRING
+              value: "mongodb://$(MONGODB_USERNAME):$(MONGODB_PASSWORD)@chat-db-mongo-svc:27017"
+          image: leballote/chat_service
+          # command: ["tail", "-f", "/dev/null"]
+          # resources:
+          #   limits:
+          #     memory: 512Mi
+          #     cpu: "1"
+          #   requests:
+          #     memory: 256Mi
+          #     cpu: "0.2"
+          ports:
+            - containerPort: 6000
+              name: chat-port
+              protocol: TCP

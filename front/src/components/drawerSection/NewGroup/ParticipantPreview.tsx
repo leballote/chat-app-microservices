@@ -8,9 +8,16 @@ import { IconButton } from "@mui/material";
 import HighlightOffIcon from "@mui/icons-material/HighlightOff";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { useNavigate } from "react-router";
-import { useMutation, gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { upsertChat } from "../../../app/features/appData/chatsPreviewsSlice";
 import { closeDetails } from "../../../app/features/appView/chatSectionSlice";
+import { triggerNewNotification } from "../../../app/features/appView/notifications/notificationsSlice";
+import { appNotificationManager } from "../../../app/features/appView/utils";
+import {
+  GenericErrorAppNotification,
+  NotificationType,
+} from "../../../app/features/appView/types";
+import { GET_OR_CREATE_CHAT } from "../../../app/graphql/mutations";
 
 export interface Props {
   id: string;
@@ -24,21 +31,13 @@ export interface Props {
   onRemove?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-const GET_OR_CREATE_CHAT = gql`
-  mutation GetOrCreateChat($input: GetOrCreateIndividualChatInput!) {
-    getOrCreateIndividualChat(input: $input) {
-      chat {
-        id
-        type
-        phrase
-        name
-        avatar
-      }
-    }
-  }
-`;
-
-export default function ({ name, avatar, id, onRemove, isViewerAdmin }: Props) {
+export default function ParticipantPreview({
+  name,
+  avatar,
+  id,
+  onRemove,
+  isViewerAdmin,
+}: Props) {
   const { value: currentUser } = useAppSelector((state) => state.currentUser);
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -67,7 +66,18 @@ export default function ({ name, avatar, id, onRemove, isViewerAdmin }: Props) {
           dispatch(closeDetails());
 
           navigate(`/app/chat/${newChat.id}`);
-        } catch (e) {}
+        } catch (e) {
+          dispatch(
+            triggerNewNotification(
+              appNotificationManager.createNotification({
+                notification: {
+                  notificationType: NotificationType.GENERIC_ERROR,
+                  message: (e as any).message,
+                } as GenericErrorAppNotification,
+              })
+            )
+          );
+        }
       }}
       data-user-id={`${id}`}
       secondaryAction={

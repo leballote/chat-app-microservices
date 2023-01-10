@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAction, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChatPreview } from "../../../types/chat.types";
 import type { RootState } from "../../store";
 
@@ -20,8 +20,6 @@ export const chatsPreviewsSlice = createSlice({
   name: "chatsPreviews",
   initialState,
   reducers: {
-    getValue(_, _action: PayloadAction<string>) {},
-    getChatPreview(_, _action: PayloadAction<string>) {},
     setSearchTerm(state, { payload }) {
       state.searchTerm = payload;
     },
@@ -47,16 +45,21 @@ export const chatsPreviewsSlice = createSlice({
   },
 });
 
+export const getValue = createAction<string>(
+  `${chatsPreviewsSlice.name}/getValue`
+);
+export const getChatPreview = createAction<string>(
+  `${chatsPreviewsSlice.name}/getChatPreview`
+);
+
 export const {
   setValue,
-  getValue,
   setLoading,
   setError,
   setSearchTerm,
   upsertChat,
   removeChat,
   resetState,
-  getChatPreview,
 } = chatsPreviewsSlice.actions;
 
 export const selectChatsPreviews = (state: RootState) => state.chatsPreviews;

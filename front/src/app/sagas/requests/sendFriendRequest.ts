@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
+import { SEND_FRIEND_REQUEST } from "../../graphql/mutations";
 
 type SendFriendRequestInput = {
   userToAdd?: string;
@@ -13,17 +13,6 @@ export async function requestSendFriendRequest({
   userToAddEmail,
   userToAddUsername,
 }: SendFriendRequestInput): Promise<any> {
-  const SEND_FRIEND_REQUEST = gql`
-    mutation ($input: RequestFriendshipInput!) {
-      requestFriendship(input: $input) {
-        friendAdded {
-          id
-          name
-        }
-      }
-    }
-  `;
-
   const variables: {
     input: SendFriendRequestInput;
   } = {

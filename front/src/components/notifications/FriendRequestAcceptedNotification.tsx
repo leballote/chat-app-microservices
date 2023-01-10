@@ -5,9 +5,10 @@ import { MouseEventHandler } from "react";
 import { useDispatch } from "react-redux";
 import { removeNotification } from "../../app/features/appView/notifications/notificationsSlice";
 import CircleNotificationsIcon from "@mui/icons-material/CircleNotifications";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router";
 import { upsertChat } from "../../app/features/appData/chatsPreviewsSlice";
+import { GET_OR_CREATE_CHAT } from "../../app/graphql/mutations";
 
 type Props = {
   // message: ReactNode;
@@ -15,28 +16,13 @@ type Props = {
   notificationId: number;
 };
 
-//TODO: all this create chat logic should be into a sagas, just don't know how to navigate within a saga
-const GET_OR_CREATE_CHAT = gql`
-  mutation GetOrCreateChat($input: GetOrCreateIndividualChatInput!) {
-    getOrCreateIndividualChat(input: $input) {
-      chat {
-        id
-        type
-        phrase
-        name
-        avatar
-      }
-    }
-  }
-`;
-
 export function FriendRequestAcceptedNotification({
   accepter,
   notificationId,
 }: Props) {
   if (!accepter) return null;
   const dispatch = useDispatch();
-  let [
+  const [
     getOrCreateChatFn,
     {
       error: getOrCreateChatError,
@@ -46,7 +32,7 @@ export function FriendRequestAcceptedNotification({
   ] = useMutation(GET_OR_CREATE_CHAT);
   const navigate = useNavigate();
 
-  const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {
+  const handleClose: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(removeNotification({ notificationId }));
   };
 
@@ -63,8 +49,7 @@ export function FriendRequestAcceptedNotification({
   const action = (
     <Box>
       <Button
-        onClick={async (ev) => {
-          const contactId = ev.currentTarget.dataset["contactId"];
+        onClick={async () => {
           try {
             const getOrCreateChatRes = await getOrCreateChatFn({
               variables: {

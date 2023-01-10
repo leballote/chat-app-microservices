@@ -6,9 +6,8 @@ import {
   setMessagesNoBatch,
   appendMessages,
 } from "../../features/appData/currentChatSlice";
-import { put, call } from "redux-saga/effects";
+import { put, call, select } from "redux-saga/effects";
 import { loadMessages } from "../requests/loadMessages.request";
-import { store } from "../../store";
 
 export function* handleLoadMessages(
   action?: PayloadAction<GetMessagesInput>
@@ -16,13 +15,17 @@ export function* handleLoadMessages(
   const payload = action?.payload;
   try {
     yield put(setLoadingMessages(true));
-    yield put(
-      setMessagesNoBatch(store.getState().currentChat.messagesNoBatch + 1)
+    const messagesNoBatch = yield select(
+      (state) => state.currentChat.messagesNoBatch + 1
     );
+    yield put(setMessagesNoBatch(messagesNoBatch));
     const response = yield call(loadMessages, payload);
     const { data } = response;
     const messages = data.messages;
-    yield put(appendMessages(messages));
+    const currentChatId = yield select((state) => state.currentChat.value?.id);
+    if (messages.length > 0 && currentChatId == messages[0].chat.id) {
+      yield put(appendMessages(messages));
+    }
   } catch (error) {
     let message;
     yield put(setLoadingMessages(false));

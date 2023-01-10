@@ -7,8 +7,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import ProfilePreview from "./ProfilePreview";
 import ChatsDrawerSection from "./Chats/ChatsDrawerSection";
 import ContactsIcon from "@mui/icons-material/Contacts";
-import { useContext, useEffect, useRef, useState } from "react";
-import { CurrentUserContext } from "../../contexts";
+import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../../app/hooks";
 import { useDispatch } from "react-redux";
 import {
@@ -16,9 +15,6 @@ import {
   turnOffMoreMenu,
   turnOnMoreMenu,
 } from "../../app/features/appView/mainSectionDrawerSlice";
-import { gql, useMutation } from "@apollo/client";
-import { useNavigate } from "react-router";
-import { getValue as getCurrentUserValue } from "../../app/features/appData/currentUserSlice";
 import { useTranslation } from "react-i18next";
 import {
   setNewGroupDrawerSection,
@@ -32,33 +28,15 @@ interface Props {
 }
 
 export default function MainDrawerView(props: Props) {
-  const userInfo = useContext(CurrentUserContext);
+  const { value: userInfo } = useAppSelector((state) => state.currentUser);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const anchorRef = useRef<HTMLButtonElement | null>(null);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { t } = useTranslation();
 
-  // const LOGOUT = gql`
-  //   mutation {
-  //     logout {
-  //       success
-  //     }
-  //   }
-  // `;
-  // const [logoutMutationFn, { loading: loadingLogOut, error: errorLogOut }] =
-  //   useMutation(LOGOUT);
   const { moreDropdownActive: moreMenuOpen } = useAppSelector(
     (state) => state.mainSectionDrawer
   );
-
-  const {
-    logoutAction: {
-      error: logoutError,
-      loading: logoutLoading,
-      value: logoutResponse,
-    },
-  } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     setAnchorEl(anchorRef.current);
@@ -73,10 +51,6 @@ export default function MainDrawerView(props: Props) {
   }
 
   async function handleLogOut() {
-    // try {
-    //   await logoutMutationFn();
-    //   dispatch(getCurrentUserValue());
-    // } catch (e) {}
     dispatch(triggerLogout());
   }
 
@@ -89,12 +63,6 @@ export default function MainDrawerView(props: Props) {
     dispatch(resetMainDrawerState());
     dispatch(setSettingsDrawerSection());
   }
-
-  // useEffect(() => {
-  //   if (logoutResponse?.success) {
-  //     dispatch(getCurrentUserValue());
-  //   }
-  // }, [logoutResponse]);
 
   return userInfo ? (
     <>

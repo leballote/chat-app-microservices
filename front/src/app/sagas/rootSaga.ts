@@ -49,33 +49,30 @@ import { triggerLogout } from "../features/appData/authSlice";
 import { handleLogout } from "./handlers/logout.handle";
 
 export function* watcherSaga() {
-  yield takeLatest(getCurrentUserValue.toString(), handleGetUser);
-  yield takeLatest(getChatsPreviewsValue.toString(), handleChatsPreviews);
-  yield takeLatest(getContactsPreviewsValue.toString(), handleContactsPreviews);
-  yield takeLatest(getCurrentChatValue.toString(), handleGetChat);
-  yield takeEvery(sendMessage.toString(), handleSendMessage);
-  yield takeEvery(sendFriendRequest.toString(), handleSendFriendRequest);
-  yield takeLatest(loadMessages.toString(), handleLoadMessages);
+  yield takeLatest(getCurrentUserValue, handleGetUser);
+  yield takeLatest(getChatsPreviewsValue, handleChatsPreviews);
+  yield takeLatest(getContactsPreviewsValue, handleContactsPreviews);
+  yield takeLatest(getCurrentChatValue, handleGetChat);
+  yield takeEvery(sendMessage, handleSendMessage);
+  yield takeEvery(sendFriendRequest, handleSendFriendRequest);
+  yield takeLatest(loadMessages, handleLoadMessages);
   yield takeLatest(
-    getFriendRequestsPreviewsValue.toString(),
+    getFriendRequestsPreviewsValue,
     handleFriendRequestsPreviews
   );
-  yield takeEvery(acceptFriendRequest.toString(), handleAcceptFriend);
-  yield takeEvery(requestRemoveParticipant.toString(), handleRemoveParticipant);
-  yield takeEvery(requestLeaveGroup.toString(), handleLeaveGroup);
-  yield takeEvery(rejectFriendRequest.toString(), handleRejectFriendRequest);
-  yield takeEvery(requestRemoveFriend.toString(), handleRemoveFriend);
-  yield takeEvery(getChatPreview.toString(), handleGetChatPreview);
-  yield takeEvery(requestAddParticipants.toString(), handleAddParticipant);
+  yield takeEvery(acceptFriendRequest, handleAcceptFriend);
+  yield takeEvery(requestRemoveParticipant, handleRemoveParticipant);
+  yield takeEvery(requestLeaveGroup, handleLeaveGroup);
+  yield takeEvery(rejectFriendRequest, handleRejectFriendRequest);
+  yield takeEvery(requestRemoveFriend, handleRemoveFriend);
+  yield takeEvery(getChatPreview, handleGetChatPreview);
+  yield takeEvery(requestAddParticipants, handleAddParticipant);
+  yield takeEvery(searchMainContactsSectionContacts, handleSearchContact);
   yield takeEvery(
-    searchMainContactsSectionContacts.toString(),
-    handleSearchContact
-  );
-  yield takeEvery(
-    searchNewGroupContactsSectionContacts.toString(),
+    searchNewGroupContactsSectionContacts,
     handleSearchContactFromNewGroupDrawerSection
   );
-  yield takeEvery(searchChats.toString(), handleSearchChats);
-  yield takeEvery(triggerNewNotification.toString(), handleNewNotification);
-  yield takeEvery(triggerLogout.toString(), handleLogout);
+  yield takeEvery(searchChats, handleSearchChats);
+  yield takeEvery(triggerNewNotification, handleNewNotification);
+  yield takeEvery(triggerLogout, handleLogout);
 }

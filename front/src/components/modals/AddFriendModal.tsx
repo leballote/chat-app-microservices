@@ -24,10 +24,10 @@ import { green } from "@mui/material/colors";
 import DoneIcon from "@mui/icons-material/Done";
 import { triggerNewNotification } from "../../app/features/appView/notifications/notificationsSlice";
 import {
-  appNotificationManager,
   GenericSuccessAppNotification,
   NotificationType,
 } from "../../app/features/appView/types";
+import { appNotificationManager } from "../../app/features/appView/utils";
 
 export default function AddFriendModal() {
   const {

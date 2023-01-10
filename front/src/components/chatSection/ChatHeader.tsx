@@ -1,13 +1,11 @@
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
-import { useContext } from "react";
 import React from "react";
-import { ChatContext, CurrentUserContext } from "../../contexts";
 import { WithHeight } from "../../types/utilTypes";
 import FormatedAvatar from "../../utils/FormatedAvatar";
 import { openDetails } from "../../app/features/appView/chatSectionSlice";
-import { useAppDispatch } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { setValue as setCurrentUserProfilePage } from "../../app/features/appView/currentUserProfilePageSlice";
 import { blueGrey } from "@mui/material/colors";
 
@@ -23,9 +21,9 @@ type BaseChatHeaderProps = {
   WithHeight;
 
 export default function ChatHeader({ height }: WithHeight) {
-  const chat = useContext(ChatContext);
+  const { value: chat } = useAppSelector((state) => state.currentChat);
   if (!chat) return null;
-  const { participants, ...chatInfo } = chat;
+  const { ...chatInfo } = chat;
 
   return chatInfo.type == "INDIVIDUAL" ? (
     <IndividualChatHeader height={height} />
@@ -35,13 +33,13 @@ export default function ChatHeader({ height }: WithHeight) {
 }
 
 function IndividualChatHeader({ height }: WithHeight) {
-  const chat = useContext(ChatContext);
+  const { value: chat } = useAppSelector((state) => state.currentChat);
   if (!chat) return null;
   const { participants, ...chatInfo } = chat;
-  const currentUser = useContext(CurrentUserContext);
+  const { value: currentUser } = useAppSelector((state) => state.currentUser);
   const receiver = participants.filter(({ id }) => id != currentUser?.id)[0];
   const dispatch = useAppDispatch();
-  const user = useContext(CurrentUserContext);
+  const { value: user } = useAppSelector((state) => state.currentUser);
 
   const handleOpenDetailsClick: React.MouseEventHandler<
     HTMLDivElement
@@ -69,9 +67,9 @@ function IndividualChatHeader({ height }: WithHeight) {
 }
 
 function GroupChatHeader({ height }: WithHeight) {
-  const chat = useContext(ChatContext);
+  const { value: chat } = useAppSelector((state) => state.currentChat);
   if (!chat) return null;
-  const { participants, ...chatInfo } = chat;
+  const { ...chatInfo } = chat;
   const dispatch = useAppDispatch();
 
   const handleOpenDetailsClick: React.MouseEventHandler<

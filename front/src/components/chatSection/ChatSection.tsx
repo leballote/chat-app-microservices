@@ -11,8 +11,8 @@ import {
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { useContext, useEffect, useRef, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 // import ImageIcon from "@mui/icons-material/Image";
 // import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { useDispatch } from "react-redux";
@@ -24,11 +24,9 @@ import {
 } from "../../app/features/appData/currentChatSlice";
 import { resetState as resetChatSectionState } from "../../app/features/appView/chatSectionSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { ChatContext, CurrentUserContext } from "../../contexts";
 import { Message } from "../../types/chat.types";
 import { WithHeight } from "../../types/utilTypes";
 import getScrollHeightGap from "../../utils/getScrollHeightGap";
-import indexArrayByField from "../../utils/indexArrayByField";
 import ChatLoading from "../feedback/ChatLoading";
 import ChatDetailsModal from "../modals/ChatDetailsModal";
 import ChatHeader from "./ChatHeader";
@@ -46,13 +44,13 @@ function formatDate(dateString: string) {
 }
 
 function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
-  const chat = useContext(ChatContext);
+  const { value: chat } = useAppSelector((state) => state.currentChat);
   if (!chat) return null;
-  let { participants: participantList, ...otherChatInfo } = chat;
-  const participants = indexArrayByField(participantList, "id");
+  // let { participants: participantList, ...otherChatInfo } = chat;
+  // const participants = indexArrayByField(participantList, "id");
   const dispatch = useDispatch();
 
-  const currentUser = useContext(CurrentUserContext);
+  const { value: currentUser } = useAppSelector((state) => state.currentUser);
   const chatBottomRef = useRef<HTMLDivElement>(null);
   const [scrollInfo, setScrollInfo] = useState<{
     top: number | undefined | null;
@@ -80,7 +78,7 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
     }
   }, [scrollInfo]);
 
-  const handleScroll: React.UIEventHandler<HTMLDivElement> = (ev) => {
+  const handleScroll: React.UIEventHandler<HTMLDivElement> = () => {
     if (chatAreaRef.current && chatAreaRef.current?.scrollTop < 1) {
       dispatch(loadMessages({}));
       chatAreaRef.current?.scrollTo({ top: 1 });
@@ -129,7 +127,7 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
                 {index == messages.length - 1 ||
                 messages[index + 1].sentBy.id != message.sentBy.id ? (
                   <ListItemAvatar>
-                    <Avatar src={participants[message.sentBy.id]?.avatar} />
+                    <Avatar src={message.sentBy.avatar} />
                   </ListItemAvatar>
                 ) : null}
 
@@ -141,7 +139,7 @@ function ChatBody({ messages: preMessages, height, chatAreaRef }: Props) {
                       sx={{ fontSize: "1.1em" }}
                       fontWeight="bold"
                     >
-                      {participants[message.sentBy.id].name}
+                      {message.sentBy.name}
                     </Typography>
                   ) : null}
                   {index == messages.length - 1 ||
@@ -175,10 +173,10 @@ type ChatFooterProps = {
 } & WithHeight;
 function ChatFooter({ height, loading = false }: ChatFooterProps) {
   const dispatch = useAppDispatch();
-  const chat = useContext(ChatContext);
+  const { value: chat } = useAppSelector((state) => state.currentChat);
   if (!chat) return null;
   const { id: chatId } = chat;
-  const user = useContext(CurrentUserContext);
+  const { value: user } = useAppSelector((state) => state.currentUser);
   const messageTextInput = useRef<HTMLInputElement>(null);
 
   function clearInput() {
@@ -286,12 +284,10 @@ export default function ChatSection({
   const chatAreaRef = useRef<HTMLElement>(null);
   const navigate = useNavigate();
 
-  let chatId = id;
-  let {
-    error,
-    loading,
-    value: chat,
-  } = useAppSelector((state) => state.currentChat);
+  const chatId = id;
+  const { currentChat } = useAppSelector((state) => state);
+  const { loading, value: chat } = currentChat;
+  let { error } = currentChat;
 
   if (chatId == undefined) {
     error = { message: "Chat not defined" };
@@ -316,10 +312,8 @@ export default function ChatSection({
   let component;
   if (loading || !connected) {
     component = <ChatLoading />;
-  } else if (error) {
-    component = <Navigate to={"/chatError"} />;
   } else if (chat != null) {
-    const { messages, participants, ...chatInfo } = chat;
+    const { messages } = chat;
     component = (
       <Box
         sx={{
@@ -330,15 +324,13 @@ export default function ChatSection({
           width: "calc(100% - 400px)",
         }}
       >
-        <ChatContext.Provider value={{ participants, ...chatInfo }}>
-          <ChatHeader height={"10vh"} />
-          <ChatBody
-            messages={messages}
-            height={"70vh"}
-            chatAreaRef={chatAreaRef}
-          />
-          <ChatFooter height={"20vh"} loading={chatFooterLoading} />
-        </ChatContext.Provider>
+        <ChatHeader height={"10vh"} />
+        <ChatBody
+          messages={messages}
+          height={"70vh"}
+          chatAreaRef={chatAreaRef}
+        />
+        <ChatFooter height={"20vh"} loading={chatFooterLoading} />
         <ChatDetailsModal />
       </Box>
     );

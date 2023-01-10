@@ -1,8 +1,8 @@
-import { call, put } from "redux-saga/effects";
+import { call, put, select } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { removeFriend } from "../requests/removeFriend.request";
 import { removeContact } from "../../features/appData/contactsPreviewsSlice";
-import { store } from "../../store";
+import { RootState } from "../../store";
 import { closeDetails } from "../../features/appView/chatSectionSlice";
 
 export function* handleRemoveFriend(action: PayloadAction<string>): any {
@@ -13,12 +13,12 @@ export function* handleRemoveFriend(action: PayloadAction<string>): any {
     const { removeFriendship } = data;
     const { userRemoved } = removeFriendship;
     yield put(removeContact(payload));
-    if (store.getState().currentUserProfilePage.value?.id == payload) {
+    const currentUserProfilePageId = yield select(
+      (state: RootState) => state.currentUserProfilePage.value?.id
+    );
+    if (currentUserProfilePageId == payload) {
       yield put(closeDetails());
-      // yield put(setValue(null));
     }
-    // yield put(removeFriendRequest(payload));
-    // yield put(addContact(acceptFriendship.friendAdded));
   } catch (error) {
     //TODO: see how to handle this error
   }

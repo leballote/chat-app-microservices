@@ -1,32 +1,9 @@
 const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
 const validatorLib = require("validator");
 const passportLocalMongoose = require("passport-local-mongoose");
+const { InvalidPasswordError } = require("../errors/InvalidPasswordError");
 
-const authUserSchema = new mongoose.Schema(
-  {
-    // username: {
-    //   type: String,
-    //   required: true,
-    //   unique: true,
-    //   minlength: 1,
-    // },
-    // password: {
-    //   type: String,
-    //   required: true,
-    //   validate: {
-    //     validator: validatorLib.isStrongPassword,
-    //     message: () => {
-    //       const errorMessage = `password should be length 8, and contain at least one of each of the following: lowercase letter, uppercase letter, symbol and number.`;
-    //       const err = new Error(errorMessage);
-    //       err.publicMessage = err.message;
-    //       return err;
-    //     },
-    //   },
-    // },
-  },
-  { timestamps: true }
-);
+const authUserSchema = new mongoose.Schema({}, { timestamps: true });
 
 authUserSchema.plugin(passportLocalMongoose, {
   limitAttempts: true,
@@ -36,8 +13,7 @@ authUserSchema.plugin(passportLocalMongoose, {
   passwordValidator(password, cb) {
     if (!validatorLib.isStrongPassword(password)) {
       const errorMessage = `Password should be length 8, and contain at least one of each of the following: lowercase letter, uppercase letter, symbol and number.`;
-      const error = new Error(errorMessage);
-      error.publicMessage = errorMessage;
+      const error = new InvalidPasswordError(errorMessage);
       cb(error);
     }
     // return an empty cb() on success

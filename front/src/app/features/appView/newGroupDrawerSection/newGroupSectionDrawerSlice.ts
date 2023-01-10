@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ContactPreview } from "../../../../types/user.types";
 import removeOne from "../../../../utils/removeOne";
+import { createNamespacedActionCreator } from "../../../utils";
 import { GroupSectionDrawerSubsection } from "../types";
 
 export type DrawerSectionNewGroup = {
@@ -23,7 +24,6 @@ export const newGroupDrawerSlice = createSlice({
   initialState,
   reducers: {
     //
-    searchContacts(_state, _action: PayloadAction<string>) {},
     setContactsShown(state, { payload }: PayloadAction<ContactPreview[]>) {
       state.contactsShown = payload;
     },
@@ -53,6 +53,10 @@ export const newGroupDrawerSlice = createSlice({
   },
 });
 
+const sliceCreateAction = createNamespacedActionCreator(newGroupDrawerSlice);
+
+export const searchContacts = sliceCreateAction<string>("searchContacts");
+
 export const {
   addParticipant,
   removeParticipant,
@@ -60,7 +64,6 @@ export const {
   setSetTitleAndAvatarSubsection,
   setContactsShown,
   setSearchTerm,
-  searchContacts,
   resetState,
 } = newGroupDrawerSlice.actions;
 

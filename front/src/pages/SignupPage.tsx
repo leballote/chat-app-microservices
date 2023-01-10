@@ -1,6 +1,5 @@
-import { useQuery, gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
-  Box,
   TextField,
   Stack,
   Container,
@@ -9,19 +8,12 @@ import {
   Typography,
   Alert,
 } from "@mui/material";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { setError } from "../app/features/appData/chatsPreviewsSlice";
-import { CurrentUserContext } from "../contexts";
-
-const SIGNUP = gql`
-  mutation Signup($input: SignUpInput) {
-    signup(input: $input) {
-      success
-    }
-  }
-`;
+import { SIGNUP } from "../app/graphql/mutations";
+import { useAppSelector } from "../app/hooks";
 
 export default function SignupPage() {
   const usernameInput = useRef<HTMLInputElement>(null);
@@ -37,7 +29,7 @@ export default function SignupPage() {
     null
   );
 
-  const user = useContext(CurrentUserContext);
+  const { value: user } = useAppSelector((state) => state.currentUser);
   const navigate = useNavigate();
   useEffect(() => {
     if (data) {

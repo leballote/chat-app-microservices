@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createNamespacedActionCreator } from "../../utils";
 
 // Define a type for the slice state
 type FriendRequestsPreviewsState = {
@@ -45,8 +46,6 @@ export const friendRequestsPreviewsSlice = createSlice({
       state.firstFetch = true;
       state.loading = false;
     },
-    acceptFriendRequest(_, _action: PayloadAction<string>) {},
-    rejectFriendRequest(_, _action: PayloadAction<string>) {},
     removeFriendRequest(state, { payload }: PayloadAction<string>) {
       if (state.value[payload]) {
         delete state.value[payload];
@@ -85,14 +84,22 @@ export const friendRequestsPreviewsSlice = createSlice({
   },
 });
 
+const sliceCreateAction = createNamespacedActionCreator(
+  friendRequestsPreviewsSlice
+);
+export const acceptFriendRequest = sliceCreateAction<string>(
+  "acceptFriendRequest"
+);
+export const rejectFriendRequest = sliceCreateAction<string>(
+  "rejectFriendRequest"
+);
+
 export const {
   setValue,
   getValue,
   setLoading,
   setError,
   resetState,
-  acceptFriendRequest,
-  rejectFriendRequest,
   addFriendRequest,
   removeFriendRequest,
   setFriendRequestToAccepting,

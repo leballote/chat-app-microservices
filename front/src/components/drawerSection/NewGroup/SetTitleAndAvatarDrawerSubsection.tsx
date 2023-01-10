@@ -1,4 +1,4 @@
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DoneIcon from "@mui/icons-material/Done";
 import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useContext } from "react";
+import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { upsertChat } from "../../../app/features/appData/chatsPreviewsSlice";
@@ -22,28 +22,14 @@ import {
   setAddFriendsSubsection,
 } from "../../../app/features/appView/newGroupDrawerSection/newGroupSectionDrawerSlice";
 import { setMainDrawerSection } from "../../../app/features/appView/sideBarSlice";
+import { CREATE_GROUP_CHAT } from "../../../app/graphql/mutations";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
-import { CurrentUserContext } from "../../../contexts";
-
-const CREATE_GROUP_CHAT = gql`
-  mutation CreateGroupChat($input: CreateGroupChatInput!) {
-    createGroupChat(input: $input) {
-      chat {
-        id
-        type
-        name
-        phrase
-        avatar
-      }
-    }
-  }
-`;
 
 export default function SetTitleAndAvatarDrawerSubsection() {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const user = useContext(CurrentUserContext);
+  const { value: user } = useAppSelector((state) => state.currentUser);
   const [createGroupChatFn, { loading, data, error }] =
     useMutation(CREATE_GROUP_CHAT);
   const { participantsToAdd } = useAppSelector(

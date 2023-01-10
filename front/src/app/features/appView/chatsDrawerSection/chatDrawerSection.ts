@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ChatPreview } from "../../../../types/chat.types";
+import { createNamespacedActionCreator } from "../../../utils";
 
 export type State = {
   chatsShown: ChatPreview[];
@@ -12,11 +13,10 @@ const initialState: State = {
   searchTerm: "",
 };
 
-export const contactsDrawerSection = createSlice({
+export const contactsDrawerSectionSlice = createSlice({
   name: "mainContactsSubsection",
   initialState,
   reducers: {
-    searchChats(_state, _action: PayloadAction<string>) {},
     setChatsShown(state, { payload }: PayloadAction<ChatPreview[]>) {
       state.chatsShown = payload;
     },
@@ -29,7 +29,13 @@ export const contactsDrawerSection = createSlice({
   },
 });
 
-export const { setChatsShown, searchChats, setSearchTerm, resetState } =
-  contactsDrawerSection.actions;
+const sliceCreateAction = createNamespacedActionCreator(
+  contactsDrawerSectionSlice
+);
 
-export default contactsDrawerSection.reducer;
+export const searchChats = sliceCreateAction<string>("searchChats");
+
+export const { setChatsShown, setSearchTerm, resetState } =
+  contactsDrawerSectionSlice.actions;
+
+export default contactsDrawerSectionSlice.reducer;

@@ -1,15 +1,6 @@
-import { gql } from "@apollo/client";
 import { PayloadAction } from "@reduxjs/toolkit";
 import client from "../../../client";
-
-const LEAVE_GROUP = gql`
-  mutation LeaveGroup($input: LeaveGroupChatInput!) {
-    leaveGroupChat(input: $input) {
-      chatId
-      success
-    }
-  }
-`;
+import { LEAVE_GROUP } from "../../graphql/mutations";
 
 export async function leaveGroupRequest({
   payload,

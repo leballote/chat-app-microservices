@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client";
 import client from "../../../client";
+import { ACCEPT_FRIEND_REQUEST } from "../../graphql/mutations";
 
 type AcceptFriendRequestInput = {
   userToAccept: string;
@@ -9,20 +9,6 @@ type AcceptFriendRequestInput = {
 export async function acceptFriendRequest({
   userToAccept,
 }: AcceptFriendRequestInput): Promise<any> {
-  const ACCEPT_FRIEND_REQUEST = gql`
-    mutation AcceptRequest($input: AcceptFriendshipInput!) {
-      acceptFriendship(input: $input) {
-        friendAdded {
-          id
-          username
-          avatar
-          phrase
-          status
-        }
-      }
-    }
-  `;
-
   return await client.mutate({
     mutation: ACCEPT_FRIEND_REQUEST,
     variables: {

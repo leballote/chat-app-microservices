@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphql-gateway-deployment
+  labels:
+    microservice: graphql-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: graphql-gateway
+  template:
+    metadata:
+      name: graphql-gateway
+      labels:
+        app: graphql-gateway
+    spec:
+      containers:
+        - name: graphql-gateway
+          env:
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: graphql-gateway-configmap
+                  key: port
+            - name: AUTH_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: graphql-gateway-configmap
+                  key: auth_uri
+            - name: CHAT_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: graphql-gateway-configmap
+                  key: chat_uri
+            - name: USER_URI
+              valueFrom:
+                configMapKeyRef:
+                  name: graphql-gateway-configmap
+                  key: user_uri
+          image: leballote/graphql_gateway
+          # command: ["tail", "-f", "/dev/null"]
+          ports:
+            - containerPort: 4000
+              name: graphql-port
+              protocol: TCP

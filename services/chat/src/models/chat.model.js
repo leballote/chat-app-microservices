@@ -17,6 +17,7 @@ const chatSchema = new mongoose.Schema(
     },
     phrase: {
       type: String,
+      required: true,
     },
     lastMessageId: {
       type: mongoose.SchemaTypes.ObjectId,
@@ -25,6 +26,21 @@ const chatSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+chatSchema.static.createIndividualChat = function ({ participants }) {
+  this.create();
+};
+
+chatSchema.static.createGroupChat = function ({
+  name,
+  type,
+  phrase = "",
+  participants,
+}) {};
+
+chatSchema.static.createChat = function ({ name, type, phrase, participants }) {
+  this.create();
+};
 
 const ChatModel = mongoose.model("chat", chatSchema);
 

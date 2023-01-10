@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "../../../app/store";
 import { User } from "../../../types/user.types";
+import { createNamespacedActionCreator } from "../../utils";
 
 // Define a type for the slice state
 type UserState = {
@@ -24,7 +25,6 @@ export const userSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    getValue() {},
     setValue(state, { payload }) {
       state.value = payload;
       state.loading = false;
@@ -40,8 +40,11 @@ export const userSlice = createSlice({
     },
   },
 });
+const sliceCreateAction = createNamespacedActionCreator(userSlice);
 
-export const { setValue, getValue, setLoading, setError, setFirstFetch } =
+export const getValue = sliceCreateAction<void>("getValue");
+
+export const { setValue, setLoading, setError, setFirstFetch } =
   userSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
