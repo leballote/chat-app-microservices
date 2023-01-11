@@ -18,6 +18,6 @@ const individualRelSchema = new mongoose.Schema({
 
 individualRelSchema.index({ user1Id: 1, user2Id: -1 }, { unique: true });
 
-IndividualRelModel = mongoose.model("individualRel", individualRelSchema);
+const IndividualRelModel = mongoose.model("individualRel", individualRelSchema);
 
 module.exports = IndividualRelModel;

@@ -1,27 +1,24 @@
 const { default: mongoose } = require("mongoose");
+const { appErrors } = require("../errors");
 const Chat = require("../models/chat.model");
 const Message = require("../models/message.model");
+const defaultErrorHandler = require("../errors/defaultErrorHandler");
 
 const router = require("express").Router();
-
-const errors = {
-  serverError: { error: { message: "Server Error" } },
-  messageNotFound: { error: { message: "Message not found" } },
-};
 
 router.post("/message", async (req, res) => {
   try {
     const { chatId } = req.body;
     const message = await Message.create(req.body);
 
-    const update = await Chat.findOneAndUpdate(
+    await Chat.findOneAndUpdate(
       { _id: mongoose.Types.ObjectId(chatId) },
       { $set: { lastMessageId: message._id } },
       { new: true }
     );
     return res.status(201).send({ data: message });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    defaultErrorHandler(e, req, res);
   }
 });
 
@@ -31,11 +28,13 @@ router.get("/message", async (req, res) => {
   const afterDate_ = new Date(afterDate);
 
   if (start != null && offset != null) {
-    return res.send({
-      error: {
-        message: "Can only paginate by one of the following: offset, start",
-      },
-    });
+    return res.send(
+      appErrors.queryError(
+        "message",
+        ["offset", "start"],
+        () => "Can only paginate by one of the following: offset, start"
+      )
+    );
   }
   offset = 0;
 
@@ -81,9 +80,7 @@ router.get("/message", async (req, res) => {
 
     return res.send({ data: messages });
   } catch (e) {
-    return res
-      .status(500)
-      .send({ ...errors.serverError, debugError: e.message });
+    defaultErrorHandler(e, req, res);
   }
 });
 
@@ -92,13 +89,11 @@ router.get("/message/:id", async (req, res) => {
   try {
     const message = await Message.findById(id);
     if (!message) {
-      return res.status(404).send(errors.messageNotFound);
+      return res.status(404).send(appErrors.notFoundError("message", { id }));
     }
     return res.send({ data: message });
   } catch (e) {
-    return res
-      .status(500)
-      .send({ error: errors.serverError, debugError: e.message });
+    defaultErrorHandler(e, req, res);
   }
 });
 
@@ -108,9 +103,12 @@ router.put("/message/:id", async (req, res) => {
     const message = await Message.findByIdAndUpdate(id, req.body, {
       new: true,
     });
+    if (!message) {
+      return res.send(appErrors.notFoundError("message", { id }));
+    }
     return res.send({ data: message });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    defaultErrorHandler(e, req, res);
   }
 });
 
@@ -118,9 +116,12 @@ router.delete("/message/:id", async (req, res) => {
   const { id } = req.params.id;
   try {
     const message = await Message.findByIdAndDelete(id);
+    if (!message) {
+      return res.send(appErrors.notFoundError("message", { id }));
+    }
     return res.status(204).send({ data: message });
   } catch (e) {
-    return res.status().send(errors.serverError);
+    defaultErrorHandler(e, req, res);
   }
 });
 
