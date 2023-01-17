@@ -1,16 +1,14 @@
-import SendIcon from "@mui/icons-material/Send";
-import { Button, Paper, Stack } from "@mui/material";
-import TextField from "@mui/material/TextField";
 import { useEffect, useRef } from "react";
-import { sendMessage } from "../../app/features/appData/currentChatSlice";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { WithHeight } from "../../types/utilTypes";
+import { sendMessage } from "../../../app/features/appData/currentChatSlice";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { WithHeight } from "../../../types/utilTypes";
+import { PresentationalChatFooter } from "./PresentationalChatFooter";
 
 export type ChatFooterProps = {
   loading?: boolean;
 } & WithHeight;
 
-export function ChatFooter({ height, loading = false }: ChatFooterProps) {
+export function ChatFooter({ height }: ChatFooterProps) {
   const dispatch = useAppDispatch();
   const { value: chat } = useAppSelector((state) => state.currentChat);
   if (!chat) return null;
@@ -68,42 +66,11 @@ export function ChatFooter({ height, loading = false }: ChatFooterProps) {
   }, []);
 
   return (
-    <Paper
-      elevation={2}
-      sx={{
-        height,
-      }}
-    >
-      <Stack
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-        height="100%"
-        width="100%"
-        gap={2}
-      >
-        <TextField
-          sx={{ width: "50%", bgcolor: "white" }}
-          // ref={messageTextInput}
-          InputProps={{ onKeyDown: handleKeyDown }}
-          inputProps={{ maxLength: 1000 }}
-          inputRef={messageTextInput}
-          disabled={loading}
-        />
-        <Button
-          sx={{
-            aspectRatio: "1 / 1",
-            bgcolor: "whitesmoke",
-            "&:hover": {
-              bgcolor: "#EEEEEE",
-            },
-          }}
-          onClick={handleSendClick}
-          disabled={loading}
-        >
-          <SendIcon />
-        </Button>
-      </Stack>
-    </Paper>
+    <PresentationalChatFooter
+      height={height}
+      loading={false}
+      onChatboxKeyDown={handleKeyDown}
+      onSendClick={handleSendClick}
+    />
   );
 }

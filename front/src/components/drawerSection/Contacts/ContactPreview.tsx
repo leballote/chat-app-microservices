@@ -69,9 +69,9 @@ export default function ContactPreview({
       >
         <Typography
           component="h3"
-          fontSize={"1.1em"}
+          fontSize="1.1em"
           fontWeight="bold"
-          color="textPrimary"
+          color="text.primary"
         >
           {name}
         </Typography>

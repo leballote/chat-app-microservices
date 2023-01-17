@@ -67,7 +67,6 @@ export default function ChatDrawerSection() {
         component="h2"
         fontSize="1.2em"
         fontWeight="light"
-        color="MenuText"
         sx={{ margin: "1em .2em .2em .5em" }}
       >
         {t("user.chats")}

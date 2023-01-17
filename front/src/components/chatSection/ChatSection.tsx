@@ -12,8 +12,8 @@ import { WithHeight } from "../../types/utilTypes";
 import ChatLoading from "../feedback/ChatLoading";
 import ChatDetailsModal from "../modals/ChatDetailsModal";
 import ChatHeader from "./ChatHeader";
-import { ChatBody } from "./ChatBody";
-import { ChatFooter } from "./ChatFooter";
+import { ChatBody } from "./ChatBody/ChatBody";
+import { ChatFooter } from "./ChatFooter/ChatFooter";
 
 export interface Props extends WithHeight {
   messages: Message[];

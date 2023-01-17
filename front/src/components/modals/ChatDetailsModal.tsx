@@ -11,7 +11,6 @@ import { MouseEventHandler, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { useTranslation } from "react-i18next";
 import { Chat } from "../../types/chat.types";
-import { red } from "@mui/material/colors";
 import { closeDetails } from "../../app/features/appView/chatSectionSlice";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { useDispatch } from "react-redux";
@@ -92,11 +91,6 @@ function IndividualChatDetails({
   const { t } = useTranslation();
 
   const { value: viewer } = useAppSelector((state) => state.currentUser);
-  // const {
-  //   error,
-  //   loading,
-  //   value: userProfile,
-  // } = useAppSelector((state) => state.currentUserProfilePage);
   const { value: contacts, firstFetch } = useAppSelector(
     (state) => state.contactsPreviews
   );
@@ -148,10 +142,10 @@ function IndividualChatDetails({
               variant="outlined"
               sx={{
                 width: "100%",
-                color: red[500],
-                borderColor: red[300],
+                color: "error.light",
+                borderColor: "error.main",
                 "&:hover": {
-                  borderColor: red[400],
+                  borderColor: "error.dark",
                 },
               }}
               onClick={handleRemoveFriendClick}

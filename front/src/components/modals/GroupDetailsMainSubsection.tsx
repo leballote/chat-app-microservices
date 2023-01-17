@@ -14,7 +14,6 @@ import { MouseEventHandler } from "react";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { Chat } from "../../types/chat.types";
 import ParticipantPreview from "../drawerSection/NewGroup/ParticipantPreview";
-import { red, blue } from "@mui/material/colors";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AddIcon from "@mui/icons-material/Add";
 import {
@@ -94,23 +93,21 @@ export default function GroupDetailsMainSubsection({
                     height: 60,
                     backgroundColor: "inherit",
                     border: "solid 2px",
-                    borderColor: blue[500],
+                    borderColor: "primary.main",
                   }}
                 >
-                  <AddIcon sx={{ color: blue[400] }} />
+                  <AddIcon sx={{ color: "primary.main" }} />
                 </Avatar>
               </ListItemAvatar>
               <ListItemText
                 sx={{
                   marginLeft: ".6em",
-                  color: blue[500],
                 }}
               >
                 <Typography
                   component="h3"
                   fontSize={"1.1em"}
-                  // fontWeight="bold"
-                  color={blue[400]}
+                  color="primary.main"
                 >
                   {t("app.modals.chatDetails.addParticipants")}
                 </Typography>
@@ -132,10 +129,10 @@ export default function GroupDetailsMainSubsection({
           variant="outlined"
           sx={{
             width: "100%",
-            color: red[500],
-            borderColor: red[300],
+            color: "error.light",
+            borderColor: "error.main",
             "&:hover": {
-              borderColor: red[400],
+              borderColor: "error.main",
             },
           }}
           onClick={handleLeaveGroupClick}

@@ -19,12 +19,11 @@ export interface Props {
   onRemove?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
-export default function ({
+export default function ParticipantPreviewWithCheckBox({
   name,
   avatar,
   id,
   onAddParticipantToAdd,
-  onRemove,
 }: Props) {
   const { value: currentUser } = useAppSelector((state) => state.currentUser);
   return (
@@ -60,7 +59,7 @@ export default function ({
           component="h3"
           fontSize={"1.1em"}
           fontWeight="bold"
-          color="textPrimary"
+          color="text.primary"
         >
           {name}
         </Typography>

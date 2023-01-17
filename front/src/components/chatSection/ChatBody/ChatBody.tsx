@@ -2,11 +2,11 @@ import { List, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { loadMessages } from "../../app/features/appData/currentChatSlice";
-import { useAppSelector } from "../../app/hooks";
-import getScrollHeightGap from "../../utils/getScrollHeightGap";
-import { Props } from "./ChatSection";
-import { Message } from "./Message";
+import { loadMessages } from "../../../app/features/appData/currentChatSlice";
+import { useAppSelector } from "../../../app/hooks";
+import getScrollHeightGap from "../../../utils/getScrollHeightGap";
+import { Props } from "../ChatSection";
+import { Message } from "../Message/Message";
 
 export function ChatBody({
   messages: preMessages,
@@ -61,15 +61,30 @@ export function ChatBody({
       ref={chatAreaRef}
       onScroll={handleScroll}
     >
-      <Stack direction="column-reverse" flex="1 1 0px" component={List}>
+      <Stack
+        direction="column-reverse"
+        flex="1 1 0px"
+        component={List}
+        gap=".1em"
+      >
         {messages.map((message, index: number) => {
+          const isFirstMessageInBatch =
+            index == messages.length - 1 ||
+            messages[index + 1].sentBy.id != message.sentBy.id;
+          const hasPassedEnoughTime =
+            index == messages.length - 1 ||
+            Math.abs(
+              Date.parse(messages[index + 1].sentAt) -
+                Date.parse(message.sentAt)
+            ) > 18000;
+
           return (
             <Message
               key={message.id}
               message={message}
-              messages={messages}
-              index={index}
-              currentUser={currentUser}
+              showUsername={isFirstMessageInBatch}
+              showDatetime={isFirstMessageInBatch || hasPassedEnoughTime}
+              isOwnedByMe={message.sentBy.id == currentUser?.id}
             />
           );
         })}

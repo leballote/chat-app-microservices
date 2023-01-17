@@ -70,7 +70,6 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
           component="h2"
           fontSize="1.2em"
           fontWeight="light"
-          color="MenuText"
           sx={{ margin: ".5em .2em .2em .5em" }}
         >
           <Button

@@ -33,7 +33,7 @@ export default function ChatPreview({ id, avatar, name, lastMessage }: Props) {
   if (typeof sentAt === "string") sentAt = new Date(sentAt);
   if (lastMessage) {
     previewSection = (
-      <Typography component="p" fontSize={".8em"} color="textSecondary">
+      <Typography component="p" fontSize={".8em"} color="text.secondary">
         {content.slice(0, 50)}
       </Typography>
     );
@@ -42,7 +42,7 @@ export default function ChatPreview({ id, avatar, name, lastMessage }: Props) {
       <Typography
         component="p"
         fontSize={".8em"}
-        color="textSecondary"
+        color="text.secondary"
         fontStyle={"italic"}
       >
         {"new chat"}

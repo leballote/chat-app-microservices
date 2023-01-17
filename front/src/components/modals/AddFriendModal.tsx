@@ -61,9 +61,9 @@ export default function AddFriendModal() {
 
   const buttonSx = {
     ...(sendFriendRequestValue != null && {
-      bgcolor: green[500],
+      bgcolor: "success.main",
       "&:hover": {
-        bgcolor: green[700],
+        bgcolor: "success.dark",
       },
     }),
   };

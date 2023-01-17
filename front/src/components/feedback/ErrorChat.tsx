@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box";
-import { red } from "@mui/material/colors";
 import { useTranslation } from "react-i18next";
 
 export default function ErrorChat() {
@@ -10,7 +9,7 @@ export default function ErrorChat() {
         fontSize: "4rem",
         margin: "1em",
         fontWeight: "bold",
-        color: red[400],
+        color: "error.main",
       }}
     >
       {t("app.error.default")}

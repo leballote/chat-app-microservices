@@ -30,8 +30,7 @@ export default function SetTitleAndAvatarDrawerSubsection() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { value: user } = useAppSelector((state) => state.currentUser);
-  const [createGroupChatFn, { loading, data, error }] =
-    useMutation(CREATE_GROUP_CHAT);
+  const [createGroupChatFn] = useMutation(CREATE_GROUP_CHAT);
   const { participantsToAdd } = useAppSelector(
     (state) => state.newGroupSectionDrawer
   );
@@ -67,7 +66,9 @@ export default function SetTitleAndAvatarDrawerSubsection() {
       if (!res.errors) {
         navigate(`/app/chat/${res.data.createGroupChat.chat.id}`);
       }
-    } catch (e) {}
+    } catch (e) {
+      //TODO: create a notification if fails
+    }
   };
 
   return (
@@ -77,7 +78,6 @@ export default function SetTitleAndAvatarDrawerSubsection() {
           component="h2"
           fontSize="1.2em"
           fontWeight="light"
-          color="MenuText"
           sx={{ margin: ".5em .2em .2em .5em" }}
         >
           <Button
@@ -99,7 +99,7 @@ export default function SetTitleAndAvatarDrawerSubsection() {
             width: "5em",
             height: "5em",
             "&:hover": {
-              color: "ButtonHighlight",
+              color: "grey.300",
               cursor: "pointer",
             },
           }}

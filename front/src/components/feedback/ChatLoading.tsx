@@ -1,18 +1,11 @@
-import {
-  List,
-  ListItem,
-  ListItemText,
-  Button,
-  Skeleton,
-  TextField,
-  Box,
-  Container,
-} from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
+import { Skeleton, Box, Container, Stack, List } from "@mui/material";
 import { WithHeight } from "../../types/utilTypes";
 import ChatDetailsModal from "../modals/ChatDetailsModal";
+import { MessageSkeleton } from "../chatSection/Message/MessageSkeleton";
+import { ChatFooterLoading } from "../chatSection/ChatFooter/ChatFooterLoading";
 
 export default function ChatLoading() {
+  console.log("hola", "chat loading");
   return (
     <Box
       sx={{
@@ -73,68 +66,22 @@ function ChatBodyLoading({ height }: WithHeight) {
   }
   return (
     <Box sx={{ height, overflowY: "auto" }}>
-      <List
-        sx={{ display: "flex", flexFlow: "column-reverse", height: "100%" }}
-      >
+      <Stack direction="column-reverse" gap=".1em" component={List}>
         {mockMessages.map((message, index: number) => {
+          const isFirstMessageInBatch =
+            index == mockMessages.length - 1 ||
+            mockMessages[index + 1].sentBy != message.sentBy;
+
           return (
-            <Box
-              sx={{
-                bgcolor: message.sentBy == 0 ? "#999999" : "#579977",
-                borderRadius: "5px",
-                margin: ".1em",
-                display: "flex",
-                flexBasis: "50%",
-                flex: "1",
-                alignSelf: message.sentBy == 0 ? "flex-end" : "flex-start",
-                maxWidth: "70%",
-                width: "44%",
-                overflow: "hide",
-                flexGrow: "0",
-              }}
+            <MessageSkeleton
+              maxWidth="55%"
+              isOwnedByMe={message.sentBy % 3 === 0}
+              showSender={isFirstMessageInBatch}
               key={message.id}
-            >
-              <ListItem>
-                <ListItemText sx={{ overflowWrap: "break-word" }}>
-                  {index == mockMessages.length - 1 ||
-                  mockMessages[index + 1].sentBy != message.sentBy ? (
-                    <Skeleton sx={{ width: "100%" }} />
-                  ) : null}
-                  <Skeleton sx={{ width: "60px" }} />
-                </ListItemText>
-              </ListItem>
-            </Box>
+            />
           );
         })}
-      </List>
-    </Box>
-  );
-}
-
-function ChatFooterLoading({ height }: WithHeight) {
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        padding: "0em",
-        bgcolor: "#CCCCCC",
-        width: "100%",
-        height,
-      }}
-      gap={2}
-    >
-      {/* <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }} disabled>
-        <ImageIcon />
-      </Button>
-      <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }} disabled>
-        <EmojiEmotionsIcon />
-      </Button> */}
-      <TextField sx={{ width: "50%" }} disabled />
-      <Button variant="outlined" sx={{ aspectRatio: "1 / 1" }} disabled>
-        <SendIcon />
-      </Button>
+      </Stack>
     </Box>
   );
 }

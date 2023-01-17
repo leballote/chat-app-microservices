@@ -12,13 +12,7 @@ export interface Props {
   status: "online" | "offline";
 }
 
-export default function ProfilePreview({
-  id,
-  avatar,
-  name,
-  phrase,
-  status,
-}: Props) {
+export default function ProfilePreview({ avatar, name, phrase }: Props) {
   return (
     <ListItem>
       <ListItemAvatar>
@@ -40,11 +34,11 @@ export default function ProfilePreview({
           component="h3"
           fontSize={"1.1em"}
           fontWeight="bold"
-          color="textPrimary"
+          color="text.primary"
         >
           {name}
         </Typography>
-        <Typography component="p" fontSize={".8em"} color="textSecondary">
+        <Typography component="p" fontSize={".8em"} color="text.secondary">
           {phrase}
         </Typography>
       </ListItemText>

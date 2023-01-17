@@ -35,7 +35,6 @@ export function GenericErrorNotification({ notificationId, message }: Props) {
           sx={{
             display: "flex",
             flexFlow: "row wrap",
-            color: "primary",
             alignItems: "center",
             gap: ".4em",
             width: "100%",

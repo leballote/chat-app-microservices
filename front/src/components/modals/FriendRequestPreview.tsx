@@ -2,7 +2,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import DoneIcon from "@mui/icons-material/Done";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
-import { green, red } from "@mui/material/colors";
 import ListItem from "@mui/material/ListItem";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemText from "@mui/material/ListItemText";
@@ -23,11 +22,8 @@ export interface Props {
   sentAt: string;
 }
 
-export default function ({
-  user: { name, username, phrase: _phrase, avatar, id },
-  // sentAt,
-  accepting: _accepting,
-  rejecting: _rejecting,
+export default function FriendRequestPreview({
+  user: { name, username, avatar, id },
   onAccept,
   onReject,
 }: Props) {
@@ -56,17 +52,17 @@ export default function ({
           component="h3"
           fontSize={"1.1rem"}
           fontWeight="bold"
-          color="textPrimary"
+          color="text.primary"
         >
           {name}
         </Typography>
-        <Typography component="p" fontSize={".9rem"} color="textSecondary">
+        <Typography component="p" fontSize={".9rem"} color="text.secondary">
           {username}
         </Typography>
-        <Button onClick={onAccept} sx={{ color: green[500] }}>
+        <Button onClick={onAccept} sx={{ color: "success.main" }}>
           <DoneIcon />
         </Button>
-        <Button onClick={onReject} sx={{ color: red[500] }}>
+        <Button onClick={onReject} sx={{ color: "error.main" }}>
           <CloseIcon />
         </Button>
       </ListItemText>

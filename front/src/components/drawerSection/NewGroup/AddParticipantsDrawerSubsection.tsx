@@ -91,7 +91,6 @@ export default function AddParticipantsDrawerSubsection() {
           component="h2"
           fontSize="1.2em"
           fontWeight="light"
-          color="MenuText"
           sx={{ margin: ".5em .2em .2em .5em" }}
         >
           <Button
@@ -106,7 +105,6 @@ export default function AddParticipantsDrawerSubsection() {
       </Box>
 
       <DrawerSearchBar
-        value={contactSearched}
         onSearch={handleSearch}
         onKeyDown={handleEscapeOnSearch}
       />

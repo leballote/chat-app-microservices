@@ -111,7 +111,7 @@ export default function ParticipantPreview({
           component="h3"
           fontSize={"1.1em"}
           fontWeight="bold"
-          color="textPrimary"
+          color="text.primary"
         >
           {name}
         </Typography>
