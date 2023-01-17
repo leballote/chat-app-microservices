@@ -10,7 +10,6 @@ const appErrors = {
   tooManyAttemptsError,
   missingCredentialsError,
   clientError,
-  validationError,
   duplicateKeyError,
   invalidPasswordError,
 };

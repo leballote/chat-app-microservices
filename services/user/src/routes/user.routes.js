@@ -1,11 +1,8 @@
+const { appErrors } = require("../errors");
+const { defaultErrorHandler } = require("../errors/defaultErrorHandler");
 const User = require("../models/user.model");
 
 const router = require("express").Router();
-
-const errors = {
-  serverError: { error: { message: "Server error" } },
-  userNotFound: { error: { message: "User not found" } },
-};
 
 router.post("/user", async (req, res) => {
   const { id, username, name, birthDate, email, phrase, avatar } = req.body;
@@ -15,13 +12,9 @@ router.post("/user", async (req, res) => {
     });
     if (alreadyExistingUser) {
       if (email && alreadyExistingUser.email == email) {
-        return res
-          .status(400)
-          .send({ error: { message: "Email already in usage" } });
+        return res.status(400).send(appErrors.duplicateKeyError({ email }));
       } else if (username && alreadyExistingUser.username == username) {
-        return res
-          .status(400)
-          .send({ error: { message: "User already in usage" } });
+        return res.status(400).send(appErrors.duplicateKeyError({ username }));
       }
     }
     const user = await User.create({
@@ -38,8 +31,7 @@ router.post("/user", async (req, res) => {
     });
     return res.send({ data: user });
   } catch (e) {
-    // return res.status(400).send({ debugError: e });
-    return res.status(500).send(errors.serverError);
+    defaultErrorHandler(e, req, res);
   }
 });
 
@@ -48,11 +40,11 @@ router.get("/user/:id", async (req, res) => {
   try {
     const user = await User.findOne({ _id: id }).populate("friends");
     if (!user) {
-      return res.status(404).send(errors.userNotFound);
+      return res.status(404).send(appErrors.notFoundError("user", { id }));
     }
     return res.send({ data: user });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    defaultErrorHandler(e, req, res);
   }
 });
 
@@ -91,7 +83,7 @@ router.get("/user", async (req, res) => {
       .populate("friends");
     return res.send({ data: users });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    defaultErrorHandler(e, req, res);
   }
 });
 
@@ -107,13 +99,11 @@ router.put("/user/:id", async (req, res) => {
       { new: true }
     );
     if (!user) {
-      return res.send(errors.userNotFound);
+      return res.send(appErrors.notFoundError("user", { id }));
     }
     return res.send({ data: user });
   } catch (e) {
-    return res
-      .status(500)
-      .send({ ...errors.serverError, debugError: e.message });
+    defaultErrorHandler(e, req, res);
   }
 });
 
@@ -122,11 +112,11 @@ router.delete("/user/:id", async (req, res) => {
   try {
     const user = await User.findOneAndDelete({ _id: id });
     if (!user) {
-      return res.send(errors.userNotFound);
+      return res.send(appErrors.notFoundError("user", { id }));
     }
     return res.send({ data: user });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    defaultErrorHandler(e, req, res);
   }
 });
 

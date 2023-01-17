@@ -3,7 +3,7 @@ const { appErrors } = require(".");
 const { InvalidPasswordError } = require("./InvalidPasswordError");
 
 function handleMongooseSignupErrors(err, _req, res) {
-  if (err.name == "MongoError" && err?.code === 11000) {
+  if (err?.name == "MongoError" && err?.code === 11000) {
     if (err.keyValue.username !== undefined) {
       return res
         .status(400)

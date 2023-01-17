@@ -15,26 +15,26 @@ function loginMiddleware(req, res, next) {
     if (req.body.password === "") {
       return res.status(401).send(appErrors.missingPasswordError());
     }
-    if (
-      info.name === "IncorrectPasswordError" ||
-      info.name === "IncorrectUsernameError"
-    ) {
-      return res.status(401).send(appErrors.incorrectCredentialsError());
+    if (info?.name) {
+      if (
+        info.name === "IncorrectPasswordError" ||
+        info.name === "IncorrectUsernameError"
+      ) {
+        return res.status(401).send(appErrors.incorrectCredentialsError());
+      }
+      if (info.name === "MissingUsernameError") {
+        return res.status(400).send(appErrors.missingCredentialsError());
+      }
+      if (info.name === "MissingPasswordError") {
+        return res.status(400).send(appErrors.missingCredentialsError());
+      }
+      if (info.name === "AttemptTooSoonError") {
+        return res.status(401).send(appErrors.attemptTooSoonError());
+      }
+      if (info.name === "TooManyAttemptsError") {
+        return res.status(429).send(appErrors.tooManyAttemptsError());
+      }
     }
-    if (info.name === "MissingUsernameError") {
-      return res.status(400).send(appErrors.missingCredentialsError());
-    }
-    if (info.name === "MissingPasswordError") {
-      return res.status(400).send(appErrors.missingCredentialsError());
-    }
-    if (info.name === "AttemptTooSoonError") {
-      return res.status(401).send(appErrors.attemptTooSoonError());
-    }
-    if (info.name === "TooManyAttemptsError") {
-      return res.status(429).send(appErrors.tooManyAttemptsError());
-    }
-
-    console.log({ ERROR: err, USER: user, INFO: info });
 
     if (err) {
       return res.status(500).send(appErrors.serverError());

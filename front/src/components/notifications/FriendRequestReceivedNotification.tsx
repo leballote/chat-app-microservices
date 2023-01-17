@@ -12,7 +12,6 @@ import {
 import { useTranslation } from "react-i18next";
 
 type Props = {
-  // message: ReactNode;
   sender: User;
   notificationId: number;
 };

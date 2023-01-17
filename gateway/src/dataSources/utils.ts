@@ -27,10 +27,9 @@ export function HandleError(
         if (error?.extensions?.response?.body?.error?.message) {
           errorToSend = {
             message: error.extensions.response.body.error.message,
+            code: error.extensions.response.body?.error?.code,
+            meta: error.extensions.response.body?.error?.meta,
           };
-          // errorToSend = new GraphQLError(
-          //   error.extensions.response.body.error.message
-          // );
         } else if (
           error.message &&
           error?.extensions?.code == "ERROR_NOT_400_NOR_500"

@@ -58,6 +58,7 @@ const typeDefs = gql`
   type User implements UserInterface {
     id: ID!
     username: String!
+    email: String!
     name: String!
     chats: [Chat!]!
     friends: [User!]!
@@ -72,6 +73,7 @@ const typeDefs = gql`
   type Viewer implements UserInterface {
     id: ID!
     username: String!
+    email: String!
     name: String!
     chats: [Chat!]!
     friends: [User!]!
@@ -89,6 +91,7 @@ const typeDefs = gql`
   type ChatUser implements UserInterface {
     id: ID!
     username: String!
+    email: String!
     name: String!
     phrase: String!
     status: Status!

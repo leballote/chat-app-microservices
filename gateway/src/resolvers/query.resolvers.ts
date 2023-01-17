@@ -2,14 +2,14 @@ import { UserModelSuccessResponse } from "../types/servicesRest";
 import { isErrorResponse, DataObject } from "../types/general.types";
 import { QueryResolvers } from "../generated/graphql";
 
-import { GraphQLError } from "graphql";
+import { authError, createGQLError } from "../errors/utils";
 
 const queryRelatedResolvers: QueryResolvers = {
   user: async (_, { input }, { dataSources }) => {
     const { userId } = input;
     const userRes = await dataSources.userAPI.getUser(userId);
     if (isErrorResponse(userRes)) {
-      throw new GraphQLError(userRes.error.message);
+      throw createGQLError(userRes);
     }
     return userRes.data;
   },
@@ -17,14 +17,14 @@ const queryRelatedResolvers: QueryResolvers = {
   messages: async (_, { input }, { dataSources, req, res }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new GraphQLError("Not authenticated");
+      throw authError;
     }
     const messagesRes = await dataSources.chatAPI.getMessages({
       userId: viewer._id,
       ...input,
     });
     if (isErrorResponse(messagesRes)) {
-      throw new GraphQLError(messagesRes.error.message);
+      throw createGQLError(messagesRes);
     }
     return messagesRes.data;
   },
@@ -36,13 +36,13 @@ const queryRelatedResolvers: QueryResolvers = {
   friendshipRequestsReceived: async (_parent, _input, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
-      throw new GraphQLError("Not authenticated");
+      throw authError;
     }
     const friendRes = await dataSources.userAPI.getFriendshipRequests({
       to: viewer._id,
     });
     if (isErrorResponse(friendRes)) {
-      throw new GraphQLError(friendRes.error.message);
+      throw createGQLError(friendRes);
     }
 
     const promises = friendRes.data.map(async (friendReq) =>

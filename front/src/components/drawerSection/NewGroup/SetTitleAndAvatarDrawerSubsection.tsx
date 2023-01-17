@@ -73,7 +73,7 @@ export default function SetTitleAndAvatarDrawerSubsection() {
 
   return (
     <Stack component="form" onSubmit={handleFinish}>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Stack justifyContent="space-between" direction="row">
         <Typography
           component="h2"
           fontSize="1.2em"
@@ -89,7 +89,7 @@ export default function SetTitleAndAvatarDrawerSubsection() {
           </Button>
           {t("app.drawer.newGroup.title")}
         </Typography>
-      </Box>
+      </Stack>
 
       <Container
         sx={{ display: "flex", justifyContent: "center", margin: "2em 0" }}

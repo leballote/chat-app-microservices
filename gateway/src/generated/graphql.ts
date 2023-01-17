@@ -61,6 +61,7 @@ export type ChatUser = UserInterface & {
   __typename?: 'ChatUser';
   admin: Scalars['Boolean'];
   avatar?: Maybe<Scalars['String']>;
+  email: Scalars['String'];
   id: Scalars['ID'];
   individualChat?: Maybe<Chat>;
   name: Scalars['String'];
@@ -363,6 +364,7 @@ export type User = UserInterface & {
   avatar?: Maybe<Scalars['String']>;
   chat?: Maybe<Chat>;
   chats: Array<Chat>;
+  email: Scalars['String'];
   friends: Array<User>;
   id: Scalars['ID'];
   individualChat?: Maybe<Chat>;
@@ -397,6 +399,7 @@ export type Viewer = UserInterface & {
   avatar?: Maybe<Scalars['String']>;
   chat?: Maybe<Chat>;
   chats: Array<Chat>;
+  email: Scalars['String'];
   friends: Array<User>;
   id: Scalars['ID'];
   name: Scalars['String'];
@@ -609,6 +612,7 @@ export type ChatResolvers<ContextType = MyContext, ParentType extends ResolversP
 export type ChatUserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['ChatUser'] = ResolversParentTypes['ChatUser']> = {
   admin?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   individualChat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -755,6 +759,7 @@ export type UserResolvers<ContextType = MyContext, ParentType extends ResolversP
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   chat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType, Partial<UserChatArgs>>;
   chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   friends?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   individualChat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType>;
@@ -785,6 +790,7 @@ export type ViewerResolvers<ContextType = MyContext, ParentType extends Resolver
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   chat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType, Partial<ViewerChatArgs>>;
   chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   friends?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;

@@ -7,7 +7,12 @@ const appErrors = {
   validationError,
   notFoundError,
   queryError,
+  friendshipRequestAlreadySent,
+  heAlreadyRequestedFriendship,
+  cannotRequestFriendshipToYourself,
+  youAreAlreadyFriends,
 };
+
 module.exports = {
   appErrors,
 };
@@ -18,7 +23,6 @@ const SERVER_ERROR = createErrorResponse("Server Error", "SERVER_ERROR");
 function serverError() {
   return SERVER_ERROR;
 }
-
 // signup
 function clientError(message, meta) {
   return createErrorResponse(message ?? "Client error", "CLIENT_ERROR", meta);
@@ -44,11 +48,12 @@ function duplicateKeyError(keyValue, createMessage) {
   if (createMessage != null) {
     message = createMessage(keyValue);
   }
-  return createErrorResponse(
+  const out = createErrorResponse(
     message ?? `${JSON.stringify(keyValue)} is duplicated`,
     "DUPLICATE_ERROR",
     { keyValue }
   );
+  return out;
 }
 
 function notFoundError(resource, moreMeta = {}, createMessage) {
@@ -74,4 +79,35 @@ function queryError(resource, keys, moreMeta = {}, createMessage) {
     keys,
     ...moreMeta,
   });
+}
+
+function friendshipRequestAlreadySent({ from, to }) {
+  return createErrorResponse(
+    "You already requested friendship",
+    "FRIENDHIP_REQUEST_ALREADY_SENT_ERROR",
+    { from, to }
+  );
+}
+
+function heAlreadyRequestedFriendship({ from, to }) {
+  return createErrorResponse(
+    "He already requested friendship",
+    "FRIENDHIP_REQUEST_ALREADY_RECEIVED_ERROR",
+    { from, to }
+  );
+}
+
+function cannotRequestFriendshipToYourself() {
+  return createErrorResponse(
+    "Cannot request frienship to yourself",
+    "CANNOT_REQUEST_FRIENDSHIP_TO_YOURSELF_ERROR"
+  );
+}
+
+function youAreAlreadyFriends({ from, to }) {
+  return createErrorResponse(
+    "You are already friends",
+    "YOU_ARE_ALREADY_FRIENDS_ERROR",
+    { from, to }
+  );
 }

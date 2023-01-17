@@ -1,3 +1,4 @@
+const { appErrors } = require("../errors");
 const FriendRequestModel = require("../models/friendRequest.model");
 const UserModel = require("../models/user.model");
 
@@ -5,18 +6,6 @@ const router = require("express").Router();
 
 const errors = {
   serverError: { error: { message: "Server error" } },
-  cannotRequestFriendshipToYourself: {
-    error: { message: "Cannot request frienship to yourself" },
-  },
-  youAlreadyRequestedFriendship: {
-    error: { message: "You already requested friendship" },
-  },
-  heAlreadyRequestedFriendship: {
-    error: { message: "He already requested friendship" },
-  },
-  friendshipRequestNotFound: {
-    error: { message: "Friendship request not found" },
-  },
   youAreAlreadyFriends: {
     error: { message: "You are already friends" },
   },
@@ -26,7 +15,9 @@ router.post("/friendshipRequest", async (req, res) => {
   const { from, to } = req.body;
   try {
     if (from == to) {
-      return res.status(400).send(errors.cannotRequestFriendshipToYourself);
+      return res
+        .status(400)
+        .send(appErrors.cannotRequestFriendshipToYourself());
     }
     const [friendReq, user1] = await Promise.all([
       FriendRequestModel.findOne({
@@ -39,13 +30,17 @@ router.post("/friendshipRequest", async (req, res) => {
     ]);
 
     if (friendReq?.from == from) {
-      return res.status(400).send(errors.youAlreadyRequestedFriendship);
+      return res
+        .status(400)
+        .send(appErrors.friendshipRequestAlreadySent({ from, to }));
     }
     if (friendReq?.to == from) {
-      return res.status(400).send(errors.heAlreadyRequestedFriendship);
+      return res
+        .status(400)
+        .send(appErrors.heAlreadyRequestedFriendship({ from, to }));
     }
     if (user1.friends.includes(to)) {
-      return res.status(400).send(errors.youAreAlreadyFriends);
+      return res.status(400).send(appErrors.youAreAlreadyFriends({ from, to }));
     }
 
     const friendshipRequest = await FriendRequestModel.create({
@@ -55,6 +50,7 @@ router.post("/friendshipRequest", async (req, res) => {
 
     return res.send({ data: { success: true, ...friendshipRequest } });
   } catch (e) {
+    console.log(e);
     return res
       .status(500)
       .send({ ...errors.serverError, debugError: e.message });
@@ -90,12 +86,12 @@ router.delete("/friendshipRequest", async (req, res) => {
       to,
     });
     if (!friendshipRequest) {
-      return res.status(404).send(errors.friendshipRequestNotFound);
+      return res.status(404).send(appErrors.notFoundError("friendshipRequest"));
     }
 
     return res.send({ data: { success: true, ...friendshipRequest } });
   } catch (e) {
-    return res.status(500).send(errors.serverError);
+    return res.status(500).send(appErrors.serverError());
   }
 });
 

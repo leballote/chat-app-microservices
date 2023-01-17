@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Tab, Tabs } from "@mui/material";
+import { Box, Typography, Button, Tab, Tabs, Stack } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import * as React from "react";
@@ -65,18 +65,14 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
   return (
     <>
       <AddFriendModal />
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography
-          component="h2"
-          fontSize="1.2em"
-          fontWeight="light"
-          sx={{ margin: ".5em .2em .2em .5em" }}
-        >
-          <Button
-            sx={{ display: "inline-block" }}
-            size="small"
-            onClick={onBackClick}
-          >
+      <Stack
+        justifyContent="space-between"
+        direction="row"
+        padding=".5em"
+        alignItems="center"
+      >
+        <Typography component="h2" fontSize="1.2em" fontWeight="light">
+          <Button size="small" onClick={onBackClick}>
             <ArrowBackIcon />
           </Button>
           {t("user.friends")}
@@ -85,7 +81,7 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
         <Button onClick={handleAddFriendClick}>
           <PersonAddIcon fontSize="large" />
         </Button>
-      </Box>
+      </Stack>
 
       <Tabs onChange={handleChangeTab} value={tabValue}>
         <Tab label={t("app.drawer.contacts.friends")} value={Subsection.MAIN} />

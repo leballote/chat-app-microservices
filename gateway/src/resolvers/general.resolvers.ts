@@ -2,7 +2,7 @@ import { ChatModelType, UserModelSuccessResponse } from "../types/servicesRest";
 import { isErrorResponse, DataObject } from "../types/general.types";
 import { getPropertyFromReceiver, isStringArray } from "../utils";
 import { Resolvers, ChatType, Status } from "../generated/graphql";
-import { GraphQLError } from "graphql";
+import { authError, createGQLError } from "../errors/utils";
 
 const resolvers: Resolvers = {
   Chat: {
@@ -20,7 +20,7 @@ const resolvers: Resolvers = {
       const { dataSources } = context;
       const viewer = await dataSources.getViewer();
       if (!viewer) {
-        throw new GraphQLError("Not user logged in");
+        throw authError;
       }
       if (parent.type == "group") {
         return parent.phrase ?? "";
@@ -40,7 +40,7 @@ const resolvers: Resolvers = {
       const { dataSources } = context;
       const viewer = await dataSources.getViewer();
       if (!viewer) {
-        throw new GraphQLError("Not user logged in");
+        throw authError;
       }
       if (parent.type == "group") {
         return parent.name ?? "";
@@ -60,7 +60,7 @@ const resolvers: Resolvers = {
       const { dataSources } = context;
       const viewer = await dataSources.getViewer();
       if (!viewer) {
-        throw new GraphQLError("Not user logged in");
+        throw authError;
       }
       if (parent.type == "group") {
         return parent.avatar ?? "";
@@ -84,7 +84,7 @@ const resolvers: Resolvers = {
       });
 
       if (isErrorResponse(messageRes)) {
-        throw new GraphQLError(messageRes.error.message);
+        throw createGQLError(messageRes);
       }
       const [message] = messageRes.data;
       return message;
@@ -117,14 +117,14 @@ const resolvers: Resolvers = {
     messages: async (parent, _, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       if (!viewer) {
-        throw new GraphQLError("Not authenticated");
+        throw authError;
       }
       const viewerParticipantRes = await dataSources.chatAPI.getParticipant(
         parent._id,
         viewer._id
       );
       if (isErrorResponse(viewerParticipantRes)) {
-        throw new GraphQLError(viewerParticipantRes.error.message);
+        throw createGQLError(viewerParticipantRes);
       }
       const messagesRes = await dataSources.chatAPI.getMessages({
         afterDate: viewerParticipantRes.data.participantSince,
@@ -132,21 +132,21 @@ const resolvers: Resolvers = {
         limit: 15,
       });
       if (isErrorResponse(messagesRes)) {
-        throw new GraphQLError(messagesRes.error.message);
+        throw createGQLError(messagesRes);
       }
       return messagesRes.data;
     },
     viewerAsChatUser: async (parent, _, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       if (!viewer) {
-        throw new GraphQLError("Not authenticated");
+        throw authError;
       }
       const participantRes = await dataSources.chatAPI.getParticipant(
         parent._id,
         viewer._id
       );
       if (isErrorResponse(participantRes)) {
-        throw new GraphQLError(participantRes.error.message);
+        throw createGQLError(participantRes);
       }
       //TODO: for some reason it is not allowing individualChat = null
       return {
@@ -165,7 +165,7 @@ const resolvers: Resolvers = {
     chat: async (parent, _, { dataSources }) => {
       const chatRes = await dataSources.chatAPI.getChat(parent.chatId);
       if (isErrorResponse(chatRes)) {
-        throw new GraphQLError(chatRes.error.message);
+        throw createGQLError(chatRes);
       }
       return chatRes.data;
     },
@@ -178,7 +178,7 @@ const resolvers: Resolvers = {
         // dataSources.chatAPI.getParticipant(parent.chatId, parent.sentBy),
       ]);
       if (isErrorResponse(userRes)) {
-        throw new GraphQLError(userRes.error.message);
+        throw createGQLError(userRes);
       }
       // if (isErrorResponse(participantRes)) {
       //   throw new GraphQLError(participantRes.error.message);
@@ -198,7 +198,7 @@ const resolvers: Resolvers = {
     individualChat: async (parent, _, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       if (!viewer) {
-        throw new GraphQLError("Not user logged in");
+        throw authError;
       }
       const chatRes = await dataSources.chatAPI.getChats({
         user1Id: viewer._id,
@@ -206,7 +206,7 @@ const resolvers: Resolvers = {
       });
 
       if (isErrorResponse(chatRes)) {
-        throw new GraphQLError(chatRes.error.message);
+        throw createGQLError(chatRes);
       }
       return chatRes.data[0] ?? null;
     },
@@ -241,13 +241,13 @@ const resolvers: Resolvers = {
         return friends;
       }
     },
-    chats: async (parent, _, { dataSources }) => {
+    chats: async (_parent, _input, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       const chatRes = await dataSources.chatAPI.getChats({
         userId: viewer._id,
       });
       if (isErrorResponse(chatRes)) {
-        throw new GraphQLError(chatRes.error.message);
+        throw createGQLError(chatRes);
       }
 
       return chatRes.data;
@@ -255,20 +255,20 @@ const resolvers: Resolvers = {
     chat: async (_, { chatId }, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       if (!viewer) {
-        throw new GraphQLError("Not user logged in");
+        throw authError;
       }
       const chatRes = await dataSources.chatAPI.getChat(chatId, {
         userId: viewer._id,
       });
       if (isErrorResponse(chatRes)) {
-        throw new GraphQLError(chatRes.error.message);
+        throw createGQLError(chatRes);
       }
       return chatRes.data;
     },
     individualChat: async (parent, _, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       if (!viewer) {
-        throw new GraphQLError("Not user logged in");
+        throw authError;
       }
       const chatRes = await dataSources.chatAPI.getChats({
         user1Id: viewer._id,
@@ -276,7 +276,7 @@ const resolvers: Resolvers = {
       });
 
       if (isErrorResponse(chatRes)) {
-        throw new GraphQLError(chatRes.error.message);
+        throw createGQLError(chatRes);
       }
       return chatRes.data[0] ?? null;
     },

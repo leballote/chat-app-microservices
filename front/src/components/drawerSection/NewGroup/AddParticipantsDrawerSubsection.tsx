@@ -1,4 +1,4 @@
-import { Box, Typography, List, Button, Paper } from "@mui/material";
+import { Box, Typography, List, Button, Paper, Stack } from "@mui/material";
 import ContactPreview, {
   Props as ContactPreviewProps,
 } from "../Contacts/ContactPreview";
@@ -86,23 +86,19 @@ export default function AddParticipantsDrawerSubsection() {
 
   return (
     <>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+      <Stack justifyContent="space-between" direction="row">
         <Typography
           component="h2"
           fontSize="1.2em"
           fontWeight="light"
-          sx={{ margin: ".5em .2em .2em .5em" }}
+          padding=".5em .2em .2em .5em"
         >
-          <Button
-            sx={{ display: "inline-block" }}
-            size="small"
-            onClick={handleBackClick}
-          >
+          <Button size="small" onClick={handleBackClick}>
             <ArrowBackIcon />
           </Button>
           {t("app.drawer.newGroup.addParticipantsSubsection.mainAction")}
         </Typography>
-      </Box>
+      </Stack>
 
       <DrawerSearchBar
         onSearch={handleSearch}

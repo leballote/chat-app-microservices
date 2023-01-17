@@ -21,6 +21,7 @@ import {
   setSettingsDrawerSection,
 } from "../../app/features/appView/sideBarSlice";
 import { triggerLogout } from "../../app/features/appData/authSlice";
+import { Stack } from "@mui/material";
 
 interface Props {
   onContactsClick: (ev: React.MouseEvent<HTMLElement>) => void;
@@ -68,7 +69,7 @@ export default function MainDrawerView(props: Props) {
     <>
       <ProfilePreview {...userInfo} />
       <Divider />
-      <Toolbar sx={{ display: "flex", justifyContent: "space-around" }}>
+      <Toolbar component={Stack} justifyContent="space-around" direction="row">
         <Button startIcon={<ContactsIcon />} onClick={props.onContactsClick}>
           {t("user.friends")}
         </Button>

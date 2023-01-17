@@ -4,6 +4,7 @@ import { APIResponse } from "../general.types";
 export type DefaultError = {
   message: string;
   code?: string;
+  meta?: any;
 };
 
 export type DefaultAPIResponse<T> = APIResponse<T, DefaultError>;

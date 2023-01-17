@@ -9,6 +9,7 @@ import {
 } from "./actions";
 import { isErrorResponse } from "../types/general.types";
 import { GraphQLError } from "graphql";
+import { authError, createGQLError } from "../errors/utils";
 
 export const subscriptionResolvers: SubscriptionResolvers = {
   messageCreated: {
@@ -63,7 +64,7 @@ const responseSubscriptionResponses: Resolvers = {
         dataSources: typeof context.dataSources;
       };
       if (!user) {
-        throw new GraphQLError("Not authenticated");
+        throw authError;
       }
 
       const parent_ = parent as unknown as {
@@ -83,7 +84,7 @@ const responseSubscriptionResponses: Resolvers = {
         dataSources: typeof context.dataSources;
       };
       if (!user) {
-        throw new GraphQLError("Not authenticated");
+        throw authError;
       }
 
       const parent_ = parent as unknown as {
@@ -105,7 +106,7 @@ const responseSubscriptionResponses: Resolvers = {
         dataSources: typeof context.dataSources;
       };
       if (!user) {
-        throw new GraphQLError("Not authenticated");
+        throw authError;
       }
 
       const parent_ = parent as unknown as {
@@ -124,7 +125,7 @@ const responseSubscriptionResponses: Resolvers = {
         dataSources: typeof context.dataSources;
       };
       if (!user) {
-        throw new GraphQLError("Not authenticated");
+        throw authError;
       }
 
       const parent_ = parent as unknown as {
@@ -143,13 +144,13 @@ const responseSubscriptionResponses: Resolvers = {
       //TODO: change this type to the correct one
       const { user, dataSources } = context as any;
       if (!user) {
-        throw new GraphQLError("Not authenticated");
+        throw authError;
       }
       const parentTemp = parent as any;
       const message = parentTemp.data;
       const chatRes = await dataSources.chatAPI.getChat(message.chatId);
       if (isErrorResponse(chatRes)) {
-        throw new GraphQLError(chatRes.error.message);
+        throw createGQLError(chatRes);
       }
       const { participants } = chatRes.data;
 
