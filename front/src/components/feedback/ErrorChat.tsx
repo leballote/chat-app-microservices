@@ -1,7 +1,9 @@
 import Box from "@mui/material/Box";
 import { red } from "@mui/material/colors";
+import { useTranslation } from "react-i18next";
 
 export default function ErrorChat() {
+  const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -11,7 +13,7 @@ export default function ErrorChat() {
         color: red[400],
       }}
     >
-      Oops! something went wrong
+      {t("app.error.default")}
     </Box>
   );
 }

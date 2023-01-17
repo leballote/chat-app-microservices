@@ -16,8 +16,6 @@ import { closeAddFriendModal } from "../../app/features/appView/contactsDrawerSe
 import {
   resetSendFriendRequest,
   sendFriendRequest,
-  setSendFriendRequestError,
-  setSendFriendRequestLoading,
   setSendFriendRequestValue,
 } from "../../app/features/appView/contactsDrawerSection/friendRequestsDrawerSlice";
 import { green } from "@mui/material/colors";
@@ -48,7 +46,7 @@ export default function AddFriendModal() {
           appNotificationManager.createNotification({
             notification: {
               notificationType: NotificationType.GENERIC_SUCCESS,
-              message: "Friend request sent",
+              message: t("app.success.friendRequestSent"),
             } as GenericSuccessAppNotification,
           })
         )
@@ -152,7 +150,16 @@ export default function AddFriendModal() {
             </Box>
           </DialogActions>
           {sendFriendRequestError ? (
-            <Alert severity="error">{sendFriendRequestError.message}</Alert>
+            <Alert severity="error">
+              {t([`errors.${sendFriendRequestError.code}`, "errors.fallback"], {
+                meta: {
+                  ...sendFriendRequestError.meta,
+                  resource: t(
+                    `resources.${sendFriendRequestError.meta?.resource}`
+                  ),
+                },
+              })}
+            </Alert>
           ) : null}
         </Box>
       </DialogContent>

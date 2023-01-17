@@ -6,6 +6,7 @@ import {
   setSendFriendRequestLoading,
   setSendFriendRequestValue,
 } from "../../features/appView/contactsDrawerSection/friendRequestsDrawerSlice";
+import { handleSagaStatefulError } from "./utils";
 
 type SendFriendRequestInput = {
   userToAdd: string;
@@ -25,12 +26,12 @@ export function* handleSendFriendRequest(
     } = data;
     yield put(setSendFriendRequestValue(friendAdded));
     yield put(setSendFriendRequestLoading(false));
-  } catch (error: any) {
-    yield put(setSendFriendRequestLoading(false));
-    if (error.message) {
-      yield put(setSendFriendRequestError({ message: error.message }));
-    } else {
-      yield put(setSendFriendRequestError({ message: "Something went wrong" }));
-    }
+  } catch (error) {
+    console.log(error);
+    yield* handleSagaStatefulError(
+      error,
+      setSendFriendRequestError,
+      setSendFriendRequestLoading
+    );
   }
 }

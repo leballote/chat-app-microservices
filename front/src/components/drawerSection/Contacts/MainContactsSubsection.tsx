@@ -13,12 +13,7 @@ import GenericPeopleLoading from "../../feedback/GenericPeopleLoading";
 import DrawerSearchBar from "../DrawerSearchBar";
 import ContactPreview, { Props as ContactPreviewProps } from "./ContactPreview";
 
-interface Props {
-  onBackClick: (ev: React.MouseEvent<HTMLElement>) => void;
-  onAddContactClick?: (ev: React.MouseEvent<HTMLElement>) => void;
-}
-
-export default function MainContactsSubsection({ onBackClick }: Props) {
+export default function MainContactsSubsection() {
   const {
     value: allContacts,
     loading,
@@ -31,14 +26,8 @@ export default function MainContactsSubsection({ onBackClick }: Props) {
   const contacts = contactSearched == "" ? allContacts : contactsShown;
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const [
-    getOrCreateChatFn,
-    {
-      error: getOrCreateChatError,
-      loading: getOrCreateChatLoading,
-      data: getOrCreateChatData,
-    },
-  ] = useMutation(GET_OR_CREATE_CHAT);
+  const [getOrCreateChatFn, { error: getOrCreateChatError }] =
+    useMutation(GET_OR_CREATE_CHAT);
 
   useEffect(() => {
     dispatch(getContactsPreviewsValue(""));
@@ -52,6 +41,30 @@ export default function MainContactsSubsection({ onBackClick }: Props) {
   ) => {
     if (ev.key === "Escape") {
       dispatch(searchContacts(""));
+    }
+  };
+
+  const handleClickChatPreview: React.MouseEventHandler<
+    HTMLAnchorElement
+  > = async (ev) => {
+    const contactId = ev.currentTarget.dataset["contactId"];
+    try {
+      const getOrCreateChatRes = await getOrCreateChatFn({
+        variables: {
+          input: {
+            userId: contactId,
+          },
+        },
+      });
+      const { chat: newChat, created } =
+        getOrCreateChatRes.data.getOrCreateIndividualChat;
+      if (created) dispatch(upsertChat(newChat));
+      if (newChat?.id) {
+        navigate(`/app/chat/${newChat.id}`);
+      }
+    } catch (e) {
+      // eslint-disable-line
+      // again this error is managed by the hook
     }
   };
 
@@ -73,24 +86,7 @@ export default function MainContactsSubsection({ onBackClick }: Props) {
           <ContactPreview
             {...contact}
             key={contact.id}
-            onClick={async (ev) => {
-              const contactId = ev.currentTarget.dataset["contactId"];
-              try {
-                const getOrCreateChatRes = await getOrCreateChatFn({
-                  variables: {
-                    input: {
-                      userId: contactId,
-                    },
-                  },
-                });
-                const { chat: newChat, created } =
-                  getOrCreateChatRes.data.getOrCreateIndividualChat;
-                if (created) dispatch(upsertChat(newChat));
-                if (newChat?.id) {
-                  navigate(`/app/chat/${newChat.id}`);
-                }
-              } catch (e) {}
-            }}
+            onClick={handleClickChatPreview}
           />
         ))}
       </List>

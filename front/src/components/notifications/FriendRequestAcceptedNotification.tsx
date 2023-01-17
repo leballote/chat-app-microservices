@@ -9,6 +9,7 @@ import { useMutation } from "@apollo/client";
 import { useNavigate } from "react-router";
 import { upsertChat } from "../../app/features/appData/chatsPreviewsSlice";
 import { GET_OR_CREATE_CHAT } from "../../app/graphql/mutations";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   // message: ReactNode;
@@ -22,15 +23,9 @@ export function FriendRequestAcceptedNotification({
 }: Props) {
   if (!accepter) return null;
   const dispatch = useDispatch();
-  const [
-    getOrCreateChatFn,
-    {
-      error: getOrCreateChatError,
-      loading: getOrCreateChatLoading,
-      data: getOrCreateChatData,
-    },
-  ] = useMutation(GET_OR_CREATE_CHAT);
+  const [getOrCreateChatFn] = useMutation(GET_OR_CREATE_CHAT);
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleClose: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(removeNotification({ notificationId }));
@@ -65,10 +60,12 @@ export function FriendRequestAcceptedNotification({
               navigate(`/app/chat/${newChat.id}`);
               dispatch(removeNotification({ notificationId }));
             }
-          } catch (e) {}
+          } catch (e) {
+            //TODO: add notification here
+          }
         }}
       >
-        Say hi!
+        {t("app.notifications.sayHi")}
       </Button>
     </Box>
   );
@@ -97,7 +94,11 @@ export function FriendRequestAcceptedNotification({
         variant={"standard"}
         action={closeButton}
       >
-        <Box>{`${accepter.name} accepted your friend request`}</Box>
+        <Box>
+          {t("app.notifications.friendRequestAccepted", {
+            user: accepter.username,
+          })}
+        </Box>
         {action}
       </Alert>
     </Snackbar>

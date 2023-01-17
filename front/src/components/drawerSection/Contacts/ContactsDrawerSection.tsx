@@ -98,7 +98,7 @@ export default function ContactsDrawerSection({ onBackClick }: Props) {
       </Tabs>
 
       <TabPanel value={tabValue} index={Subsection.MAIN}>
-        <MainContactsSubsection onBackClick={onBackClick} />
+        <MainContactsSubsection />
       </TabPanel>
       <TabPanel value={tabValue} index={Subsection.FRIEND_REQUESTS}>
         <FriendRequestsContactsDrawerSubsection />

@@ -49,11 +49,10 @@ export default function ChatAppPage() {
 
   useSubscription(MESSAGE_CREATED, {
     fetchPolicy: "no-cache",
-    onComplete: () => {
-      console.log("PPPPUEDE SER");
-    },
+    // onComplete: () => {
+    //   console.log("PPPPUEDE SER");
+    // },
     onData: ({ data }) => {
-      console.log("DATA, MESSAGE_CREATED: ", data.data.messageCreated);
       const chatId = data.data?.messageCreated.message?.chat.id;
       if (data.data?.messageCreated.message) {
         if (

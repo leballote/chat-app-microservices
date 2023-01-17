@@ -92,6 +92,7 @@ export const GET_USER_DATA = gql`
     viewer {
       id
       username
+      email
       name
       phrase
       status

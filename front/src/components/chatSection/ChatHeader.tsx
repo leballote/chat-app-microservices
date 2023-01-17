@@ -7,7 +7,7 @@ import FormatedAvatar from "../../utils/FormatedAvatar";
 import { openDetails } from "../../app/features/appView/chatSectionSlice";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { setValue as setCurrentUserProfilePage } from "../../app/features/appView/currentUserProfilePageSlice";
-import { blueGrey } from "@mui/material/colors";
+import { Divider, Stack } from "@mui/material";
 
 type BaseChatHeaderProps = {
   name: string;
@@ -95,21 +95,15 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
   const { onOpenDetailsClick, ...others } = props;
 
   return (
-    <Box
-      sx={{
-        backgroundColor: blueGrey[100],
-        height: height,
-      }}
-    >
-      <Box
+    <Box height={height}>
+      <Stack
+        direction="row"
         onClick={onOpenDetailsClick}
+        height="100%"
         sx={{
-          display: "flex",
-          textDecoration: "none",
           width: "fit-content",
-          height: "100%",
           "&:hover": {
-            backgroundColor: blueGrey[200],
+            bgcolor: "primary.light",
           },
           "&:visited": {
             color: "inherit",
@@ -123,7 +117,8 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
           </Typography>
           <Typography component="h2">{phrase}</Typography>
         </Container>
-      </Box>
+      </Stack>
+      <Divider />
     </Box>
   );
 }

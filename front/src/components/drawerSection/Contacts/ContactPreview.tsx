@@ -21,10 +21,8 @@ export interface Props {
   onClick?: React.MouseEventHandler<HTMLAnchorElement> | undefined;
 }
 
-export default function ({
+export default function ContactPreview({
   name,
-  phrase,
-  status,
   avatar,
   id,
   to,

@@ -27,14 +27,9 @@ import { ChatDetailsSectionModalSubsection as Subsection } from "../../app/featu
 export default function ChatDetailsModal() {
   const dispatch = useAppDispatch();
   const { detailsOpen } = useAppSelector((state) => state.chatSection);
-  const { t } = useTranslation();
-  const {
-    loading,
-    error,
-    value: currentChat,
-  } = useAppSelector((state) => state.currentChat);
+  const { value: currentChat } = useAppSelector((state) => state.currentChat);
 
-  const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {
+  const handleClose: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(closeDetails());
   };
 
@@ -94,6 +89,7 @@ function IndividualChatDetails({
   participants,
 }: Omit<Chat, "type">) {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const { value: viewer } = useAppSelector((state) => state.currentUser);
   // const {
@@ -160,7 +156,7 @@ function IndividualChatDetails({
               }}
               onClick={handleRemoveFriendClick}
             >
-              Remove friend &nbsp;
+              {t("app.modals.chatDetails.removeFriend")} &nbsp;
               <PersonRemoveIcon />
             </Button>
           ) : null}

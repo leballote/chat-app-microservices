@@ -1,11 +1,12 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createNamespacedActionCreator } from "../../../utils";
+import { AppError } from "../../types";
 
 export type FriendsRequestsSubsectionState = {
   sendFriendRequest: {
     value: AddedFriend | null;
     loading: boolean;
-    error: { message: string } | null;
+    error: AppError;
   };
 };
 
@@ -38,10 +39,7 @@ export const contactsDrawerSectionSlice = createSlice({
     setSendFriendRequestLoading(state, { payload }: PayloadAction<boolean>) {
       state.sendFriendRequest.loading = payload;
     },
-    setSendFriendRequestError(
-      state,
-      { payload }: PayloadAction<{ message: string } | null>
-    ) {
+    setSendFriendRequestError(state, { payload }: PayloadAction<AppError>) {
       state.sendFriendRequest.error = payload;
     },
     resetSendFriendRequest(state) {

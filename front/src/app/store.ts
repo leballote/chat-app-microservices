@@ -1,9 +1,4 @@
-import {
-  configureStore,
-  combineReducers,
-  Action,
-  Reducer,
-} from "@reduxjs/toolkit";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import createSagaMiddleware from "redux-saga";
 import chatsPreviewsReducer from "./features/appData/chatsPreviewsSlice";
 import contactsPreviewsReducer from "./features/appData/contactsPreviewsSlice";

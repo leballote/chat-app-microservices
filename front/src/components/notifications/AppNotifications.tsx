@@ -13,7 +13,7 @@ import { GenericSuccessNotification } from "./GenericSuccessNotification";
 
 export default function AppNotifications() {
   const { notifications } = useAppSelector((state) => state.notifications);
-  let lastNotification = notifications.at(-1);
+  const lastNotification = notifications.at(-1);
   if (!lastNotification) return null;
 
   if (

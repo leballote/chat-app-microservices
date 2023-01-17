@@ -9,8 +9,6 @@ import {
   Container,
 } from "@mui/material";
 import SendIcon from "@mui/icons-material/Send";
-import ImageIcon from "@mui/icons-material/Image";
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import { WithHeight } from "../../types/utilTypes";
 import ChatDetailsModal from "../modals/ChatDetailsModal";
 

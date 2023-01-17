@@ -3,12 +3,12 @@ import { createNamespacedActionCreator } from "../../../utils";
 import { indexCreator_ } from "../utils";
 import { AppNotification } from "../types";
 
-export type NotificationsState = {
+export type sState = {
   notifications: AppNotification[];
 };
 
 // Define the initial state using that type
-const initialState: NotificationsState = {
+const initialState: sState = {
   notifications: [],
 };
 
@@ -39,7 +39,7 @@ export const notificationsSlice = createSlice({
 const sliceCreateAction = createNamespacedActionCreator(notificationsSlice);
 
 export const triggerNewNotification = sliceCreateAction<AppNotification>(
-  "triggerNewNotification"
+  "triggerNotification"
 );
 
 export const { removeNotification, pushNotification, resetState } =

@@ -1,6 +1,4 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
 import React, { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "./app/hooks";
@@ -17,16 +15,14 @@ import {
 } from "./app/features/appView/types";
 import { appNotificationManager } from "./app/features/appView/utils";
 import AppNotifications from "./components/notifications/AppNotifications";
+import { useTranslation } from "react-i18next";
+import { Grid } from "@mui/material";
 
 const App: React.FunctionComponent = function () {
   const currentUserState = useAppSelector((state) => state.currentUser);
+  const { t } = useTranslation();
 
-  const {
-    value: currentUser,
-    loading: userLoading,
-    error: userError,
-    firstFetch: userFirstFetch,
-  } = currentUserState;
+  const { error: userError, firstFetch: userFirstFetch } = currentUserState;
 
   const dispatch = useAppDispatch();
 
@@ -41,7 +37,10 @@ const App: React.FunctionComponent = function () {
           appNotificationManager.createNotification({
             notification: {
               notificationType: NotificationType.GENERIC_ERROR,
-              message: `Something went wrong when fetching your information, please try to login again`,
+              // message: `Something went wrong when fetching your information, please try to login again`,
+              message: `${t("app.error.default")}. ${t(
+                "app.error.loginAgain"
+              )}`,
             } as GenericErrorAppNotification,
           })
         )
@@ -52,22 +51,20 @@ const App: React.FunctionComponent = function () {
   let component;
   if (!userFirstFetch) {
     component = (
-      <Container
-        sx={{
-          alignItems: "center",
-          height: "100vh",
-          justifyContent: "center",
-          display: "flex",
-        }}
+      <Grid
+        alignItems="center"
+        container
+        minHeight="100vh"
+        justifyContent="center"
       >
-        <Box width={"80%"}>
+        <Grid item xs={8}>
           <CssBaseline />
           <LinearDeterminate />
-          <Typography textAlign={"right"} variant={"h5"}>
-            Please wait...
+          <Typography textAlign="right" variant="h5">
+            {t("general.loading")}
           </Typography>
-        </Box>
-      </Container>
+        </Grid>
+      </Grid>
     );
   } else {
     component = (

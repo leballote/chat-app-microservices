@@ -41,7 +41,10 @@ export default function LoginPage() {
         variables: { username, password },
       });
       dispatch(getCurrentUserValue());
-    } catch (e) {}
+    } catch (e) {
+      /* es-lint disable-line*/
+      //the error is already set in the hook and is handeled
+    }
   }
 
   useEffect(() => {
@@ -93,7 +96,14 @@ export default function LoginPage() {
           <Button type="submit" variant="outlined">
             {t("loginPage.loginButton")}
           </Button>
-          {error ? <Alert severity="error">{error.message}</Alert> : null}
+          {error ? (
+            <Alert severity="error">
+              {t([
+                `errors.${error.graphQLErrors[0].extensions.code}`,
+                "errors.fallback",
+              ])}
+            </Alert>
+          ) : null}
           <Typography textAlign="center">
             {t("loginPage.dontHaveAnAccount")} &nbsp;
             <Link to="/auth/signup">{t("loginPage.signup")}</Link>

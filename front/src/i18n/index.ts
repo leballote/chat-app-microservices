@@ -1,10 +1,30 @@
 import i18next from "i18next";
 import { initReactI18next } from "react-i18next";
 // import LanguageDetector from "i18next-browser-languagedetector";
+import { errorResources, ErrorsTranslation } from "./errors";
+import { resourcesResource, ResourcesTranslation } from "./resources";
 
 type Translation = {
   translation: {
+    errors: ErrorsTranslation;
+    resources: ResourcesTranslation;
     app: {
+      notifications: {
+        accept: string;
+        reject: string;
+        sayHi: string;
+        friendRequestAccepted: string;
+        friendRequestReceived: string;
+      };
+      error: {
+        default: string;
+        loginAgain: string;
+        couldNotGetChat: string;
+      };
+      success: {
+        friendRequestSent: string;
+        default: string;
+      };
       drawer: {
         // general: {};
         main: {
@@ -38,6 +58,7 @@ type Translation = {
           cancel: string;
         };
         chatDetails: {
+          removeFriend: string;
           addParticipants: string;
           leaveGroup: string;
           addParticipantsSubsection: {
@@ -50,6 +71,7 @@ type Translation = {
     };
     general: {
       search: string;
+      loading: string;
     };
     user: {
       user: string;
@@ -84,7 +106,25 @@ type Translation = {
 const resources: { [language: string]: Translation } = {
   es: {
     translation: {
+      errors: errorResources.es,
+      resources: resourcesResource.es,
       app: {
+        notifications: {
+          friendRequestAccepted: "{{user}} aceptó tu solicitud de amitad",
+          sayHi: "Dile hola!",
+          friendRequestReceived: "{{user}} te envió una solicitud de amistad",
+          accept: "Aceptar",
+          reject: "Rechazar",
+        },
+        error: {
+          loginAgain: "Por favor, intenta ingresar de nuevo",
+          default: "Ups! algo salió mal",
+          couldNotGetChat: "No se pudo obtener esta conversación",
+        },
+        success: {
+          friendRequestSent: "Se envió la solicitud de amistad",
+          default: "La operación se completó con éxito",
+        },
         drawer: {
           // general: {},
           main: {
@@ -118,6 +158,7 @@ const resources: { [language: string]: Translation } = {
             cancel: "Cancelar",
           },
           chatDetails: {
+            removeFriend: "Eliminar amigo",
             leaveGroup: "Salir del grupo",
             addParticipants: "Añadir participante",
             addParticipantsSubsection: {
@@ -129,6 +170,7 @@ const resources: { [language: string]: Translation } = {
         // chat: {},
       },
       general: {
+        loading: "Por favor, espere...",
         search: "Buscar",
       },
       user: {
@@ -162,7 +204,25 @@ const resources: { [language: string]: Translation } = {
   },
   en: {
     translation: {
+      errors: errorResources.en,
+      resources: resourcesResource.en,
       app: {
+        notifications: {
+          friendRequestAccepted: "{{user}} accepted your friend request",
+          sayHi: "Say hi!",
+          friendRequestReceived: "{{user}} sent you a friend request",
+          accept: "Accept",
+          reject: "Reject",
+        },
+        error: {
+          default: "Oops! something went wrong",
+          loginAgain: "Please, login again",
+          couldNotGetChat: "Could not get this conversation",
+        },
+        success: {
+          friendRequestSent: "Friend request sent",
+          default: "The operation was completed successfully",
+        },
         drawer: {
           // general: {},
           main: {
@@ -196,6 +256,7 @@ const resources: { [language: string]: Translation } = {
             cancel: "Cancel",
           },
           chatDetails: {
+            removeFriend: "Remove friend",
             addParticipants: "Add participant",
             leaveGroup: "Leave group",
             addParticipantsSubsection: {
@@ -207,6 +268,7 @@ const resources: { [language: string]: Translation } = {
         // chat: {},
       },
       general: {
+        loading: "Please, wait...",
         search: "Search",
       },
       user: {
@@ -240,7 +302,27 @@ const resources: { [language: string]: Translation } = {
   },
   de: {
     translation: {
+      errors: errorResources.de,
+      resources: resourcesResource.de,
       app: {
+        notifications: {
+          friendRequestAccepted:
+            "{{user}} hat deine Freundschaftsanfrage angenommen",
+          friendRequestReceived:
+            "{{user}} hat dir eine Freundschaftsanfrage geschickt",
+          accept: "Akzeptieren",
+          reject: "Ablehnen",
+          sayHi: "Sag Hallo!",
+        },
+        error: {
+          loginAgain: "Bitte melden Sie sich erneut an",
+          default: "Hoppla! etwas ist schief gelaufen",
+          couldNotGetChat: "Konnte nicht chatten",
+        },
+        success: {
+          friendRequestSent: "Freundschaftsanfrage gesendet",
+          default: "Der Vorgang wurde erfolgreich abgeschlossen",
+        },
         drawer: {
           // general: {},
           main: {
@@ -274,6 +356,7 @@ const resources: { [language: string]: Translation } = {
             cancel: "Abbrechen",
           },
           chatDetails: {
+            removeFriend: "Freund entfernen",
             addParticipants: "Teilnehmer hinzufüge",
             leaveGroup: "Gruppe verlassen",
             addParticipantsSubsection: {
@@ -285,6 +368,7 @@ const resources: { [language: string]: Translation } = {
         // chat: {},
       },
       general: {
+        loading: "Warten Sie mal...",
         search: "Suche",
       },
       user: {

@@ -9,6 +9,7 @@ import {
   acceptFriendRequest,
   rejectFriendRequest,
 } from "../../app/features/appData/friendRequestsPreviewsSlice";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   // message: ReactNode;
@@ -22,24 +23,29 @@ export function FriendRequestReceivedNotification({
 }: Props) {
   if (!sender) return null;
   const dispatch = useDispatch();
+  const { t } = useTranslation();
 
-  const handleAcceptClick: MouseEventHandler<HTMLButtonElement> = (ev) => {
+  const handleAcceptClick: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(acceptFriendRequest(sender.id));
     dispatch(removeNotification({ notificationId }));
   };
 
-  const handleRejectClick: MouseEventHandler<HTMLButtonElement> = (ev) => {
+  const handleRejectClick: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(rejectFriendRequest(sender.id));
     dispatch(removeNotification({ notificationId }));
   };
 
-  const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {
+  const handleClose: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(removeNotification({ notificationId }));
   };
   const action = (
     <Box>
-      <Button onClick={handleAcceptClick}>Accept</Button>
-      <Button onClick={handleRejectClick}>Reject</Button>
+      <Button onClick={handleAcceptClick}>
+        {t("app.notifications.accept")}
+      </Button>
+      <Button onClick={handleRejectClick}>
+        {t("app.notifications.reject")}
+      </Button>
       <IconButton
         size="small"
         aria-label="close"
@@ -74,7 +80,11 @@ export function FriendRequestReceivedNotification({
         icon={<CircleNotificationsIcon />}
         variant={"standard"}
       >
-        <Box>{`${sender.name} sent you a friend request`}</Box>
+        <Box>
+          {t("app.notifications.friendRequestReceived", {
+            user: sender.username,
+          })}
+        </Box>
         {action}
       </Alert>
     </Snackbar>

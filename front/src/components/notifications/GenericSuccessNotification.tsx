@@ -12,7 +12,7 @@ type Props = {
 export function GenericSuccessNotification({ notificationId, message }: Props) {
   const dispatch = useDispatch();
 
-  const handleClose: MouseEventHandler<HTMLButtonElement> = (ev) => {
+  const handleClose: MouseEventHandler<HTMLButtonElement> = () => {
     dispatch(removeNotification({ notificationId }));
   };
 
@@ -43,7 +43,6 @@ export function GenericSuccessNotification({ notificationId, message }: Props) {
         ></Box>
       }
       action={action}
-      //TODO: internationalize
     >
       <Alert severity="success" sx={{ width: "100%" }} variant={"standard"}>
         {message}

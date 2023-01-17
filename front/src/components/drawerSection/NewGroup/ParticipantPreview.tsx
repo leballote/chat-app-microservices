@@ -18,6 +18,7 @@ import {
   NotificationType,
 } from "../../../app/features/appView/types";
 import { GET_OR_CREATE_CHAT } from "../../../app/graphql/mutations";
+import { useTranslation } from "react-i18next";
 
 export interface Props {
   id: string;
@@ -42,6 +43,7 @@ export default function ParticipantPreview({
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const [getOrCreateChatFn] = useMutation(GET_OR_CREATE_CHAT);
+  const { t } = useTranslation();
   return (
     <ListItem
       key={id}
@@ -67,12 +69,14 @@ export default function ParticipantPreview({
 
           navigate(`/app/chat/${newChat.id}`);
         } catch (e) {
+          //I feel like it should not display the reason, just the fact that it did not work in this case
+          const message = t(["app.error.couldNotGetChat", "errors.fallback"]);
           dispatch(
             triggerNewNotification(
               appNotificationManager.createNotification({
                 notification: {
                   notificationType: NotificationType.GENERIC_ERROR,
-                  message: (e as any).message,
+                  message,
                 } as GenericErrorAppNotification,
               })
             )

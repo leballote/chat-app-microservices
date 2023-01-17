@@ -23,11 +23,13 @@ export default function SignupPage() {
   const confirmPasswordInput = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
   //TODO: maybe move this into a saga
-  const [mutationFunction, { data, loading, error }] = useMutation(SIGNUP);
+  const [mutationFunction, { data, error }] = useMutation(SIGNUP);
 
-  const [clientError, setClientError] = useState<{ message: string } | null>(
-    null
-  );
+  const [clientError, setClientError] = useState<{
+    message: string;
+    code: string;
+    meta?: object;
+  } | null>(null);
 
   const { value: user } = useAppSelector((state) => state.currentUser);
   const navigate = useNavigate();
@@ -52,7 +54,10 @@ export default function SignupPage() {
     const confirmPassword = confirmPasswordInput.current?.value;
     //TODO: Validate email
     if (password !== confirmPassword) {
-      setClientError({ message: "Passwords don't match" });
+      setClientError({
+        message: "Passwords don't match",
+        code: "PASSWORDS_DONT_MATCH",
+      });
       setError(undefined);
       return;
     } else {
@@ -74,7 +79,8 @@ export default function SignupPage() {
       try {
         await mutationFunction({ variables: { input: inputs } });
       } catch (e) {
-        console.log(e);
+        // disable-eslint-line
+        //this is handeled by the hook already
       }
     }
   }
@@ -137,10 +143,29 @@ export default function SignupPage() {
             {t("signupPage.signupButton")}
           </Button>
           {clientError ? (
-            <Alert severity="error">{clientError.message}</Alert>
+            <Alert severity="error">
+              {t(`errors.${clientError.code}`, { meta: clientError.meta })}
+            </Alert>
           ) : null}
           {error && !clientError ? (
-            <Alert severity="error">{error.message}</Alert>
+            <Alert severity="error">
+              {t(
+                [
+                  `errors.${error.graphQLErrors[0].extensions.code}`,
+                  "errors.fallback",
+                ],
+                {
+                  article: "El",
+                  meta: error.graphQLErrors[0].extensions,
+                  key: Object.keys(
+                    (error.graphQLErrors[0].extensions as any).meta.keyValue
+                  )[0],
+                  value: Object.values(
+                    (error.graphQLErrors[0].extensions as any).meta.keyValue
+                  )[0],
+                }
+              )}
+            </Alert>
           ) : null}
           <Typography textAlign="center">
             {t("signupPage.haveAnAccount")} &nbsp;
