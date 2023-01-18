@@ -3,7 +3,7 @@ import ContactPreview, {
   Props as ContactPreviewProps,
 } from "../Contacts/ContactPreview";
 import DrawerSearchBar from "../DrawerSearchBar";
-import { ChangeEvent, useEffect } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { getValue as getContactsPreviewsValue } from "../../../app/features/appData/contactsPreviewsSlice";
@@ -56,9 +56,10 @@ export default function AddParticipantsDrawerSubsection() {
     dispatch(setMainDrawerSection());
   }
 
-  //TODO: solve this any
-  function handleAddParticipant(ev: any) {
-    dispatch(addParticipant(ev.currentTarget.dataset.contactId));
+  function handleAddParticipant(ev: React.MouseEvent<HTMLElement, MouseEvent>) {
+    if (ev.currentTarget.dataset.contactId) {
+      dispatch(addParticipant(ev.currentTarget.dataset.contactId));
+    }
   }
 
   function handleNext() {

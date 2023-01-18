@@ -8,20 +8,20 @@ import {
   Avatar,
 } from "@mui/material";
 import { MouseEventHandler, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { useTranslation } from "react-i18next";
-import { Chat } from "../../types/chat.types";
-import { closeDetails } from "../../app/features/appView/chatSectionSlice";
+import { Chat } from "../../../types/chat.types";
+import { closeDetails } from "../../../app/features/appView/chatSectionSlice";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import { useDispatch } from "react-redux";
 import {
   getValue as getContactsPreviewsValue,
   requestRemoveFriend,
-} from "../../app/features/appData/contactsPreviewsSlice";
+} from "../../../app/features/appData/contactsPreviewsSlice";
 import GroupDetailsMainSubsection from "./GroupDetailsMainSubsection";
 import AddParticipantsModalSubsection from "./AddParticipantsModalSubsection";
-import { setSubsection } from "../../app/features/appView/chatDetailsModal/chatDetailsModalSlice";
-import { ChatDetailsSectionModalSubsection as Subsection } from "../../app/features/appView/types";
+import { setSubsection } from "../../../app/features/appView/chatDetailsModal/chatDetailsModalSlice";
+import { ChatDetailsSectionModalSubsection as Subsection } from "../../../app/features/appView/types";
 
 export default function ChatDetailsModal() {
   const dispatch = useAppDispatch();

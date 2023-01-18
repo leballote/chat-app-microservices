@@ -25,9 +25,7 @@ export default function SearchBar({ onSearch, onKeyDown }: Props) {
         ),
       }}
       inputProps={{ maxLength: 100 }}
-      // value={value}
       onChange={onSearch}
-      //TODO: check what is going on with this event
       onKeyDown={onKeyDown}
     />
   );

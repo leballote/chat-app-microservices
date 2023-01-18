@@ -1,17 +1,6 @@
 import { useMutation } from "@apollo/client";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import DoneIcon from "@mui/icons-material/Done";
-import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
-import {
-  Avatar,
-  Box,
-  Button,
-  Container,
-  Paper,
-  Stack,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Button, Paper, Stack } from "@mui/material";
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
@@ -24,6 +13,11 @@ import {
 import { setMainDrawerSection } from "../../../app/features/appView/sideBarSlice";
 import { CREATE_GROUP_CHAT } from "../../../app/graphql/mutations";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { createAndDispatchGenericErrorNotification } from "../../../utils/createAndDispatchGenericErrorNotification";
+import { SectionTitleWithBackButton } from "../../shared/SectionTitleWithBackButton";
+import { BottomElement } from "./BottomElement";
+import { NewGroupMainForm } from "./NewGroupMainFrom";
+import { UploadImage } from "./UploadImage";
 
 export default function SetTitleAndAvatarDrawerSubsection() {
   const dispatch = useAppDispatch();
@@ -67,71 +61,25 @@ export default function SetTitleAndAvatarDrawerSubsection() {
         navigate(`/app/chat/${res.data.createGroupChat.chat.id}`);
       }
     } catch (e) {
-      //TODO: create a notification if fails
+      createAndDispatchGenericErrorNotification({ error: e, dispatch });
     }
   };
 
   return (
     <Stack component="form" onSubmit={handleFinish}>
-      <Stack justifyContent="space-between" direction="row">
-        <Typography
-          component="h2"
-          fontSize="1.2em"
-          fontWeight="light"
-          sx={{ margin: ".5em .2em .2em .5em" }}
-        >
-          <Button
-            sx={{ display: "inline-block" }}
-            size="small"
-            onClick={handleBackClick}
-          >
-            <ArrowBackIcon />
-          </Button>
-          {t("app.drawer.newGroup.title")}
-        </Typography>
-      </Stack>
-
-      <Container
-        sx={{ display: "flex", justifyContent: "center", margin: "2em 0" }}
-      >
-        <Avatar
-          sx={{
-            width: "5em",
-            height: "5em",
-            "&:hover": {
-              color: "grey.300",
-              cursor: "pointer",
-            },
-          }}
-        >
-          <PhotoCameraIcon sx={{ fontSize: "2.5em" }} />
-        </Avatar>
-      </Container>
-      <TextField
-        sx={{ margin: ".5em 1em" }}
-        label={t("app.drawer.newGroup.groupName")}
-        inputProps={{ maxLength: 80 }}
-        name="name"
-        required
+      <SectionTitleWithBackButton
+        title={t("app.drawer.newGroup.title")}
+        onBackClick={handleBackClick}
       />
-      <TextField
-        sx={{ margin: ".5em 1em" }}
-        inputProps={{ maxLength: 200 }}
-        label={t("app.drawer.newGroup.groupPhrase")}
-        name="phrase"
-        size="small"
-      />
-
-      <Paper
-        sx={{ position: "absolute", bottom: 0, left: 0, right: 0 }}
-        elevation={3}
-      >
-        <Box>
-          <Button type="submit" sx={{ width: "100%" }}>
+      <UploadImage />
+      <NewGroupMainForm />
+      <BottomElement>
+        <Paper elevation={4}>
+          <Button type="submit" fullWidth>
             <DoneIcon />
           </Button>
-        </Box>
-      </Paper>
+        </Paper>
+      </BottomElement>
     </Stack>
   );
 }

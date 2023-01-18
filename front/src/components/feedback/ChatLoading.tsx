@@ -1,6 +1,6 @@
 import { Skeleton, Box, Container, Stack, List } from "@mui/material";
 import { WithHeight } from "../../types/utilTypes";
-import ChatDetailsModal from "../modals/ChatDetailsModal";
+import ChatDetailsModal from "../modals/ChatDetailsModal/ChatDetailsModal";
 import { MessageSkeleton } from "../chatSection/Message/MessageSkeleton";
 import { ChatFooterLoading } from "../chatSection/ChatFooter/ChatFooterLoading";
 

@@ -44,10 +44,6 @@ export function PresentationalChatFooter({
         <Button
           sx={{
             aspectRatio: "1 / 1",
-            // bgcolor: "whitesmoke",
-            // "&:hover": {
-            //   bgcolor: "#EEEEEE",
-            // },
           }}
           onClick={onSendClick}
           disabled={loading}

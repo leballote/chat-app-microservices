@@ -11,15 +11,15 @@ import {
   ListItemText,
 } from "@mui/material";
 import { MouseEventHandler } from "react";
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { Chat } from "../../types/chat.types";
-import ParticipantPreview from "../drawerSection/NewGroup/ParticipantPreview";
+import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { Chat } from "../../../types/chat.types";
+import ParticipantPreview from "../../drawerSection/NewGroup/ParticipantPreview";
 import ExitToAppIcon from "@mui/icons-material/ExitToApp";
 import AddIcon from "@mui/icons-material/Add";
 import {
   requestLeaveGroup,
   requestRemoveParticipant,
-} from "../../app/features/appData/currentChatSlice";
+} from "../../../app/features/appData/currentChatSlice";
 import { useTranslation } from "react-i18next";
 
 export default function GroupDetailsMainSubsection({

@@ -52,7 +52,7 @@ export const errorResources: Record<"en" | "es" | "de", ErrorsTranslation> = {
     CANNOT_REQUEST_FRIENDSHIP_TO_YOURSELF_ERROR:
       "No puedes envíar solicitud de amistad a ti mismo",
     YOU_ARE_ALREADY_FRIENDS_ERROR: "Ya eres amigo de este usuario",
-    fallback: "Algo salio mal",
+    fallback: "Algo salió mal",
   },
   de: {
     NOT_AUTHENTICATED: "Sie sind nicht authentifiziert",

@@ -100,10 +100,12 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
         direction="row"
         onClick={onOpenDetailsClick}
         height="100%"
+        padding=".4em .5em"
         sx={{
           width: "fit-content",
           "&:hover": {
-            bgcolor: "primary.light",
+            color: "primary.main",
+            bgcolor: "grey.100",
           },
           "&:visited": {
             color: "inherit",

@@ -24,6 +24,7 @@ export function ChatFooter({ height }: ChatFooterProps) {
 
   function triggerSendMessage() {
     //the last condition is not really necessary, but I think it makes it more explicit
+    console.log("");
     if (
       user &&
       messageTextInput.current?.value &&
@@ -46,6 +47,7 @@ export function ChatFooter({ height }: ChatFooterProps) {
   }
 
   function handleEnter() {
+    console.log("handleEnter");
     triggerSendMessage();
   }
 
@@ -62,6 +64,7 @@ export function ChatFooter({ height }: ChatFooterProps) {
   }
 
   useEffect(() => {
+    //when entering a chat, focus the chat box
     messageTextInput.current?.focus();
   }, []);
 
@@ -69,6 +72,7 @@ export function ChatFooter({ height }: ChatFooterProps) {
     <PresentationalChatFooter
       height={height}
       loading={false}
+      chatboxRef={messageTextInput}
       onChatboxKeyDown={handleKeyDown}
       onSendClick={handleSendClick}
     />

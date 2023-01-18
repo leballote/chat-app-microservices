@@ -27,7 +27,6 @@ export interface Props {
   status: string;
   avatar?: string;
   isViewerAdmin: boolean;
-  //TODO: change this for the correct type
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   onRemove?: React.MouseEventHandler<HTMLButtonElement>;
 }

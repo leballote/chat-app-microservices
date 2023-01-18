@@ -1,4 +1,4 @@
-import { List, ListItem, Skeleton } from "@mui/material";
+import { List, ListItem, Skeleton, Stack } from "@mui/material";
 
 type Props = {
   numberOfPeople: number;
@@ -13,14 +13,12 @@ export default function GenericPeopleLoading({ numberOfPeople }: Props) {
     <List>
       {list.map((no) => {
         return (
-          <ListItem
+          <Stack
             key={no}
-            sx={{
-              display: "flex",
-              flexFlow: "row wrap",
-              padding: "0.8em 1em",
-              gap: ".8em",
-            }}
+            direction="row"
+            padding="0.6em 1em"
+            component={ListItem}
+            gap={2}
           >
             <Skeleton variant="circular" height={60} width={60} />
             <Skeleton
@@ -29,7 +27,7 @@ export default function GenericPeopleLoading({ numberOfPeople }: Props) {
               width={"calc(100% - 80px)"}
               key={2}
             />
-          </ListItem>
+          </Stack>
         );
       })}
     </List>

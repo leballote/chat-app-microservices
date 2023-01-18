@@ -1,19 +1,17 @@
 import {
   Box,
-  Typography,
   List,
-  Button,
   ListItem,
   ListItemButton,
   ListItemText,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useAppDispatch } from "../../../app/hooks";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
 import { useMutation } from "@apollo/client";
 import { setMainSubsection } from "../../../app/features/appData/settingsSectionSlice";
 import { SET_LANGUAGE } from "../../../app/graphql/mutations";
+import { SectionTitleWithBackButton } from "../../shared/SectionTitleWithBackButton";
 
 const LngAbbreviationMapping: { [code: string]: string } = {
   en: "English",
@@ -32,59 +30,80 @@ const languageCodeNamePairs = (["de", "en", "es"] ?? [])
   });
 
 export default function LanguageSettingsSubsection() {
-  //TODO: change for const
   const dispatch = useAppDispatch();
   const [setLanguageMutationFn] = useMutation(SET_LANGUAGE);
   const { t } = useTranslation();
+
+  async function handleSelectLanguageClick(
+    _ev: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    languageCode: string
+  ) {
+    try {
+      i18next.changeLanguage(languageCode);
+      setLanguageMutationFn({
+        variables: {
+          input: {
+            language: languageCode,
+          },
+        },
+      });
+    } catch (e) {
+      //TODO: trigger a notification
+    }
+  }
 
   async function handleBackClick() {
     dispatch(setMainSubsection());
   }
 
   return (
-    <>
-      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-        <Typography
-          component="h2"
-          fontSize="1.2em"
-          fontWeight="light"
-          sx={{ margin: ".5em .2em .2em .5em" }}
-        >
-          <Button
-            sx={{ display: "inline-block" }}
-            size="small"
-            onClick={handleBackClick}
-          >
-            <ArrowBackIcon />
-          </Button>
-          {t("settingsSection.languageSubsection.title")}
-        </Typography>
-      </Box>
+    <Box>
+      <SectionTitleWithBackButton
+        onBackClick={handleBackClick}
+        title={t("settingsSection.languageSubsection.title")}
+      />
       <List>
         {languageCodeNamePairs.map(([languageCode, languageName]) => (
-          <ListItem key={languageName}>
-            {languageCode}
-            <ListItemButton
-              disableRipple
-              data-language-code={languageCode}
-              onClick={(ev) => {
-                const languageCode = ev.currentTarget.dataset["languageCode"];
-                i18next.changeLanguage(languageCode);
-
-                setLanguageMutationFn({
-                  variables: {
-                    input: {
-                      language: languageCode,
-                    },
-                  },
-                });
-              }}
-            >
-              <ListItemText primary={languageName} />
-            </ListItemButton>
-          </ListItem>
+          <LanguageItem
+            key={languageCode}
+            languageCode={languageCode}
+            languageName={languageName}
+            onSelectLanguageClick={handleSelectLanguageClick}
+          />
         ))}
       </List>
-    </>
+    </Box>
+  );
+}
+type LanguageItemProps = {
+  languageCode: string;
+  languageName: string;
+  onSelectLanguageClick?: (
+    ev: React.MouseEvent<HTMLDivElement, MouseEvent>,
+    languageCode: string
+  ) => void;
+};
+
+function LanguageItem({
+  languageCode,
+  languageName,
+  onSelectLanguageClick,
+}: LanguageItemProps) {
+  return (
+    <ListItem key={languageName}>
+      {languageCode}
+      <ListItemButton
+        disableRipple
+        data-language-code={languageCode}
+        onClick={(ev) => {
+          const languageCode = ev.currentTarget.dataset["languageCode"];
+          if (languageCode && typeof onSelectLanguageClick == "function") {
+            onSelectLanguageClick(ev, languageCode);
+          }
+        }}
+      >
+        <ListItemText primary={languageName} />
+      </ListItemButton>
+    </ListItem>
   );
 }

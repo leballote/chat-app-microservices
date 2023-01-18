@@ -17,7 +17,6 @@ export interface Props {
   status: string;
   avatar: string;
   to?: string;
-  //TODO: change this for the correct type
   onClick?: React.MouseEventHandler<HTMLAnchorElement> | undefined;
 }
 

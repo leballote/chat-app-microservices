@@ -1,5 +1,5 @@
 import { useSubscription } from "@apollo/client";
-import Box from "@mui/material/Box";
+import { Stack } from "@mui/material";
 import i18next from "i18next";
 import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
@@ -151,7 +151,7 @@ export default function ChatAppPage() {
   }, [settings]);
 
   return user ? (
-    <Box sx={{ display: "flex" }}>
+    <Stack direction="row">
       <SideBar />
       <Routes>
         <Route
@@ -160,6 +160,6 @@ export default function ChatAppPage() {
         />
         <Route path="/app/error" element={<ErrorChat />} />
       </Routes>
-    </Box>
+    </Stack>
   ) : null;
 }

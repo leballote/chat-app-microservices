@@ -57,21 +57,7 @@ export function FriendRequestReceivedNotification({
   );
 
   return (
-    <Snackbar
-      open
-      message={
-        <Box
-          sx={{
-            display: "flex",
-            flexFlow: "row wrap",
-            alignItems: "center",
-            gap: ".4em",
-            width: "100%",
-          }}
-        ></Box>
-      }
-      //TODO: internationalize
-    >
+    <Snackbar open>
       <Alert
         severity="info"
         sx={{ width: "100%" }}

@@ -1,4 +1,4 @@
-import { Alert, Box, IconButton, Snackbar } from "@mui/material";
+import { Alert, IconButton, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { MouseEventHandler } from "react";
 import { useDispatch } from "react-redux";
@@ -28,21 +28,7 @@ export function GenericErrorNotification({ notificationId, message }: Props) {
   );
 
   return (
-    <Snackbar
-      open
-      message={
-        <Box
-          sx={{
-            display: "flex",
-            flexFlow: "row wrap",
-            alignItems: "center",
-            gap: ".4em",
-            width: "100%",
-          }}
-        ></Box>
-      }
-      action={action}
-    >
+    <Snackbar open action={action}>
       <Alert severity="error" sx={{ width: "100%" }} variant={"standard"}>
         {message}
         {action}
