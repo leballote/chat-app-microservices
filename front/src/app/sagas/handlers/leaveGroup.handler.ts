@@ -3,8 +3,8 @@ import { PayloadAction } from "@reduxjs/toolkit";
 import { leaveGroupRequest } from "../requests/leaveGroup.request";
 import { getValue } from "../../features/appData/currentChatSlice";
 import { removeChat } from "../../features/appData/chatsPreviewsSlice";
-// import { removeParticipant as removeParticipantInState } from "../../features/currentChatSlice";
-import { store } from "../../store";
+import { createAndPutGenericErrorNotification } from "../../../utils/createAndDispatchGenericErrorNotification";
+import { t } from "i18next";
 
 export function* handleLeaveGroup(
   action: PayloadAction<{ chatId: string }>
@@ -13,20 +13,20 @@ export function* handleLeaveGroup(
     const {
       payload: { chatId },
     } = action;
-    const response = yield call(leaveGroupRequest, action);
-    const { data } = response;
-    const { leaveGroupChat } = data;
+    yield call(leaveGroupRequest, action);
     yield put(removeChat({ chatId }));
     const currentChatId = yield select((state) => state.currentChat.value?.id);
 
     if (currentChatId && currentChatId == chatId) {
       yield put(getValue({ chatId: currentChatId }));
     }
-
-    // yield put(removeParticipantInState({ chatId, participantId }));
-    // yield put(setValue(friendshipRequestsReceivedDict));
   } catch (error) {
-    // yield put(setLoading(false));
-    // yield put(setError(error));
+    yield* createAndPutGenericErrorNotification({
+      error,
+      message: t([
+        "app.error.couldntLeaveGroup",
+        "app.error.default",
+      ]) as string,
+    });
   }
 }

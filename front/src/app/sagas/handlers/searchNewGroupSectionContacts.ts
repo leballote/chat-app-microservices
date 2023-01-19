@@ -1,6 +1,5 @@
 import { put, select } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { store } from "../../store";
 import {
   setContactsShown,
   setSearchTerm,

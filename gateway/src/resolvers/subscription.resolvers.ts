@@ -8,7 +8,6 @@ import {
   pubsub,
 } from "./actions";
 import { isErrorResponse } from "../types/general.types";
-import { GraphQLError } from "graphql";
 import { authError, createGQLError } from "../errors/utils";
 
 export const subscriptionResolvers: SubscriptionResolvers = {
@@ -71,10 +70,14 @@ const responseSubscriptionResponses: Resolvers = {
         sender: UserModelSuccessResponse;
         receiver: UserModelSuccessResponse;
       };
+      console.log("accepter running");
 
       if (user._id == parent_.receiver._id || user._id == parent_.sender._id) {
+        console.log("accepter FULFILLED");
+        console.log("accepter parent sender", parent_.sender);
         return parent_.sender;
       } else {
+        console.log("accepter NOT FULFILLED");
         return null;
       }
     },
@@ -91,10 +94,15 @@ const responseSubscriptionResponses: Resolvers = {
         sender: UserModelSuccessResponse;
         receiver: UserModelSuccessResponse;
       };
+      console.log("requester running");
 
       if (user._id == parent_.receiver._id || user._id == parent_.sender._id) {
+        console.log("requester FULFILLED");
+
+        console.log("requester parent receiver", parent_.receiver);
         return parent_.receiver;
       } else {
+        console.log("requester NOT FULFILLED");
         return null;
       }
     },

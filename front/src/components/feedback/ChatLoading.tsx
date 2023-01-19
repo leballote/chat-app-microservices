@@ -5,7 +5,6 @@ import { MessageSkeleton } from "../chatSection/Message/MessageSkeleton";
 import { ChatFooterLoading } from "../chatSection/ChatFooter/ChatFooterLoading";
 
 export default function ChatLoading() {
-  console.log("hola", "chat loading");
   return (
     <Box
       sx={{

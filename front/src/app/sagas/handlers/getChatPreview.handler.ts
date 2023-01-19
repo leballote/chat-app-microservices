@@ -2,6 +2,8 @@ import { call, put } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { upsertChat } from "../../features/appData/chatsPreviewsSlice";
 import { requestGetChatPreview } from "../requests/getChatPreview.request";
+import { createAndPutGenericErrorNotification } from "../../../utils/createAndDispatchGenericErrorNotification";
+import { t } from "i18next";
 
 export function* handleGetChatPreview(action: PayloadAction<string>): any {
   try {
@@ -11,6 +13,10 @@ export function* handleGetChatPreview(action: PayloadAction<string>): any {
       viewer: { chat },
     } = data;
     yield put(upsertChat(chat));
-    // yield put(setChatsPreviews(chat));
-  } catch (error) {}
+  } catch (error) {
+    yield* createAndPutGenericErrorNotification({
+      error,
+      message: t("app.error.default") as string,
+    });
+  }
 }

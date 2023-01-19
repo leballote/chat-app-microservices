@@ -25,7 +25,6 @@ import { Stack } from "@mui/material";
 
 interface Props {
   onContactsClick: (ev: React.MouseEvent<HTMLElement>) => void;
-  onMoreClick: (ev: React.MouseEvent<HTMLElement>) => void;
 }
 
 export default function MainDrawerView(props: Props) {

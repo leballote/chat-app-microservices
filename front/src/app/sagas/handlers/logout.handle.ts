@@ -5,8 +5,9 @@ import {
   setLogoutActionValue,
   setLououtActionLoading,
 } from "../../features/appData/authSlice";
-import client, { wsLink } from "../../../client";
+import client from "../../../client";
 import { setFirstFetch } from "../../features/appData/currentUserSlice";
+import { handleSagaStatefulError } from "./utils";
 
 export function* handleLogout(): any {
   try {
@@ -18,17 +19,15 @@ export function* handleLogout(): any {
     yield put({ type: "root/resetState" });
     yield put(setLogoutActionValue(logout));
     yield call(client.resetStore);
+    //TODO: I don't remember what is this for
     yield put(setFirstFetch(true));
   } catch (error) {
-    console.log(error);
-    let message;
-    yield put(setLououtActionLoading(false));
-    if ((error as any).message) {
-      message = (error as any).message;
-    } else {
-      message = "something went wrong";
-    }
+    yield* handleSagaStatefulError(
+      error,
+      setLogoutActionError,
+      setLououtActionLoading
+    );
+    //TODO: I don't remember what is this for
     yield put(setFirstFetch(true));
-    yield put(setLogoutActionError({ message }));
   }
 }

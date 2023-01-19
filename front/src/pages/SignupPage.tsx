@@ -16,7 +16,6 @@ export default function SignupPage() {
   const confirmPasswordInput = useRef<HTMLInputElement>(null);
   const { t } = useTranslation();
 
-  //TODO: maybe move this into a saga
   const [mutationFunction, { data, error }] = useMutation(SIGNUP);
 
   const [clientError, setClientError] = useState<{
@@ -38,8 +37,8 @@ export default function SignupPage() {
     }
   }, [user]);
 
-  //TODO client side validation
-  async function handleSubmit(ev: React.FormEvent<HTMLInputElement>) {
+  //SUGGESTION: maybe some client side validation for the password and realtime feedback instead of on submit
+  async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     const username = usernameInput.current?.value;
     const name = nameInput.current?.value;
@@ -79,12 +78,7 @@ export default function SignupPage() {
   }
   return (
     <FormCentered>
-      <Stack
-        gap={2}
-        component="form"
-        //TODO: solve this any
-        onSubmit={handleSubmit as any}
-      >
+      <Stack gap={2} component="form" onSubmit={handleSubmit}>
         <Typography
           variant="h4"
           fontWeight="bold"

@@ -112,14 +112,6 @@ const serverCleanup = useServer(
         } = authRes;
         userContext.user = user;
       }
-      const now = new Date();
-      console.group("subs");
-      console.log(
-        `${now.getHours()}:${now.getMinutes()}:${now.getSeconds()}`,
-        "AUTH_RES",
-        authRes
-      );
-      console.groupEnd();
       return {
         dataSources: {
           chatAPI: new ChatAPI({ cache }),

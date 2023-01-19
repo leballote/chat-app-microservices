@@ -15,7 +15,7 @@ export function ParticipantsToAdd() {
   const dispatch = useAppDispatch();
   const participants = useAppSelector(
     (state) => state.newGroupSectionDrawer.participantsToAdd
-  ).map((participantId) => contactsMap[participantId]);
+  ).flatMap((participantId) => contactsMap[participantId] ?? []);
 
   const handleRemoveParticipant: RemoveParticipantFn = (_, participantId) => {
     dispatch(removeParticipant(participantId));

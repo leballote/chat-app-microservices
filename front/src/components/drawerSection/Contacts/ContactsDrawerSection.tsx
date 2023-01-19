@@ -39,7 +39,6 @@ function TabPanel(props: TabPanelProps) {
 
 interface Props {
   onBackClick: (ev: React.MouseEvent<HTMLElement>) => void;
-  onAddContactClick?: (ev: React.MouseEvent<HTMLElement>) => void;
 }
 
 export default function ContactsDrawerSection({ onBackClick }: Props) {

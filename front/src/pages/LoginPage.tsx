@@ -11,17 +11,15 @@ import { FormCentered } from "../components/shared/FromCentered";
 export default function LoginPage() {
   const usernameInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
-  //TODO: move this into a saga
   const [mutationFunction, { error }] = useMutation(LOGIN, {
     fetchPolicy: "no-cache",
   });
-  // const {value: user} = useAppSelector(state => state.currentUser);
   const user = useAppSelector((state) => state.currentUser.value);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  async function handleSubmit(ev: React.FormEvent<HTMLInputElement>) {
+  async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
     const username = usernameInput.current?.value;
     const password = passwordInput.current?.value;
@@ -34,10 +32,7 @@ export default function LoginPage() {
         variables: { username, password },
       });
       dispatch(getCurrentUserValue());
-    } catch (e) {
-      /* es-lint disable-line*/
-      //the error is already set in the hook and is handeled
-    }
+    } catch (e) {} //eslint-disable-line
   }
 
   useEffect(() => {
@@ -47,9 +42,8 @@ export default function LoginPage() {
   }, [user]);
 
   return (
-    //TODO: solve this any
     <FormCentered>
-      <Stack gap={2} component="form" onSubmit={handleSubmit as any}>
+      <Stack gap={2} component="form" onSubmit={handleSubmit}>
         <Typography
           variant="h4"
           fontWeight="bold"
@@ -60,7 +54,6 @@ export default function LoginPage() {
           {t("loginPage.title")}
         </Typography>
         <TextField
-          // placeholder="Username"
           label={t("user.username")}
           required
           inputRef={usernameInput}
@@ -69,7 +62,6 @@ export default function LoginPage() {
 
         <TextField
           label={t("user.password")}
-          // placeholder="Password"
           required
           type="password"
           inputRef={passwordInput}

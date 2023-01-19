@@ -4,14 +4,13 @@ import { removeFriend } from "../requests/removeFriend.request";
 import { removeContact } from "../../features/appData/contactsPreviewsSlice";
 import { RootState } from "../../store";
 import { closeDetails } from "../../features/appView/chatSectionSlice";
+import { t } from "i18next";
+import { createAndPutGenericErrorNotification } from "../../../utils/createAndDispatchGenericErrorNotification";
 
 export function* handleRemoveFriend(action: PayloadAction<string>): any {
   const { payload } = action;
   try {
-    const response = yield call(removeFriend, { userToRemoveId: payload });
-    const { data } = response;
-    const { removeFriendship } = data;
-    const { userRemoved } = removeFriendship;
+    yield call(removeFriend, { userToRemoveId: payload });
     yield put(removeContact(payload));
     const currentUserProfilePageId = yield select(
       (state: RootState) => state.currentUserProfilePage.value?.id
@@ -20,6 +19,12 @@ export function* handleRemoveFriend(action: PayloadAction<string>): any {
       yield put(closeDetails());
     }
   } catch (error) {
-    //TODO: see how to handle this error
+    yield* createAndPutGenericErrorNotification({
+      error,
+      message: t([
+        "app.error.couldntRemoveFriend",
+        "app.error.default",
+      ]) as string,
+    });
   }
 }

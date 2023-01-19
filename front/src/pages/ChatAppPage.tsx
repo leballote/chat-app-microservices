@@ -49,9 +49,6 @@ export default function ChatAppPage() {
 
   useSubscription(MESSAGE_CREATED, {
     fetchPolicy: "no-cache",
-    // onComplete: () => {
-    //   console.log("PPPPUEDE SER");
-    // },
     onData: ({ data }) => {
       const chatId = data.data?.messageCreated.message?.chat.id;
       if (data.data?.messageCreated.message) {
@@ -80,6 +77,7 @@ export default function ChatAppPage() {
   useSubscription(FRIENDSHIP_REQUEST_RECEIVED, {
     fetchPolicy: "no-cache",
     onData: ({ data }) => {
+      console.log("friend request received");
       const friendshipRequestReceived = data.data?.friendshipRequestReceived;
       const { accepterUser, requesterUser } = friendshipRequestReceived;
       if (accepterUser && accepterUser.id == user?.id) {

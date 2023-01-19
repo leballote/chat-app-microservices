@@ -1,8 +1,9 @@
 import { call } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { requestSendMessage } from "../requests/sendMessage";
+import { createAndPutGenericErrorNotification } from "../../../utils/createAndDispatchGenericErrorNotification";
+import { t } from "i18next";
 
-//TODO: this should be in types folder
 type MessageInput = {
   content: string;
   chatId: string;
@@ -13,13 +14,14 @@ type MessageInput = {
 export function* handleSendMessage(action: PayloadAction<MessageInput>): any {
   const { payload } = action;
   try {
-    const response = yield call(requestSendMessage, payload);
-    const { data } = response;
-    const {
-      createMessage: { message, success },
-    } = data;
-    // yield put(pushMessage(message));
+    yield call(requestSendMessage, payload);
   } catch (error) {
-    // TODO: see how to handle this error
+    yield* createAndPutGenericErrorNotification({
+      error,
+      message: t([
+        "app.error.couldntSendMessage",
+        "app.error.default",
+      ]) as string,
+    });
   }
 }

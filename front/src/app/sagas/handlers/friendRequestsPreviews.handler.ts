@@ -5,6 +5,7 @@ import {
   setError,
 } from "../../features/appData/friendRequestsPreviewsSlice";
 import { requestGetFriendRequestsPreviews } from "../requests/friendRequestsPreviews";
+import { handleSagaStatefulError } from "./utils";
 
 export function* handleFriendRequestsPreviews(): any {
   try {
@@ -18,13 +19,6 @@ export function* handleFriendRequestsPreviews(): any {
     );
     yield put(setValue(friendshipRequestsReceivedDict));
   } catch (error) {
-    let message;
-    yield put(setLoading(false));
-    if ((error as any).message) {
-      message = (error as any).message;
-    } else {
-      message = "something went wrong";
-    }
-    yield put(setError({ message }));
+    yield* handleSagaStatefulError(error, setError, setLoading);
   }
 }

@@ -22,16 +22,12 @@ export default function ResponsiveDrawer() {
   if (currentDrawerSection == DrawerSection.MAIN) {
     section = (
       <MainDrawerView
-        //TODO: onMoreClick doesn't work anymore, remove it:
-        onMoreClick={() => {}}
         onContactsClick={() => dispatch(setContactsDrawerSection())}
       />
     );
   } else if (currentDrawerSection == DrawerSection.CONTACTS) {
     section = (
       <ContactsDrawerSection
-        //TODO handle on add contact click
-        onAddContactClick={() => {}}
         onBackClick={() => dispatch(setMainDrawerSection())}
       />
     );

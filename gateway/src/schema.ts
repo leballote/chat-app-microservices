@@ -83,7 +83,6 @@ const typeDefs = gql`
     chat(chatId: String): Chat
     settings: UserSettings
   }
-
   type UserSettings {
     language: String
   }
@@ -290,13 +289,13 @@ const typeDefs = gql`
   }
 
   type FriendshipRequestReceivedSubscriptionResponse {
-    requesterUser: User!
-    accepterUser: User!
+    requesterUser: User
+    accepterUser: User
   }
 
   type FriendshipResponseReceivedSubscriptionResponse {
-    requesterUser: User!
-    accepterUser: User!
+    requesterUser: User
+    accepterUser: User
     accept: Boolean!
   }
 

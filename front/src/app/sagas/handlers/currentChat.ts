@@ -6,6 +6,7 @@ import {
   setLoading,
   setValue as setCurrentChatValue,
 } from "../../features/appData/currentChatSlice";
+import { handleSagaStatefulError } from "./utils";
 
 export function* handleGetChat(action: PayloadAction<{ chatId: string }>): any {
   const { payload } = action;
@@ -20,13 +21,6 @@ export function* handleGetChat(action: PayloadAction<{ chatId: string }>): any {
     } = response;
     yield put(setCurrentChatValue(chat));
   } catch (error) {
-    let message;
-    yield put(setLoading(false));
-    if ((error as any).message) {
-      message = (error as any).message;
-    } else {
-      message = "something went wrong";
-    }
-    yield put(setError({ message }));
+    yield* handleSagaStatefulError(error, setError, setLoading);
   }
 }

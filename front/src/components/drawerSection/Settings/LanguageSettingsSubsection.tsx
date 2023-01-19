@@ -12,6 +12,7 @@ import { useMutation } from "@apollo/client";
 import { setMainSubsection } from "../../../app/features/appData/settingsSectionSlice";
 import { SET_LANGUAGE } from "../../../app/graphql/mutations";
 import { SectionTitleWithBackButton } from "../../shared/SectionTitleWithBackButton";
+import { createAndDispatchGenericErrorNotification } from "../../../utils/createAndDispatchGenericErrorNotification";
 
 const LngAbbreviationMapping: { [code: string]: string } = {
   en: "English",
@@ -48,7 +49,15 @@ export default function LanguageSettingsSubsection() {
         },
       });
     } catch (e) {
-      //TODO: trigger a notification
+      //TODO: implement app.error.couldntSaveSettings
+      createAndDispatchGenericErrorNotification({
+        error: e,
+        dispatch,
+        message: t([
+          "app.error.couldntSaveSettings",
+          "app.error.default",
+        ]) as string,
+      });
     }
   }
 

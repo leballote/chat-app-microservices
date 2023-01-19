@@ -127,8 +127,9 @@ export default function GroupDetailsMainSubsection({
 
         <Button
           variant="outlined"
+          fullWidth
           sx={{
-            width: "100%",
+            // width: "100%",
             color: "error.light",
             borderColor: "error.main",
             "&:hover": {

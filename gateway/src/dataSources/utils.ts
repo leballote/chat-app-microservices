@@ -46,7 +46,6 @@ export function HandleError(
         }
       } finally {
         if (errorToSend) {
-          // console.log(errorToSend);
           return { error: { ...errorToSend } };
         }
       }

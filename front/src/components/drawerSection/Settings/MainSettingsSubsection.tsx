@@ -12,14 +12,15 @@ import { setMainDrawerSection } from "../../../app/features/appView/sideBarSlice
 import LanguageIcon from "@mui/icons-material/Language";
 import { setLanguageSubsection } from "../../../app/features/appData/settingsSectionSlice";
 import React from "react";
-import { t } from "i18next";
 import { Dispatch } from "@reduxjs/toolkit";
 import { SectionTitleWithBackButton } from "../../shared/SectionTitleWithBackButton";
+import { TFunction } from "i18next";
 
 const settingSections = [
   {
     id: "language",
-    name: t("app.drawer.settings.language"),
+    name: (t: TFunction<"translation", undefined>) =>
+      t("app.drawer.settings.language"),
     icon: LanguageIcon,
     handleClick: (
       _ev: React.MouseEvent<HTMLDivElement, MouseEvent>,
@@ -50,7 +51,7 @@ export default function LanguageSettingsSubsection() {
             key={settingSection.id}
             id={settingSection.id}
             icon={settingSection.icon}
-            name={settingSection.name}
+            name={settingSection.name(t)}
             onClick={(ev) => {
               settingSection.handleClick(ev, dispatch);
             }}

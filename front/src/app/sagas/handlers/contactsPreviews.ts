@@ -6,7 +6,7 @@ import {
   setError,
 } from "../../features/appData/contactsPreviewsSlice";
 import { requestGetContactsPreviews } from "../requests/contactsPreviews";
-import { GraphQLError } from "graphql";
+import { handleSagaStatefulError } from "./utils";
 
 export function* handleContactsPreviews(action: PayloadAction<string>): any {
   const { payload } = action;
@@ -19,13 +19,6 @@ export function* handleContactsPreviews(action: PayloadAction<string>): any {
     } = data;
     yield put(setContactsPreviewsValue(contacts));
   } catch (error) {
-    let message;
-    yield put(setLoading(false));
-    if ((error as any).message) {
-      message = (error as any).message;
-    } else {
-      message = "something went wrong";
-    }
-    yield put(setError({ message }));
+    yield* handleSagaStatefulError(error, setError, setLoading);
   }
 }

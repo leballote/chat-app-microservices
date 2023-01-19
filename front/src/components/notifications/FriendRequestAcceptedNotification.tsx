@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import { upsertChat } from "../../app/features/appData/chatsPreviewsSlice";
 import { GET_OR_CREATE_CHAT } from "../../app/graphql/mutations";
 import { useTranslation } from "react-i18next";
+import { createAndDispatchGenericErrorNotification } from "../../utils/createAndDispatchGenericErrorNotification";
 
 type Props = {
   // message: ReactNode;
@@ -61,7 +62,14 @@ export function FriendRequestAcceptedNotification({
               dispatch(removeNotification({ notificationId }));
             }
           } catch (e) {
-            //TODO: add notification here
+            createAndDispatchGenericErrorNotification({
+              error: e,
+              dispatch,
+              message: t([
+                "app.errors.couldntAcceptFriend",
+                "app.errors.default",
+              ]) as string,
+            });
           }
         }}
       >

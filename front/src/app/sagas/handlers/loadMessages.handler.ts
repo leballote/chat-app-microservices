@@ -8,6 +8,7 @@ import {
 } from "../../features/appData/currentChatSlice";
 import { put, call, select } from "redux-saga/effects";
 import { loadMessages } from "../requests/loadMessages.request";
+import { handleSagaStatefulError } from "./utils";
 
 export function* handleLoadMessages(
   action?: PayloadAction<GetMessagesInput>
@@ -27,13 +28,6 @@ export function* handleLoadMessages(
       yield put(appendMessages(messages));
     }
   } catch (error) {
-    let message;
-    yield put(setLoadingMessages(false));
-    if ((error as any).message) {
-      message = (error as any).message;
-    } else {
-      message = "something went wrong";
-    }
-    yield put(setErrorMessages({ message }));
+    yield* handleSagaStatefulError(error, setErrorMessages, setLoadingMessages);
   }
 }

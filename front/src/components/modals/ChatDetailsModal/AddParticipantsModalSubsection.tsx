@@ -53,8 +53,8 @@ export default function AddParticipantsModalSubsection({ onBack }: Props) {
     (state) => state.currentChat.participantsToAddIds
   );
 
-  const participantsToAdd = participantsToAddIds.map(
-    (participantId) => contactsMap[participantId]
+  const participantsToAdd = participantsToAddIds.flatMap(
+    (participantId) => contactsMap[participantId] ?? []
   );
 
   const {
@@ -98,7 +98,6 @@ export default function AddParticipantsModalSubsection({ onBack }: Props) {
     }
   }, []);
 
-  //TODO: change this Loading, it should only load the list inside
   let component = null;
   if (contactsLoading || loading) {
     component = <GenericPeopleLoading numberOfPeople={3} />;

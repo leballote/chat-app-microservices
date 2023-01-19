@@ -24,7 +24,6 @@ export function ChatFooter({ height }: ChatFooterProps) {
 
   function triggerSendMessage() {
     //the last condition is not really necessary, but I think it makes it more explicit
-    console.log("");
     if (
       user &&
       messageTextInput.current?.value &&
@@ -47,7 +46,6 @@ export function ChatFooter({ height }: ChatFooterProps) {
   }
 
   function handleEnter() {
-    console.log("handleEnter");
     triggerSendMessage();
   }
 

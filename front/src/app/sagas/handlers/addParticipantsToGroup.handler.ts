@@ -5,6 +5,8 @@ import {
   setParticipants,
   resetParticipantsToAdd,
 } from "../../features/appData/currentChatSlice";
+import { createAndPutGenericErrorNotification } from "../../../utils/createAndDispatchGenericErrorNotification";
+import { t } from "i18next";
 
 type AddParticipantInput = {
   chatId: string;
@@ -27,6 +29,12 @@ export function* handleAddParticipant(
     yield put(setParticipants(participants));
     yield put(resetParticipantsToAdd());
   } catch (error) {
-    //TODO: see how to handle this error
+    yield* createAndPutGenericErrorNotification({
+      error,
+      message: t([
+        "app.error.couldntAddParticipants",
+        "app.error.default",
+      ]) as string,
+    });
   }
 }

@@ -1,4 +1,3 @@
-import { Chat } from "../types/chat.types";
 import Avatar from "@mui/material/Avatar";
 
 function getAvatarInitialsFromName(name: string): string {
@@ -7,7 +6,7 @@ function getAvatarInitialsFromName(name: string): string {
   }
   const splitted = name.split(" ") ?? ["N", "A"];
   if (splitted.length == 1) {
-    let word = splitted[0];
+    const word = splitted[0];
     if (word.length == 1) {
       return word[0];
     } else {
@@ -20,9 +19,11 @@ function getAvatarInitialsFromName(name: string): string {
 
 interface WithSrc {
   avatarSrc: string;
+  avatarName?: string;
 }
 interface WithName {
   avatarName: string;
+  avatarSrc?: string;
 }
 
 type AvatarInfo = WithSrc | WithName;
@@ -35,17 +36,12 @@ type AvatarProps = React.ComponentProps<typeof Avatar>;
 
 type Props = AvatarInfo & AvatarProps;
 
-export default function (avatarInfo: Props) {
-  const { avatarSrc, avatarName, ...avatarProps } = {
-    avatarSrc: null,
-    avatarName: null,
-    ...avatarInfo,
-  };
+export default function FormatedAvatar(avatarInfo: Props) {
   if (hasSrc(avatarInfo)) {
-    const { avatarSrc } = avatarInfo;
+    const { avatarSrc, avatarName, ...avatarProps } = avatarInfo; // eslint-disable-line
     return <Avatar src={avatarSrc} {...avatarProps} />;
   } else {
-    const { avatarName } = avatarInfo;
+    const { avatarName, avatarSrc, ...avatarProps } = avatarInfo; // eslint-disable-line
     const formatedAvatarName = getAvatarInitialsFromName(avatarName);
     return <Avatar {...avatarProps}>{formatedAvatarName}</Avatar>;
   }

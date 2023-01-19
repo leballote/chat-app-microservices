@@ -27,7 +27,6 @@ export function* handleSendFriendRequest(
     yield put(setSendFriendRequestValue(friendAdded));
     yield put(setSendFriendRequestLoading(false));
   } catch (error) {
-    console.log(error);
     yield* handleSagaStatefulError(
       error,
       setSendFriendRequestError,

@@ -183,8 +183,6 @@ const mutationRelatedResolvers: MutationResolvers = {
       const userToAddRes = await dataSources.userAPI.getUsers({
         email: userToAddEmail,
       });
-      console.log("USER RES", userToAddRes);
-      //this should never happen, it should allways return at least an empty array
       if (isErrorResponse(userToAddRes)) {
         throw new GraphQLError("Unexpected error", {
           extensions: {

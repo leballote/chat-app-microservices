@@ -7,6 +7,7 @@ import {
 } from "../../features/appData/chatsPreviewsSlice";
 import { requestGetChatsPreviews } from "../requests/chatsPreviews";
 import indexArrayByField from "../../../utils/indexArrayByField";
+import { handleSagaStatefulError } from "./utils";
 
 export function* handleChatsPreviews(action: PayloadAction<string>): any {
   const { payload } = action;
@@ -21,13 +22,6 @@ export function* handleChatsPreviews(action: PayloadAction<string>): any {
     const chats_ = indexArrayByField(chats, "id");
     yield put(setChatsPreviews(chats_));
   } catch (error) {
-    let message;
-    yield put(setLoading(false));
-    if ((error as any).message) {
-      message = (error as any).message;
-    } else {
-      message = "something went wrong";
-    }
-    yield put(setError({ message }));
+    yield* handleSagaStatefulError(error, setError, setLoading);
   }
 }

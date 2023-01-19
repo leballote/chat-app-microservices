@@ -20,6 +20,12 @@ type Translation = {
         default: string;
         loginAgain: string;
         couldNotGetChat: string;
+        couldntAddParticipants: string;
+        couldntLeaveGroup: string;
+        couldntRejectFriendship: string;
+        couldntRemoveFriend: string;
+        couldntRemoveParticipant: string;
+        couldntSendMessage: string;
       };
       success: {
         friendRequestSent: string;
@@ -120,6 +126,12 @@ const resources: { [language: string]: Translation } = {
           loginAgain: "Por favor, intenta ingresar de nuevo",
           default: "Ups! algo salió mal",
           couldNotGetChat: "No se pudo obtener esta conversación",
+          couldntAddParticipants: "No se pudo añadir participantes",
+          couldntLeaveGroup: "No se pudo salir del grupo",
+          couldntRejectFriendship: "No se pudo rechazar la solicitud",
+          couldntRemoveFriend: "No se pudo remover amigo",
+          couldntRemoveParticipant: "No se pudo remover participante",
+          couldntSendMessage: "No se pudo enviar el mensaje",
         },
         success: {
           friendRequestSent: "Se envió la solicitud de amistad",
@@ -218,6 +230,12 @@ const resources: { [language: string]: Translation } = {
           default: "Oops! something went wrong",
           loginAgain: "Please, login again",
           couldNotGetChat: "Could not get this conversation",
+          couldntAddParticipants: "Could not add participants",
+          couldntLeaveGroup: "Could not leave group",
+          couldntRejectFriendship: "Could not reject friendship",
+          couldntRemoveFriend: "Could not remove friend",
+          couldntRemoveParticipant: "Could not remove participant",
+          couldntSendMessage: "Could not send message",
         },
         success: {
           friendRequestSent: "Friend request sent",
@@ -318,6 +336,12 @@ const resources: { [language: string]: Translation } = {
           loginAgain: "Bitte melden Sie sich erneut an",
           default: "Hoppla! etwas ist schief gelaufen",
           couldNotGetChat: "Konnte nicht chatten",
+          couldntAddParticipants: "Teilnehmer konnten nicht hinzugefügt werden",
+          couldntLeaveGroup: "Gruppe konnte nicht verlassen werden",
+          couldntRejectFriendship: "Konnte Freundschaft nicht ablehnen",
+          couldntRemoveFriend: "Freund konnte nicht entfernt werden",
+          couldntRemoveParticipant: "Teilnehmer konnte nicht entfernt werden",
+          couldntSendMessage: "Nachricht konnte nicht gesendet werden",
         },
         success: {
           friendRequestSent: "Freundschaftsanfrage gesendet",
