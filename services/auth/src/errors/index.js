@@ -12,6 +12,7 @@ const appErrors = {
   clientError,
   duplicateKeyError,
   invalidPasswordError,
+  usernameCanNotHaveWhitespacesError,
 };
 module.exports = {
   appErrors,
@@ -101,5 +102,12 @@ function duplicateKeyError(key, value) {
     `${value} is already taken from unique field ${key}`,
     "DUPLICATE_ERROR",
     { key, value }
+  );
+}
+
+function usernameCanNotHaveWhitespacesError() {
+  return createErrorResponse(
+    "Username cannot contain whitespaces",
+    "USERNAME_CANNOT_CONTAIN_WHITESPACES"
   );
 }

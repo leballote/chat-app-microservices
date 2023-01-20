@@ -1,5 +1,4 @@
 import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import React from "react";
 import { WithHeight } from "../../types/utilTypes";
@@ -95,14 +94,14 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
   const { onOpenDetailsClick, ...others } = props;
 
   return (
-    <Box height={height}>
+    <Box height={height} maxWidth="100%">
       <Stack
         direction="row"
         onClick={onOpenDetailsClick}
         height="100%"
         padding=".4em .5em"
         sx={{
-          width: "fit-content",
+          height,
           "&:hover": {
             color: "primary.main",
             bgcolor: "grey.100",
@@ -113,12 +112,36 @@ function BaseChatHeader(props: BaseChatHeaderProps) {
         }}
       >
         <FormatedAvatar {...others} />
-        <Container>
-          <Typography component="h1" fontWeight="bold">
-            {name}
+        <Box padding="0 1em" maxWidth="92%" sx={{ margin: "0" }}>
+          <Typography
+            component="h1"
+            fontWeight="bold"
+            // sx={{ wordWrap: "break-word" }}
+            sx={{
+              // margin: "0",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              overflowX: "hidden",
+              // maxWidth: "100%",
+            }}
+          >
+            {name.substring(0, 50)}
+            {name.length > 50 ? "..." : null}
           </Typography>
-          <Typography component="h2">{phrase}</Typography>
-        </Container>
+          <Typography
+            component="h2"
+            // sx={{ wordWrap: "break-word" }}
+            sx={{
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+              overflowX: "hidden",
+              // maxWidth: "100%",
+            }}
+          >
+            {phrase.substring(0, 50)}
+            {phrase.length > 50 ? "..." : null}
+          </Typography>
+        </Box>
       </Stack>
       <Divider />
     </Box>

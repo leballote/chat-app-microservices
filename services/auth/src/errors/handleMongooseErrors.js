@@ -1,6 +1,9 @@
 const { appErrors } = require(".");
-// const { Error: MongooseError } = require("mongoose");
+const { Error: MongooseError } = require("mongoose");
 const { InvalidPasswordError } = require("./InvalidPasswordError");
+const {
+  UsernameCanNotHaveWhitespacesError,
+} = require("../errors/UsernameCanNotHaveWhitespacesError");
 
 function handleMongooseSignupErrors(err, _req, res) {
   if (err?.name == "MongoError" && err?.code === 11000) {
@@ -17,12 +20,17 @@ function handleMongooseSignupErrors(err, _req, res) {
     return res.status(400).send(appErrors.invalidPasswordError(err.message));
   }
 
-  // if (err instanceof MongooseError.ValidationError) {
-  //   const errorValue = Object.values(err)[0];
-  //   return res
-  //     .status(400)
-  //     .send(appErrors.validationError(errorValue.message, "hey", "bye"));
-  // }
+  if (err instanceof MongooseError.ValidationError) {
+    const errorValue = Object.values(err)[0];
+    if (
+      errorValue.username.reason instanceof UsernameCanNotHaveWhitespacesError
+    ) {
+      return res
+        .status(400)
+        .send(appErrors.usernameCanNotHaveWhitespacesError());
+    }
+    return res.status(400).send(appErrors.clientError());
+  }
   return null;
 }
 

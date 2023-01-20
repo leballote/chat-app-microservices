@@ -3,12 +3,18 @@
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-}
-
 *,
 *:before,
 *:after {
   box-sizing: inherit;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
 }

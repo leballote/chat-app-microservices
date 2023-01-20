@@ -91,10 +91,15 @@ export default function SignupPage() {
         <TextField
           label={t("user.username")}
           required
-          inputProps={{ maxLength: 60 }}
+          inputProps={{ maxLength: 20 }}
           inputRef={usernameInput}
         />
-        <TextField label={t("user.fullName")} required inputRef={nameInput} />
+        <TextField
+          label={t("user.fullName")}
+          inputProps={{ maxLength: 120 }}
+          required
+          inputRef={nameInput}
+        />
         <TextField
           label={t("user.email")}
           type="email"
@@ -134,12 +139,14 @@ export default function SignupPage() {
               ],
               {
                 article: "El",
-                meta: error.graphQLErrors[0].extensions,
+                meta: error.graphQLErrors[0].extensions.meta,
                 key: Object.keys(
-                  (error.graphQLErrors[0].extensions as any).meta.keyValue
+                  (error.graphQLErrors[0].extensions as any).meta?.keyValue ||
+                    {}
                 )[0],
                 value: Object.values(
-                  (error.graphQLErrors[0].extensions as any).meta.keyValue
+                  (error.graphQLErrors[0].extensions as any).meta?.keyValue ||
+                    {}
                 )[0],
               }
             )}

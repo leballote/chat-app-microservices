@@ -6,6 +6,7 @@ import Typography from "@mui/material/Typography";
 import * as React from "react";
 
 import { Link as RouterLink } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export interface Props {
   id: string;
@@ -23,6 +24,7 @@ export interface Props {
 }
 
 export default function ChatPreview({ id, avatar, name, lastMessage }: Props) {
+  const { t } = useTranslation();
   let previewSection: React.ReactElement;
   const { content } = lastMessage || {
     content: "",
@@ -34,7 +36,8 @@ export default function ChatPreview({ id, avatar, name, lastMessage }: Props) {
   if (lastMessage) {
     previewSection = (
       <Typography component="p" fontSize={".8em"} color="text.secondary">
-        {content.slice(0, 50)}
+        {content.substring(0, 30)}
+        {content.length > 30 ? "..." : null}
       </Typography>
     );
   } else {
@@ -45,7 +48,7 @@ export default function ChatPreview({ id, avatar, name, lastMessage }: Props) {
         color="text.secondary"
         fontStyle={"italic"}
       >
-        {"new chat"}
+        {t("app.drawer.chats.newChat")}
       </Typography>
     );
   }
@@ -78,7 +81,8 @@ export default function ChatPreview({ id, avatar, name, lastMessage }: Props) {
           fontWeight="bold"
           color="textPrimary"
         >
-          {name}
+          {name.substring(0, 20)}
+          {name.length > 20 ? "..." : null}
         </Typography>
         {previewSection}
       </ListItemText>

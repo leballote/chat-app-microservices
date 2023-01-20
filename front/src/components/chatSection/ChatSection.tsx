@@ -65,11 +65,12 @@ export default function ChatSection({
     component = (
       <Box
         sx={{
+          minWidth: "300px",
           position: "relative",
           height: "100vh",
           marginTop: "0",
           marginBottom: "0",
-          width: "calc(100% - 400px)",
+          flex: "100%",
         }}
       >
         <ChatHeader height={"10vh"} />

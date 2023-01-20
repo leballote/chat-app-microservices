@@ -72,7 +72,8 @@ export default function ContactPreview({
           fontWeight="bold"
           color="text.primary"
         >
-          {name}
+          {name.substring(0, 20)}
+          {name.length > 20 ? "..." : null}
         </Typography>
       </ListItemText>
     </ListItem>

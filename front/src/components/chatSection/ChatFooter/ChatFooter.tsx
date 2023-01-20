@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { sendMessage } from "../../../app/features/appData/currentChatSlice";
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { WithHeight } from "../../../types/utilTypes";
@@ -9,6 +9,8 @@ export type ChatFooterProps = {
 } & WithHeight;
 
 export function ChatFooter({ height }: ChatFooterProps) {
+  const [maxReached, setMaxReached] = useState<boolean>(false);
+  const [closeToMaxReached, setCloseToMaxReached] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const { value: chat } = useAppSelector((state) => state.currentChat);
   if (!chat) return null;
@@ -22,12 +24,25 @@ export function ChatFooter({ height }: ChatFooterProps) {
     }
   }
 
+  function onInputChange(
+    ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) {
+    if (ev) {
+      if (messageTextInput.current?.maxLength) {
+        const maxLength = messageTextInput.current?.maxLength;
+        const length = messageTextInput.current?.value?.length;
+        setMaxReached(length >= maxLength);
+        setCloseToMaxReached((maxLength - length) / maxLength < 0.05);
+      }
+    }
+  }
+
   function triggerSendMessage() {
     //the last condition is not really necessary, but I think it makes it more explicit
     if (
       user &&
-      messageTextInput.current?.value &&
-      messageTextInput.current.value.length > 0
+      messageTextInput.current?.value.trimEnd() &&
+      messageTextInput.current.value.trimEnd().length > 0
     ) {
       dispatch(
         sendMessage({
@@ -71,8 +86,11 @@ export function ChatFooter({ height }: ChatFooterProps) {
       height={height}
       loading={false}
       chatboxRef={messageTextInput}
+      onInputChange={onInputChange}
       onChatboxKeyDown={handleKeyDown}
       onSendClick={handleSendClick}
+      maxReached={maxReached}
+      closeToMaxReached={closeToMaxReached}
     />
   );
 }

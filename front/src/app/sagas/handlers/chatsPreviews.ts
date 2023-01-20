@@ -1,5 +1,4 @@
 import { call, put } from "redux-saga/effects";
-import { PayloadAction } from "@reduxjs/toolkit";
 import {
   setValue as setChatsPreviews,
   setLoading,
@@ -9,12 +8,11 @@ import { requestGetChatsPreviews } from "../requests/chatsPreviews";
 import indexArrayByField from "../../../utils/indexArrayByField";
 import { handleSagaStatefulError } from "./utils";
 
-export function* handleChatsPreviews(action: PayloadAction<string>): any {
-  const { payload } = action;
+export function* handleChatsPreviews(): any {
   try {
     yield put(setError(null));
     yield put(setLoading(true));
-    const response = yield call(requestGetChatsPreviews, payload);
+    const response = yield call(requestGetChatsPreviews);
     const { data } = response;
     const {
       viewer: { chats },

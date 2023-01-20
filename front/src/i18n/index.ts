@@ -16,6 +16,9 @@ type Translation = {
         friendRequestAccepted: string;
         friendRequestReceived: string;
       };
+      warning: {
+        closeToMaxMessageLengthReached: string;
+      };
       error: {
         default: string;
         loginAgain: string;
@@ -26,6 +29,7 @@ type Translation = {
         couldntRemoveFriend: string;
         couldntRemoveParticipant: string;
         couldntSendMessage: string;
+        maxMessageLengthReached: string;
       };
       success: {
         friendRequestSent: string;
@@ -46,6 +50,9 @@ type Translation = {
           title: string;
           friends: string;
           friendRequests: string;
+        };
+        chats: {
+          newChat: string;
         };
         newGroup: {
           title: string;
@@ -122,6 +129,10 @@ const resources: { [language: string]: Translation } = {
           accept: "Aceptar",
           reject: "Rechazar",
         },
+        warning: {
+          closeToMaxMessageLengthReached:
+            "Está cerca de alcanzar el máximo de caracteres",
+        },
         error: {
           loginAgain: "Por favor, intenta ingresar de nuevo",
           default: "Ups! algo salió mal",
@@ -132,6 +143,8 @@ const resources: { [language: string]: Translation } = {
           couldntRemoveFriend: "No se pudo remover amigo",
           couldntRemoveParticipant: "No se pudo remover participante",
           couldntSendMessage: "No se pudo enviar el mensaje",
+          maxMessageLengthReached:
+            "El máximo de caracteres permitido para un mensaje son 1000",
         },
         success: {
           friendRequestSent: "Se envió la solicitud de amistad",
@@ -139,6 +152,9 @@ const resources: { [language: string]: Translation } = {
         },
         drawer: {
           // general: {},
+          chats: {
+            newChat: "Nueva conversación",
+          },
           main: {
             newGroup: "Nuevo grupo",
             logout: "Cerrar sesión",
@@ -226,6 +242,10 @@ const resources: { [language: string]: Translation } = {
           accept: "Accept",
           reject: "Reject",
         },
+        warning: {
+          closeToMaxMessageLengthReached:
+            "Close to reaching maximum message size",
+        },
         error: {
           default: "Oops! something went wrong",
           loginAgain: "Please, login again",
@@ -236,6 +256,7 @@ const resources: { [language: string]: Translation } = {
           couldntRemoveFriend: "Could not remove friend",
           couldntRemoveParticipant: "Could not remove participant",
           couldntSendMessage: "Could not send message",
+          maxMessageLengthReached: "Max message size reached (1000)",
         },
         success: {
           friendRequestSent: "Friend request sent",
@@ -243,6 +264,9 @@ const resources: { [language: string]: Translation } = {
         },
         drawer: {
           // general: {},
+          chats: {
+            newChat: "New chat",
+          },
           main: {
             newGroup: "New group",
             logout: "Log out",
@@ -332,6 +356,10 @@ const resources: { [language: string]: Translation } = {
           reject: "Ablehnen",
           sayHi: "Sag Hallo!",
         },
+        warning: {
+          closeToMaxMessageLengthReached:
+            "fast maximale Nachrichtengröße erreicht",
+        },
         error: {
           loginAgain: "Bitte melden Sie sich erneut an",
           default: "Hoppla! etwas ist schief gelaufen",
@@ -342,6 +370,7 @@ const resources: { [language: string]: Translation } = {
           couldntRemoveFriend: "Freund konnte nicht entfernt werden",
           couldntRemoveParticipant: "Teilnehmer konnte nicht entfernt werden",
           couldntSendMessage: "Nachricht konnte nicht gesendet werden",
+          maxMessageLengthReached: "Maximale Nachrichtengröße erreicht (1000)",
         },
         success: {
           friendRequestSent: "Freundschaftsanfrage gesendet",
@@ -349,6 +378,7 @@ const resources: { [language: string]: Translation } = {
         },
         drawer: {
           // general: {},
+          chats: { newChat: "Neuer Chatt" },
           main: {
             newGroup: "Neue Gruppe",
             logout: "Abmelden",

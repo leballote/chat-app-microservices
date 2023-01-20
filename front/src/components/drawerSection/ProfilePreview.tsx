@@ -35,11 +35,14 @@ export default function ProfilePreview({ avatar, name, phrase }: Props) {
           fontSize={"1.1em"}
           fontWeight="bold"
           color="text.primary"
+          sx={{ wordWrap: "break-word" }}
         >
-          {name}
+          {name.substring(0, 50)}
+          {name.length > 50 ? "..." : null}
         </Typography>
         <Typography component="p" fontSize={".8em"} color="text.secondary">
-          {phrase}
+          {phrase.substring(0, 50)}
+          {phrase.length > 50 ? "..." : null}
         </Typography>
       </ListItemText>
     </ListItem>

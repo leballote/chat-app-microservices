@@ -64,24 +64,7 @@ export default function GroupDetailsMainSubsection({
 
   return (
     <>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "flex-end",
-          margin: "1em",
-        }}
-      >
-        <Avatar src={avatar} sx={{ width: 100, height: 100 }} />
-        <Box>
-          <DialogTitle
-            component={"h3"}
-            sx={{ fontSize: "1.8em", textAlign: "left", minWidth: "10em" }}
-          >
-            {name}
-          </DialogTitle>
-          <Typography>{phrase}</Typography>
-        </Box>
-      </Box>
+      <ChatDetailsHeader name={name} avatar={avatar} phrase={phrase} />
       <DialogContent sx={{ padding: 0 }}>
         <List>
           {viewerAsChatUser.admin ? (
@@ -144,4 +127,61 @@ export default function GroupDetailsMainSubsection({
       </DialogContent>
     </>
   );
+}
+
+type ChatDetailsHeaderProps = {
+  name: string;
+  avatar?: string;
+  phrase: string;
+};
+
+function ChatDetailsHeader({ name, avatar, phrase }: ChatDetailsHeaderProps) {
+  return (
+    <Box>
+      <Avatar src={avatar} sx={{ width: 100, height: 100, margin: "0 auto" }} />
+      <Box minWidth="400px">
+        {/* <DialogTitle> */}
+        <Typography
+          sx={{
+            wordWrap: "break-word",
+            fontSize: defineFontSizeName(name),
+            bgcolor: "red",
+          }}
+        >
+          {name}
+        </Typography>
+        <Typography
+          sx={{
+            wordWrap: "break-word",
+            fontSize: defineFontSizePhrase(name),
+          }}
+        >
+          {phrase}
+        </Typography>
+        {/* </DialogTitle> */}
+      </Box>
+    </Box>
+  );
+}
+
+function defineFontSizeName(name: string) {
+  const length = name.length;
+  if (length > 100) {
+    return "1.2em";
+  }
+  if (length > 75) {
+    return "1.1em";
+  }
+  if (length > 50) {
+    return "1.6em";
+  }
+  return "1.8em";
+}
+
+function defineFontSizePhrase(phrase: string) {
+  const length = phrase.length;
+  if (length > 50) {
+    return "1em";
+  }
+  return "1.1em";
 }

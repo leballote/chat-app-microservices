@@ -10,10 +10,12 @@ const userSchema = new mongoose.Schema(
     username: {
       type: String,
       required: true,
+      maxlength: 20,
       unique: true,
     },
     name: {
       type: String,
+      maxlength: 120,
       required: true,
     },
     birthDate: {
@@ -23,10 +25,12 @@ const userSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      maxlength: 320,
       unique: true,
     },
     phrase: {
       type: String,
+      maxlength: 50,
       required: true,
     },
     avatar: {
