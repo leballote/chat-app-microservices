@@ -7,6 +7,7 @@ import { appCookieOptions } from "../options";
 import {
   FRIENDSHIP_REQUEST_RECEIVED,
   FRIENDSHIP_RESPONSE_RECEIVED,
+  CHAT_DELETED,
   MESSAGE_CREATED,
   pubsub,
 } from "./actions";
@@ -61,12 +62,14 @@ const mutationRelatedResolvers: MutationResolvers = {
   },
 
   createMessage: async (_, { input }, { dataSources }) => {
-    const { chatId, content, sentAt, sentById } = input;
+    const { chatId, content, sentAt } = input;
     const viewer = await dataSources.getViewer();
     if (!viewer) {
       throw authError;
     }
-    //TODO: take away userId
+    //TODO: validate that you can only send messages to your chats
+
+    //TODO: take away sentBy
     const createMessageRes = await dataSources.chatAPI.createMessage({
       chatId,
       userId: viewer._id,
@@ -77,7 +80,10 @@ const mutationRelatedResolvers: MutationResolvers = {
     if (isErrorResponse(createMessageRes)) {
       throw createGQLError(createMessageRes);
     }
-    pubsub.publish(MESSAGE_CREATED, { messageCreated: createMessageRes });
+    pubsub.publish(MESSAGE_CREATED, {
+      messageCreated: createMessageRes,
+      viewer,
+    });
     const out = { message: createMessageRes.data, success: true };
     return out;
   },
@@ -90,6 +96,16 @@ const mutationRelatedResolvers: MutationResolvers = {
 
     let friends = viewer.friends as UserModelSuccessResponse[];
     const friendsIds = friends.map((friend) => friend._id);
+    if (!friendsIds) {
+      throw new GraphQLError(
+        "You can only chat with users that are friends of you",
+        {
+          extensions: {
+            code: "NOT_FRIEND_WITH_USER",
+          },
+        }
+      );
+    }
 
     for (const participant of participantsAndViewer) {
       if (!friendsIds.includes(participant.id)) {
@@ -118,16 +134,23 @@ const mutationRelatedResolvers: MutationResolvers = {
   },
   getOrCreateIndividualChat: async (_, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
+
     if (!viewer) {
       throw authError;
     }
 
-    // let friends = viewer.friends as UserModelSuccessResponse[];
-    // const friendsIds = friends.map((friend) => friend._id);
-
-    // if (!friendsIds.includes(input.userId)) {
-    //   throw new Error("You can only chat with your friends");
-    // }
+    let friends = viewer.friends as UserModelSuccessResponse[];
+    const friendsIds = friends.map((friend) => friend._id);
+    if (!friendsIds) {
+      throw new GraphQLError(
+        "You can only chat with users that are friends of you",
+        {
+          extensions: {
+            code: "NOT_FRIEND_WITH_USER",
+          },
+        }
+      );
+    }
 
     const getChatRes = await dataSources.chatAPI.getChats({
       user1Id: viewer._id,
@@ -370,7 +393,7 @@ const mutationRelatedResolvers: MutationResolvers = {
     }
     return { language: userRes.data.settings.language, success: true };
   },
-  removeParticipant: async (parent, { input }, { dataSources }) => {
+  removeParticipant: async (_parent, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
       throw authError;
@@ -425,7 +448,7 @@ const mutationRelatedResolvers: MutationResolvers = {
       success: true,
     };
   },
-  removeFriendship: async (parent, { input }, { dataSources }) => {
+  removeFriendship: async (_parent, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
       throw authError;
@@ -445,6 +468,24 @@ const mutationRelatedResolvers: MutationResolvers = {
 
     if (isErrorResponse(userToRemoveRes)) {
       throw createGQLError(userToRemoveRes);
+    }
+
+    //SUGGESTION: I believe I should be able to remove chat by userId
+    const chatsToRemoveRes = await dataSources.chatAPI.getChats({
+      userId: userToRemoveRes.data._id,
+    });
+
+    if (!isErrorResponse(chatsToRemoveRes)) {
+      const chatToRemoveRes = chatsToRemoveRes.data[0];
+      const chatDeletedRes = await dataSources.chatAPI.deleteChat(
+        chatToRemoveRes._id
+      );
+      if (!isErrorResponse(chatDeletedRes)) {
+        pubsub.publish(CHAT_DELETED, {
+          chatRemoved: chatDeletedRes.data,
+          viewer,
+        });
+      }
     }
 
     return { userRemoved: userToRemoveRes.data };

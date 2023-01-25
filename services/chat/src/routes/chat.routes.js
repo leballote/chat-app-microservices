@@ -204,12 +204,13 @@ router.put("/chat/:id", async (req, res) => {
 router.delete("/chat/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const chat = await Chat.findByIdAndDelete(id);
+    const chat = await Chat.deleteChat(id);
+
     if (!chat) {
       return res.status(404).send(appErrors.notFoundError("chat", { id }));
     }
 
-    return res.status(204).send({ data: chat.toObject() });
+    return res.status(200).send({ data: chat });
   } catch (e) {
     return defaultErrorHandler(e, req, res);
   }

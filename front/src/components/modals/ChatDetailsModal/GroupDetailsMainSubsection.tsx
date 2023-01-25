@@ -65,7 +65,7 @@ export default function GroupDetailsMainSubsection({
   return (
     <>
       <ChatDetailsHeader name={name} avatar={avatar} phrase={phrase} />
-      <DialogContent sx={{ padding: 0 }}>
+      <DialogContent sx={{ padding: 0, overflow: "visible" }}>
         <List>
           {viewerAsChatUser.admin ? (
             <ListItem key={"addItem"} button onClick={onAddParticipants}>
@@ -138,27 +138,27 @@ type ChatDetailsHeaderProps = {
 function ChatDetailsHeader({ name, avatar, phrase }: ChatDetailsHeaderProps) {
   return (
     <Box>
-      <Avatar src={avatar} sx={{ width: 100, height: 100, margin: "0 auto" }} />
-      <Box minWidth="400px">
-        {/* <DialogTitle> */}
-        <Typography
-          sx={{
-            wordWrap: "break-word",
-            fontSize: defineFontSizeName(name),
-            bgcolor: "red",
-          }}
-        >
-          {name}
-        </Typography>
-        <Typography
-          sx={{
-            wordWrap: "break-word",
-            fontSize: defineFontSizePhrase(name),
-          }}
-        >
-          {phrase}
-        </Typography>
-        {/* </DialogTitle> */}
+      <Avatar src={avatar} sx={{ width: 150, height: 150, margin: "0 auto" }} />
+      <Box>
+        <DialogTitle>
+          <Typography
+            sx={{
+              wordWrap: "break-word",
+              fontSize: defineFontSizeName(name),
+            }}
+          >
+            {name}
+          </Typography>
+          <Typography
+            color="text.secondary"
+            sx={{
+              wordWrap: "break-word",
+              fontSize: defineFontSizePhrase(name),
+            }}
+          >
+            {phrase}
+          </Typography>
+        </DialogTitle>
       </Box>
     </Box>
   );
@@ -181,7 +181,7 @@ function defineFontSizeName(name: string) {
 function defineFontSizePhrase(phrase: string) {
   const length = phrase.length;
   if (length > 50) {
-    return "1em";
+    return ".8em";
   }
   return "1.1em";
 }

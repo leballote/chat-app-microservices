@@ -26,6 +26,7 @@ export function Message({
   showUsername,
   showDatetime,
 }: IProps) {
+  console.log("message content", message.content);
   return (
     <MessageBase isOwnedByMe={isOwnedByMe} maxWidth="55%">
       <ListItem>
@@ -54,7 +55,15 @@ export function Message({
               {formatDate(message.sentAt)}
             </Typography>
           ) : null}
-          <Typography variant="body1">{message.content}</Typography>
+          {message.content.split("\n").map((line, i) => {
+            return line !== "" ? (
+              <Typography key={`line-${i}`} variant="body1">
+                {line}
+              </Typography>
+            ) : (
+              <br />
+            );
+          })}
         </ListItemText>
       </ListItem>
     </MessageBase>

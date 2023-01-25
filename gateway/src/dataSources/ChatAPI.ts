@@ -134,4 +134,11 @@ export default class ChatAPI extends RESTDataSource {
       body: input,
     });
   }
+
+  // @HandleError()
+  async deleteChat(id: string): Promise<ChatModelResponse> {
+    const ans = await this.delete<ChatModelResponse>(`chat/${id}`);
+    console.log("CHAT DELETED FROM DATA SOURCES", ans);
+    return ans;
+  }
 }

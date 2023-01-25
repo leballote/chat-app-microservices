@@ -97,7 +97,7 @@ const serverCleanup = useServer(
     schema,
     // onSubscribe: async (...args) => {
     // },
-    context: async (ctx, msg, args) => {
+    context: async (ctx) => {
       const { cache } = server;
       const { jwt_token } = ctx.extra.request.headers.cookie
         ? cookie.parse(ctx.extra.request.headers.cookie)
@@ -117,6 +117,27 @@ const serverCleanup = useServer(
           chatAPI: new ChatAPI({ cache }),
           userAPI: new UserAPI({ cache }),
           authAPI: new AuthAPI({ cache }),
+          getViewer: async function () {
+            const token = jwt_token;
+            try {
+              const authUser = await this.authAPI.authorize(token);
+              if (token == "" || token == null) {
+                return null;
+              }
+              if (isErrorResponse(authUser)) {
+                throw new GraphQLError("User doesn't exist");
+              }
+              const viewerRes = await this.userAPI.getUser(
+                authUser.data.user._id
+              );
+              if (isErrorResponse(viewerRes)) {
+                throw new GraphQLError("User doesn't exist");
+              }
+              return viewerRes.data;
+            } catch (e) {
+              throw new GraphQLError("User doesn't exist");
+            }
+          },
         },
         ...userContext,
       };

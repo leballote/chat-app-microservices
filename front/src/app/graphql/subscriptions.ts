@@ -59,3 +59,14 @@ export const FRIENDSHIP_RESPONSE_RECEIVED = gql`
     }
   }
 `;
+
+export const CHAT_REMOVED = gql`
+  subscription ChatRemoved {
+    chatRemoved {
+      chatRemoved {
+        id
+        name
+      }
+    }
+  }
+`;

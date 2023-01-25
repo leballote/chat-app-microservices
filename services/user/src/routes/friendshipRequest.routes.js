@@ -50,7 +50,6 @@ router.post("/friendshipRequest", async (req, res) => {
 
     return res.send({ data: { success: true, ...friendshipRequest } });
   } catch (e) {
-    console.log(e);
     return res
       .status(500)
       .send({ ...errors.serverError, debugError: e.message });

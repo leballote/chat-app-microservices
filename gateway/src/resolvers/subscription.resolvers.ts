@@ -2,6 +2,7 @@ import { Resolvers, SubscriptionResolvers } from "../generated/graphql";
 import { UserModelSuccessResponse } from "../types/servicesRest";
 import { withFilter } from "graphql-subscriptions";
 import {
+  CHAT_DELETED,
   FRIENDSHIP_REQUEST_RECEIVED,
   FRIENDSHIP_RESPONSE_RECEIVED,
   MESSAGE_CREATED,
@@ -15,11 +16,28 @@ export const subscriptionResolvers: SubscriptionResolvers = {
     subscribe: async () => {
       return {
         [Symbol.asyncIterator]: withFilter(
-          (args) => {
+          () => {
             return pubsub.asyncIterator([MESSAGE_CREATED]);
           },
-          function filterMessageCreated() {
+          function filterMessageCreated(payload, variables) {
+            console.log("this is being filtered", payload);
             return true;
+          }
+        ),
+      };
+    },
+  },
+  chatRemoved: {
+    subscribe: async () => {
+      return {
+        [Symbol.asyncIterator]: withFilter(
+          () => {
+            return pubsub.asyncIterator([CHAT_DELETED]);
+          },
+          function filterFn(payload) {
+            return payload.chatRemoved.participants
+              .map((participant) => participant.id)
+              .includes(payload.viewer._id);
           }
         ),
       };
@@ -58,7 +76,7 @@ export const subscriptionResolvers: SubscriptionResolvers = {
 const responseSubscriptionResponses: Resolvers = {
   FriendshipResponseReceivedSubscriptionResponse: {
     accepterUser: async (parent, {}, context) => {
-      const { user, dataSources } = context as unknown as {
+      const { user } = context as unknown as {
         user: UserModelSuccessResponse;
         dataSources: typeof context.dataSources;
       };
@@ -70,14 +88,10 @@ const responseSubscriptionResponses: Resolvers = {
         sender: UserModelSuccessResponse;
         receiver: UserModelSuccessResponse;
       };
-      console.log("accepter running");
 
       if (user._id == parent_.receiver._id || user._id == parent_.sender._id) {
-        console.log("accepter FULFILLED");
-        console.log("accepter parent sender", parent_.sender);
         return parent_.sender;
       } else {
-        console.log("accepter NOT FULFILLED");
         return null;
       }
     },
@@ -94,15 +108,10 @@ const responseSubscriptionResponses: Resolvers = {
         sender: UserModelSuccessResponse;
         receiver: UserModelSuccessResponse;
       };
-      console.log("requester running");
 
       if (user._id == parent_.receiver._id || user._id == parent_.sender._id) {
-        console.log("requester FULFILLED");
-
-        console.log("requester parent receiver", parent_.receiver);
         return parent_.receiver;
       } else {
-        console.log("requester NOT FULFILLED");
         return null;
       }
     },
@@ -162,8 +171,6 @@ const responseSubscriptionResponses: Resolvers = {
       }
       const { participants } = chatRes.data;
 
-      // //TODO: delete this line, it is only to debug the subscription
-      // return message;
       if (
         participants.map((participant) => participant.id).includes(user._id)
       ) {
@@ -171,6 +178,17 @@ const responseSubscriptionResponses: Resolvers = {
       } else {
         return null;
       }
+    },
+  },
+  ChatRemovedSubscriptionResponse: {
+    chatRemoved: async (parent) => {
+      const parentTemp = parent as any;
+      console.log("PARENT", parent);
+      console.log(
+        "ChatRemovedSubscriptionResponse chatRemoved",
+        parent.chatRemoved
+      );
+      return parentTemp;
     },
   },
 };

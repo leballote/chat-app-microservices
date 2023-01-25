@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import {
   getChatPreview,
+  removeChat,
   upsertChat,
 } from "../app/features/appData/chatsPreviewsSlice";
 import { addContact } from "../app/features/appData/contactsPreviewsSlice";
@@ -21,6 +22,7 @@ import {
 } from "../app/features/appView/types";
 import { appNotificationManager } from "../app/features/appView/utils";
 import {
+  CHAT_REMOVED,
   FRIENDSHIP_REQUEST_RECEIVED,
   FRIENDSHIP_RESPONSE_RECEIVED,
   MESSAGE_CREATED,
@@ -32,9 +34,7 @@ import SideBar from "../components/drawerSection/SideBar";
 import ErrorChat from "../components/feedback/ErrorChat";
 
 export default function ChatAppPage() {
-  // const {value: user} = useAppSelector(state => state.currentUser);
   const user = useAppSelector((state) => state.currentUser.value);
-  // const chatsPreviews = useAppSelector((state) => state.chatsPreviews.value);
   const { value: chats } = useAppSelector((state) => state.chatsPreviews);
   const { connected } = useAppSelector((state) => state.wsConnection);
   const navigate = useNavigate();
@@ -132,6 +132,17 @@ export default function ChatAppPage() {
         if (accepterUser && accepterUser.id == user?.id) {
           dispatch(removeFriendRequest(requesterUser.id));
         }
+      }
+    },
+  });
+
+  useSubscription(CHAT_REMOVED, {
+    fetchPolicy: "no-cache",
+    onData: ({ data }) => {
+      const chatRemoved = data.data?.chatRemoved?.chatRemoved;
+      if (chatRemoved) {
+        dispatch(removeChat({ chatId: chatRemoved.id }));
+        navigate("/app");
       }
     },
   });

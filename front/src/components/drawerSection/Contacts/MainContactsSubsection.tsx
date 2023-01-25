@@ -62,10 +62,7 @@ export default function MainContactsSubsection() {
       if (newChat?.id) {
         navigate(`/app/chat/${newChat.id}`);
       }
-    } catch (e) {
-      // eslint-disable-line
-      // again this error is managed by the hook
-    }
+    } catch (e) {} // eslint-disable-line
   };
 
   useEffect(() => {

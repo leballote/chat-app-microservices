@@ -66,8 +66,8 @@ export function FriendRequestAcceptedNotification({
               error: e,
               dispatch,
               message: t([
-                "app.errors.couldntAcceptFriend",
-                "app.errors.default",
+                "app.error.couldntAcceptFriend",
+                "app.error.default",
               ]) as string,
             });
           }

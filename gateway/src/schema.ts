@@ -34,6 +34,7 @@ const typeDefs = gql`
     messageCreated: MessageCreatedSubscriptionResponse
     friendshipRequestReceived: FriendshipRequestReceivedSubscriptionResponse
     friendshipResponseReceived: FriendshipResponseReceivedSubscriptionResponse
+    chatRemoved: ChatRemovedSubscriptionResponse
   }
 
   enum ChatType {
@@ -301,6 +302,10 @@ const typeDefs = gql`
 
   type MessageCreatedSubscriptionResponse {
     message: Message
+  }
+
+  type ChatRemovedSubscriptionResponse {
+    chatRemoved: Chat
   }
 `;
 export default typeDefs;

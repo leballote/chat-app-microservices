@@ -39,6 +39,7 @@ export function ChatFooter({ height }: ChatFooterProps) {
 
   function triggerSendMessage() {
     //the last condition is not really necessary, but I think it makes it more explicit
+    console.log(messageTextInput.current?.value);
     if (
       user &&
       messageTextInput.current?.value.trimEnd() &&
@@ -52,8 +53,8 @@ export function ChatFooter({ height }: ChatFooterProps) {
           sentBy: user?.id,
         })
       );
+      clearInput();
     }
-    clearInput();
   }
 
   function handleSendClick() {
@@ -71,7 +72,8 @@ export function ChatFooter({ height }: ChatFooterProps) {
   function handleKeyDown(ev: React.KeyboardEvent<HTMLInputElement>) {
     if (ev.key === "Escape") {
       handleEscape();
-    } else if (ev.key === "Enter") {
+    } else if (ev.key === "Enter" && !ev.shiftKey) {
+      ev.preventDefault();
       handleEnter();
     }
   }
