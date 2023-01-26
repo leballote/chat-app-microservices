@@ -35,7 +35,7 @@ export default class ChatAPI extends RESTDataSource {
     args: {
       limit?: number;
       offset?: number;
-      type?: string;
+      type?: "individual" | "group";
       userId?: string;
       user1Id?: string;
       user2Id?: string;
@@ -138,7 +138,6 @@ export default class ChatAPI extends RESTDataSource {
   // @HandleError()
   async deleteChat(id: string): Promise<ChatModelResponse> {
     const ans = await this.delete<ChatModelResponse>(`chat/${id}`);
-    console.log("CHAT DELETED FROM DATA SOURCES", ans);
     return ans;
   }
 }

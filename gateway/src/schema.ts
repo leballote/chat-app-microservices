@@ -181,7 +181,6 @@ const typeDefs = gql`
   }
 
   input CreateMessageInput {
-    sentById: ID!
     sentAt: String!
     content: String!
     chatId: ID!

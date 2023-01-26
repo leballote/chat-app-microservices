@@ -26,7 +26,6 @@ export function Message({
   showUsername,
   showDatetime,
 }: IProps) {
-  console.log("message content", message.content);
   return (
     <MessageBase isOwnedByMe={isOwnedByMe} maxWidth="55%">
       <ListItem>
@@ -43,7 +42,8 @@ export function Message({
               sx={{ fontSize: "1.1em" }}
               fontWeight="bold"
             >
-              {message.sentBy.name}
+              {message.sentBy.name.substring(0, 10)}
+              {message.sentBy.name.length > 10 ? "..." : null}
             </Typography>
           ) : null}
           {showDatetime ? (
@@ -61,7 +61,7 @@ export function Message({
                 {line}
               </Typography>
             ) : (
-              <br />
+              <br key={`line-${i}`} />
             );
           })}
         </ListItemText>

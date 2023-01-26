@@ -8,6 +8,8 @@ export const MESSAGE_CREATED = gql`
         content
         sentAt
         sentBy {
+          username
+          name
           id
         }
         chat {

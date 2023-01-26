@@ -19,8 +19,7 @@ export const subscriptionResolvers: SubscriptionResolvers = {
           () => {
             return pubsub.asyncIterator([MESSAGE_CREATED]);
           },
-          function filterMessageCreated(payload, variables) {
-            console.log("this is being filtered", payload);
+          function filterMessageCreated() {
             return true;
           }
         ),
@@ -36,7 +35,7 @@ export const subscriptionResolvers: SubscriptionResolvers = {
           },
           function filterFn(payload) {
             return payload.chatRemoved.participants
-              .map((participant) => participant.id)
+              ?.map((participant) => participant.id)
               .includes(payload.viewer._id);
           }
         ),
@@ -183,11 +182,6 @@ const responseSubscriptionResponses: Resolvers = {
   ChatRemovedSubscriptionResponse: {
     chatRemoved: async (parent) => {
       const parentTemp = parent as any;
-      console.log("PARENT", parent);
-      console.log(
-        "ChatRemovedSubscriptionResponse chatRemoved",
-        parent.chatRemoved
-      );
       return parentTemp;
     },
   },

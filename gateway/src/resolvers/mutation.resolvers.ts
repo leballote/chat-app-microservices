@@ -67,9 +67,17 @@ const mutationRelatedResolvers: MutationResolvers = {
     if (!viewer) {
       throw authError;
     }
-    //TODO: validate that you can only send messages to your chats
 
-    //TODO: take away sentBy
+    // if this doesn't error it means it is part of the chat
+    const participantChatRes = await dataSources.chatAPI.getParticipant(
+      chatId,
+      viewer._id
+    );
+
+    if (isErrorResponse(participantChatRes)) {
+      throw createGQLError(participantChatRes);
+    }
+
     const createMessageRes = await dataSources.chatAPI.createMessage({
       chatId,
       userId: viewer._id,
@@ -77,6 +85,7 @@ const mutationRelatedResolvers: MutationResolvers = {
       sentAt,
       sentBy: viewer._id,
     });
+
     if (isErrorResponse(createMessageRes)) {
       throw createGQLError(createMessageRes);
     }
@@ -141,12 +150,12 @@ const mutationRelatedResolvers: MutationResolvers = {
 
     let friends = viewer.friends as UserModelSuccessResponse[];
     const friendsIds = friends.map((friend) => friend._id);
-    if (!friendsIds) {
+    if (!friendsIds.includes(input.userId)) {
       throw new GraphQLError(
         "You can only chat with users that are friends of you",
         {
           extensions: {
-            code: "NOT_FRIEND_WITH_USER",
+            code: "NOT_FRIENDS_WITH_USER",
           },
         }
       );
@@ -472,7 +481,9 @@ const mutationRelatedResolvers: MutationResolvers = {
 
     //SUGGESTION: I believe I should be able to remove chat by userId
     const chatsToRemoveRes = await dataSources.chatAPI.getChats({
-      userId: userToRemoveRes.data._id,
+      user1Id: userToRemoveRes.data._id,
+      user2Id: viewer._id,
+      type: "individual",
     });
 
     if (!isErrorResponse(chatsToRemoveRes)) {

@@ -87,7 +87,6 @@ export type CreateMessageInput = {
   chatId: Scalars['ID'];
   content: Scalars['String'];
   sentAt: Scalars['String'];
-  sentById: Scalars['ID'];
 };
 
 export type CreateMessageResponse = {

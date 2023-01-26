@@ -9,24 +9,29 @@ export type ChatFooterProps = {
 } & WithHeight;
 
 export function ChatFooter({ height }: ChatFooterProps) {
+  const userId = useAppSelector((state) => state.currentUser.value?.id);
   const [maxReached, setMaxReached] = useState<boolean>(false);
   const [closeToMaxReached, setCloseToMaxReached] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const { value: chat } = useAppSelector((state) => state.currentChat);
-  if (!chat) return null;
-  const { id: chatId } = chat;
-  const { value: user } = useAppSelector((state) => state.currentUser);
+  const chatId = useAppSelector((state) => state.currentChat.value?.id);
+  if (chatId == undefined) return null;
   const messageTextInput = useRef<HTMLInputElement>(null);
 
   function clearInput() {
     if (messageTextInput.current?.value) {
       messageTextInput.current.value = "";
+      const e = new Event("change");
+      messageTextInput.current.dispatchEvent(e);
     }
   }
 
   function onInputChange(
     ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
+    console.log(
+      "ev triggered",
+      messageTextInput.current?.value.substring(0, 10)
+    );
     if (ev) {
       if (messageTextInput.current?.maxLength) {
         const maxLength = messageTextInput.current?.maxLength;
@@ -39,18 +44,17 @@ export function ChatFooter({ height }: ChatFooterProps) {
 
   function triggerSendMessage() {
     //the last condition is not really necessary, but I think it makes it more explicit
-    console.log(messageTextInput.current?.value);
     if (
-      user &&
+      userId !== undefined &&
       messageTextInput.current?.value.trimEnd() &&
       messageTextInput.current.value.trimEnd().length > 0
     ) {
       dispatch(
         sendMessage({
-          chatId,
+          chatId: chatId as string,
           content: messageTextInput.current?.value,
           sentAt: new Date().toISOString(),
-          sentBy: user?.id,
+          sentBy: userId,
         })
       );
       clearInput();
