@@ -20,18 +20,13 @@ export function ChatFooter({ height }: ChatFooterProps) {
   function clearInput() {
     if (messageTextInput.current?.value) {
       messageTextInput.current.value = "";
-      const e = new Event("change");
-      messageTextInput.current.dispatchEvent(e);
+      //I wanted to trigger an event but I couldn't
     }
   }
 
   function onInputChange(
     ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>
   ) {
-    console.log(
-      "ev triggered",
-      messageTextInput.current?.value.substring(0, 10)
-    );
     if (ev) {
       if (messageTextInput.current?.maxLength) {
         const maxLength = messageTextInput.current?.maxLength;
@@ -43,7 +38,6 @@ export function ChatFooter({ height }: ChatFooterProps) {
   }
 
   function triggerSendMessage() {
-    //the last condition is not really necessary, but I think it makes it more explicit
     if (
       userId !== undefined &&
       messageTextInput.current?.value.trimEnd() &&
@@ -57,8 +51,11 @@ export function ChatFooter({ height }: ChatFooterProps) {
           sentBy: userId,
         })
       );
-      clearInput();
     }
+    //I really don't know how to do this more declaratively
+    setMaxReached(false);
+    setCloseToMaxReached(false);
+    clearInput();
   }
 
   function handleSendClick() {

@@ -10,6 +10,7 @@ import {
   CHAT_DELETED,
   MESSAGE_CREATED,
   pubsub,
+  FRIENDSHIP_REMOVED,
 } from "./actions";
 import { GraphQLError } from "graphql";
 import { authError, createGQLError } from "../errors/utils";
@@ -439,11 +440,12 @@ const mutationRelatedResolvers: MutationResolvers = {
       success: true,
     };
   },
-  leaveGroupChat: async (parent, { input }, { dataSources }) => {
+  leaveGroupChat: async (_parent, { input }, { dataSources }) => {
     const viewer = await dataSources.getViewer();
     if (!viewer) {
       throw authError;
     }
+
     const delParticipantRes = await dataSources.chatAPI.deleteParticipant(
       input.chatId,
       viewer._id
@@ -452,6 +454,15 @@ const mutationRelatedResolvers: MutationResolvers = {
     if (isErrorResponse(delParticipantRes)) {
       throw createGQLError(delParticipantRes);
     }
+
+    //this could be found at the same time that you delete a participant
+    const chatToCheckRes = await dataSources.chatAPI.getChat(input.chatId);
+    if (!isErrorResponse(chatToCheckRes)) {
+      if (chatToCheckRes.data.participants.length === 0) {
+        await dataSources.chatAPI.deleteChat(chatToCheckRes.data._id);
+      }
+    }
+
     return {
       chatId: input.chatId,
       success: true,
@@ -479,6 +490,18 @@ const mutationRelatedResolvers: MutationResolvers = {
       throw createGQLError(userToRemoveRes);
     }
 
+    const payload = {
+      remover: viewer,
+      removed: userToRemoveRes.data,
+    };
+    console.log("payload for friendship removed", payload);
+    pubsub.publish(FRIENDSHIP_REMOVED, {
+      friendshipRemoved: {
+        remover: viewer,
+        removed: userToRemoveRes.data,
+      },
+    });
+
     //SUGGESTION: I believe I should be able to remove chat by userId
     const chatsToRemoveRes = await dataSources.chatAPI.getChats({
       user1Id: userToRemoveRes.data._id,
@@ -487,14 +510,13 @@ const mutationRelatedResolvers: MutationResolvers = {
     });
 
     if (!isErrorResponse(chatsToRemoveRes)) {
-      const chatToRemoveRes = chatsToRemoveRes.data[0];
+      const chatToRemove = chatsToRemoveRes.data[0];
       const chatDeletedRes = await dataSources.chatAPI.deleteChat(
-        chatToRemoveRes._id
+        chatToRemove._id
       );
       if (!isErrorResponse(chatDeletedRes)) {
         pubsub.publish(CHAT_DELETED, {
           chatRemoved: chatDeletedRes.data,
-          viewer,
         });
       }
     }

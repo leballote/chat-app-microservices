@@ -24,8 +24,8 @@ export const errorResources: Record<"en" | "es" | "de", ErrorsTranslation> = {
     ATTEMPT_TOO_SOON: "Attempted too soon, please try in a second",
     MISSING_CREDENTIALS: "Missing credentials",
     USERNAME_TAKEN: "This username is already taken. Please, try another one",
-    DUPLICATE_ERROR: "The {{key}} '{{value}}' already exists",
-    NOT_FOUND_ERROR: "{{meta.resource}} no existe",
+    DUPLICATE_ERROR: "{{key}} '{{value}}' already exists",
+    NOT_FOUND_ERROR: "{{meta.resource}} doesn't exist",
     PASSWORDS_DONT_MATCH: "Passwords don't match",
     FRIENDHIP_REQUEST_ALREADY_SENT_ERROR:
       "You already sent friend request to this user",
@@ -74,7 +74,7 @@ export const errorResources: Record<"en" | "es" | "de", ErrorsTranslation> = {
     USERNAME_TAKEN:
       "Dieser Benutzername ist bereits vergeben. Bitte versuchen Sie es mit einem anderen",
     DUPLICATE_ERROR: "Die {{key}} {{value}} existiert bereits",
-    NOT_FOUND_ERROR: "{{meta.resource}} not found",
+    NOT_FOUND_ERROR: "{{meta.resource}} nicht gefunden",
     PASSWORDS_DONT_MATCH: "Passwörter stimmen nicht überein",
     FRIENDHIP_REQUEST_ALREADY_SENT_ERROR:
       "Sie haben diesem Benutzer bereits eine Freundschaftsanfrage gesendet",

@@ -6,6 +6,7 @@ import {
   FRIENDSHIP_REQUEST_RECEIVED,
   FRIENDSHIP_RESPONSE_RECEIVED,
   MESSAGE_CREATED,
+  FRIENDSHIP_REMOVED,
   pubsub,
 } from "./actions";
 import { isErrorResponse } from "../types/general.types";
@@ -27,16 +28,17 @@ export const subscriptionResolvers: SubscriptionResolvers = {
     },
   },
   chatRemoved: {
-    subscribe: async () => {
+    subscribe: async (_parent, input, { dataSources }) => {
+      const viewer = await dataSources.getViewer();
       return {
         [Symbol.asyncIterator]: withFilter(
           () => {
             return pubsub.asyncIterator([CHAT_DELETED]);
           },
-          function filterFn(payload) {
+          (payload) => {
             return payload.chatRemoved.participants
               ?.map((participant) => participant.id)
-              .includes(payload.viewer._id);
+              .includes(viewer?._id);
           }
         ),
       };
@@ -65,6 +67,24 @@ export const subscriptionResolvers: SubscriptionResolvers = {
           },
           function filterMessageCreated() {
             return true;
+          }
+        ),
+      };
+    },
+  },
+  friendshipRemoved: {
+    subscribe: async (_parent, _input, { dataSources }) => {
+      // const viewer = await dataSources.getViewer();
+      return {
+        [Symbol.asyncIterator]: withFilter(
+          () => {
+            return pubsub.asyncIterator([FRIENDSHIP_REMOVED]);
+          },
+          function filterFn(payload) {
+            return true;
+            // return [payload.remover._id, payload.removed._id].includes(
+            // viewer._id
+            // );
           }
         ),
       };
@@ -180,11 +200,13 @@ const responseSubscriptionResponses: Resolvers = {
     },
   },
   ChatRemovedSubscriptionResponse: {
-    chatRemoved: async (parent) => {
+    chatRemoved: (parent) => {
+      console.log("chat removed resolver");
       const parentTemp = parent as any;
       return parentTemp;
     },
   },
+  // FriendshipRemovedResponse: {},
 };
 
 const subscriptionRelatedResolvers: Resolvers = {

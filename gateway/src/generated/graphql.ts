@@ -108,6 +108,13 @@ export type FriendRequest = {
   user: User;
 };
 
+export type FriendshipRemovedResponse = {
+  __typename?: 'FriendshipRemovedResponse';
+  hola?: Maybe<Scalars['String']>;
+  removed?: Maybe<User>;
+  remover?: Maybe<User>;
+};
+
 export type FriendshipRequestReceivedSubscriptionResponse = {
   __typename?: 'FriendshipRequestReceivedSubscriptionResponse';
   accepterUser?: Maybe<User>;
@@ -359,6 +366,7 @@ export enum Status {
 export type Subscription = {
   __typename?: 'Subscription';
   chatRemoved?: Maybe<ChatRemovedSubscriptionResponse>;
+  friendshipRemoved: Scalars['String'];
   friendshipRequestReceived?: Maybe<FriendshipRequestReceivedSubscriptionResponse>;
   friendshipResponseReceived?: Maybe<FriendshipResponseReceivedSubscriptionResponse>;
   messageCreated?: Maybe<MessageCreatedSubscriptionResponse>;
@@ -502,6 +510,7 @@ export type ResolversTypes = {
   CreateMessageResponse: ResolverTypeWrapper<Omit<CreateMessageResponse, 'message'> & { message?: Maybe<ResolversTypes['Message']> }>;
   Error: ResolverTypeWrapper<Error>;
   FriendRequest: ResolverTypeWrapper<Omit<FriendRequest, 'user'> & { user: ResolversTypes['User'] }>;
+  FriendshipRemovedResponse: ResolverTypeWrapper<Omit<FriendshipRemovedResponse, 'removed' | 'remover'> & { removed?: Maybe<ResolversTypes['User']>, remover?: Maybe<ResolversTypes['User']> }>;
   FriendshipRequestReceivedSubscriptionResponse: ResolverTypeWrapper<Omit<FriendshipRequestReceivedSubscriptionResponse, 'accepterUser' | 'requesterUser'> & { accepterUser?: Maybe<ResolversTypes['User']>, requesterUser?: Maybe<ResolversTypes['User']> }>;
   FriendshipResponseReceivedSubscriptionResponse: ResolverTypeWrapper<Omit<FriendshipResponseReceivedSubscriptionResponse, 'accepterUser' | 'requesterUser'> & { accepterUser?: Maybe<ResolversTypes['User']>, requesterUser?: Maybe<ResolversTypes['User']> }>;
   GetMessagesInput: GetMessagesInput;
@@ -555,6 +564,7 @@ export type ResolversParentTypes = {
   CreateMessageResponse: Omit<CreateMessageResponse, 'message'> & { message?: Maybe<ResolversParentTypes['Message']> };
   Error: Error;
   FriendRequest: Omit<FriendRequest, 'user'> & { user: ResolversParentTypes['User'] };
+  FriendshipRemovedResponse: Omit<FriendshipRemovedResponse, 'removed' | 'remover'> & { removed?: Maybe<ResolversParentTypes['User']>, remover?: Maybe<ResolversParentTypes['User']> };
   FriendshipRequestReceivedSubscriptionResponse: Omit<FriendshipRequestReceivedSubscriptionResponse, 'accepterUser' | 'requesterUser'> & { accepterUser?: Maybe<ResolversParentTypes['User']>, requesterUser?: Maybe<ResolversParentTypes['User']> };
   FriendshipResponseReceivedSubscriptionResponse: Omit<FriendshipResponseReceivedSubscriptionResponse, 'accepterUser' | 'requesterUser'> & { accepterUser?: Maybe<ResolversParentTypes['User']>, requesterUser?: Maybe<ResolversParentTypes['User']> };
   GetMessagesInput: GetMessagesInput;
@@ -651,6 +661,13 @@ export type ErrorResolvers<ContextType = MyContext, ParentType extends Resolvers
 export type FriendRequestResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['FriendRequest'] = ResolversParentTypes['FriendRequest']> = {
   sentAt?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FriendshipRemovedResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['FriendshipRemovedResponse'] = ResolversParentTypes['FriendshipRemovedResponse']> = {
+  hola?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  removed?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  remover?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -763,6 +780,7 @@ export type SignUpResponseResolvers<ContextType = MyContext, ParentType extends 
 
 export type SubscriptionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   chatRemoved?: SubscriptionResolver<Maybe<ResolversTypes['ChatRemovedSubscriptionResponse']>, "chatRemoved", ParentType, ContextType>;
+  friendshipRemoved?: SubscriptionResolver<ResolversTypes['String'], "friendshipRemoved", ParentType, ContextType>;
   friendshipRequestReceived?: SubscriptionResolver<Maybe<ResolversTypes['FriendshipRequestReceivedSubscriptionResponse']>, "friendshipRequestReceived", ParentType, ContextType>;
   friendshipResponseReceived?: SubscriptionResolver<Maybe<ResolversTypes['FriendshipResponseReceivedSubscriptionResponse']>, "friendshipResponseReceived", ParentType, ContextType>;
   messageCreated?: SubscriptionResolver<Maybe<ResolversTypes['MessageCreatedSubscriptionResponse']>, "messageCreated", ParentType, ContextType>;
@@ -823,6 +841,7 @@ export type Resolvers<ContextType = MyContext> = {
   CreateMessageResponse?: CreateMessageResponseResolvers<ContextType>;
   Error?: ErrorResolvers<ContextType>;
   FriendRequest?: FriendRequestResolvers<ContextType>;
+  FriendshipRemovedResponse?: FriendshipRemovedResponseResolvers<ContextType>;
   FriendshipRequestReceivedSubscriptionResponse?: FriendshipRequestReceivedSubscriptionResponseResolvers<ContextType>;
   FriendshipResponseReceivedSubscriptionResponse?: FriendshipResponseReceivedSubscriptionResponseResolvers<ContextType>;
   GetOrCreateChatResponse?: GetOrCreateChatResponseResolvers<ContextType>;

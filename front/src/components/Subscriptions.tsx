@@ -3,7 +3,10 @@ import {
   removeChat,
   upsertChat,
 } from "../app/features/appData/chatsPreviewsSlice";
-import { addContact } from "../app/features/appData/contactsPreviewsSlice";
+import {
+  addContact,
+  removeContact,
+} from "../app/features/appData/contactsPreviewsSlice";
 import { unshiftMessage } from "../app/features/appData/currentChatSlice";
 import {
   addFriendRequest,
@@ -18,6 +21,7 @@ import {
 import { appNotificationManager } from "../app/features/appView/utils";
 import {
   CHAT_REMOVED,
+  FRIENDSHIP_REMOVED,
   FRIENDSHIP_REQUEST_RECEIVED,
   FRIENDSHIP_RESPONSE_RECEIVED,
   MESSAGE_CREATED,
@@ -136,6 +140,22 @@ export function Subscriptions() {
       if (chatRemoved) {
         dispatch(removeChat({ chatId: chatRemoved.id }));
         navigate("/app");
+      }
+    },
+  });
+
+  useSubscription(FRIENDSHIP_REMOVED, {
+    fetchPolicy: "no-cache",
+    onData: ({ data }) => {
+      const response = data.data?.friendshipRemoved;
+      console.log("data", data.data);
+      if (response) {
+        const { remover, removed } = response;
+        if (remover.id === user?.id) {
+          dispatch(removeContact(removed.id));
+        } else if (removed.id === user?.id) {
+          dispatch(removeContact(remover.id));
+        }
       }
     },
   });

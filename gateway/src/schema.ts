@@ -34,6 +34,7 @@ const typeDefs = gql`
     messageCreated: MessageCreatedSubscriptionResponse
     friendshipRequestReceived: FriendshipRequestReceivedSubscriptionResponse
     friendshipResponseReceived: FriendshipResponseReceivedSubscriptionResponse
+    friendshipRemoved: FriendshipRemovedResponse!
     chatRemoved: ChatRemovedSubscriptionResponse
   }
 
@@ -305,6 +306,12 @@ const typeDefs = gql`
 
   type ChatRemovedSubscriptionResponse {
     chatRemoved: Chat
+  }
+
+  type FriendshipRemovedResponse {
+    remover: User
+    removed: User
+    hola: String
   }
 `;
 export default typeDefs;

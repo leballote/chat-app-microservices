@@ -208,8 +208,8 @@ chatSchema.methods.deleteChatExtraData = async function () {
   }
 };
 
-chatSchema.statics.deleteChat = async function ({ id, user1Id, user2Id }) {
-  const query = getNonUndefinedValues({ id, user1Id, user2Id });
+chatSchema.statics.deleteChat = async function ({ id }) {
+  const query = getNonUndefinedValues({ _id: id });
   const chat = await this.findOneAndDelete(query);
   const { participants } = await chat.deleteChatExtraData();
 

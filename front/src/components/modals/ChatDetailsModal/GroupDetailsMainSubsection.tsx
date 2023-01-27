@@ -1,9 +1,7 @@
 import {
-  Box,
   Typography,
   List,
   Button,
-  DialogTitle,
   DialogContent,
   Avatar,
   ListItem,
@@ -21,6 +19,7 @@ import {
   requestRemoveParticipant,
 } from "../../../app/features/appData/currentChatSlice";
 import { useTranslation } from "react-i18next";
+import { ChatDetailsHeader } from "./ChatDetailsHeader";
 
 export default function GroupDetailsMainSubsection({
   name,
@@ -112,7 +111,6 @@ export default function GroupDetailsMainSubsection({
           variant="outlined"
           fullWidth
           sx={{
-            // width: "100%",
             color: "error.light",
             borderColor: "error.main",
             "&:hover": {
@@ -127,61 +125,4 @@ export default function GroupDetailsMainSubsection({
       </DialogContent>
     </>
   );
-}
-
-type ChatDetailsHeaderProps = {
-  name: string;
-  avatar?: string;
-  phrase: string;
-};
-
-function ChatDetailsHeader({ name, avatar, phrase }: ChatDetailsHeaderProps) {
-  return (
-    <Box>
-      <Avatar src={avatar} sx={{ width: 150, height: 150, margin: "0 auto" }} />
-      <Box>
-        <DialogTitle>
-          <Typography
-            sx={{
-              wordWrap: "break-word",
-              fontSize: defineFontSizeName(name),
-            }}
-          >
-            {name}
-          </Typography>
-          <Typography
-            color="text.secondary"
-            sx={{
-              wordWrap: "break-word",
-              fontSize: defineFontSizePhrase(name),
-            }}
-          >
-            {phrase}
-          </Typography>
-        </DialogTitle>
-      </Box>
-    </Box>
-  );
-}
-
-function defineFontSizeName(name: string) {
-  const length = name.length;
-  if (length > 100) {
-    return "1.2em";
-  }
-  if (length > 75) {
-    return "1.1em";
-  }
-  if (length > 50) {
-    return "1.6em";
-  }
-  return "1.8em";
-}
-
-function defineFontSizePhrase(phrase: string) {
-  const length = phrase.length;
-  if (length > 50) {
-    return ".8em";
-  }
-  return "1.1em";
 }

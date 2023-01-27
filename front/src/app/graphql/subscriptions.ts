@@ -72,3 +72,16 @@ export const CHAT_REMOVED = gql`
     }
   }
 `;
+
+export const FRIENDSHIP_REMOVED = gql`
+  subscription FriendshipRemoved {
+    friendshipRemoved {
+      removed {
+        id
+      }
+      remover {
+        id
+      }
+    }
+  }
+`;

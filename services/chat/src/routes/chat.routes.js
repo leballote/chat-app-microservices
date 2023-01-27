@@ -203,8 +203,10 @@ router.put("/chat/:id", async (req, res) => {
 
 router.delete("/chat/:id", async (req, res) => {
   const { id } = req.params;
+  console.log("RECEIVED ID", id);
   try {
-    const chat = await Chat.deleteChat(id);
+    const chat = await Chat.deleteChat({ id });
+    console.log("DELETED ID", chat._id);
 
     if (!chat) {
       return res.status(404).send(appErrors.notFoundError("chat", { id }));

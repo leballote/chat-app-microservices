@@ -1,12 +1,4 @@
-import {
-  Box,
-  Typography,
-  Button,
-  DialogTitle,
-  DialogContent,
-  Avatar,
-  Skeleton,
-} from "@mui/material";
+import { Box, Button, DialogContent, Skeleton } from "@mui/material";
 import { MouseEventHandler, useEffect } from "react";
 import { useAppSelector } from "../../../app/hooks";
 import { useTranslation } from "react-i18next";
@@ -17,6 +9,7 @@ import {
   getValue as getContactsPreviewsValue,
   requestRemoveFriend,
 } from "../../../app/features/appData/contactsPreviewsSlice";
+import { ChatDetailsHeader } from "./ChatDetailsHeader";
 
 export function IndividualChatDetails({
   name,
@@ -54,25 +47,8 @@ export function IndividualChatDetails({
 
   return (
     <>
+      <ChatDetailsHeader name={name} phrase={phrase} avatar={avatar} />
       <Box data-user-id={otherParticipant.id}>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "flex-end",
-            margin: "1em",
-          }}
-        >
-          <Avatar src={avatar} sx={{ width: 100, height: 100 }} />
-          <Box>
-            <DialogTitle
-              component={"h3"}
-              sx={{ fontSize: "1.8em", textAlign: "left", minWidth: "10em" }}
-            >
-              {name}
-            </DialogTitle>
-            <Typography>{phrase}</Typography>
-          </Box>
-        </Box>
         <DialogContent sx={{ padding: 0 }}>
           {loading ? <Skeleton /> : null}
           {contacts
