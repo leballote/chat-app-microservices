@@ -23,13 +23,13 @@ const level = () => {
 // Define different colors for each level.
 // Colors make the log message more visible,
 // adding the ability to focus or ignore messages.
-const colors = {
-  error: "red",
-  warn: "yellow",
-  info: "green",
-  http: "magenta",
-  debug: "white",
-};
+// const colors = {
+//   error: "red",
+//   warn: "yellow",
+//   info: "green",
+//   http: "magenta",
+//   debug: "white",
+// };
 
 // Tell winston that you want to link the colors
 // defined above to the severity levels.

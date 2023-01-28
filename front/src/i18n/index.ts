@@ -30,6 +30,16 @@ type Translation = {
         couldntRemoveParticipant: string;
         couldntSendMessage: string;
         maxMessageLengthReached: string;
+        nameLeadingOrTrailingSpaces: string;
+        nameTwoConsecutiveSpaces: string;
+        nameEmpty: string;
+        notValidEmail: string;
+        formNotFilled: string;
+        usernameEmpty: string;
+        usernameContainsSpaces: string;
+        passwordEmpty: string;
+        passwordWeak: string;
+        confirmPasswordNotSame: string;
       };
       success: {
         friendRequestSent: string;
@@ -145,6 +155,19 @@ const resources: { [language: string]: Translation } = {
           couldntSendMessage: "No se pudo enviar el mensaje",
           maxMessageLengthReached:
             "El máximo de caracteres permitido para un mensaje son 1000",
+          nameLeadingOrTrailingSpaces:
+            "El nombre no puede empezar o terminar con espacios",
+          nameTwoConsecutiveSpaces:
+            "El nombre no puede contener dos espacios consecutivos",
+          nameEmpty: "El nombre no puede estar en blanco",
+          notValidEmail: "El email no es válido",
+          formNotFilled: "Por favor, completa la forma",
+          usernameEmpty: "Nombre de usuario vacío",
+          usernameContainsSpaces: "Nombre de usuario contiene espacios",
+          passwordEmpty: "Password vacío",
+          passwordWeak:
+            "La contraseña debe contener al menos ocho caracteres y debe incluir al menos uno de cada uno de los siguientes caracteres: letra minúscula, letra mayúscula, un símbolo y un número",
+          confirmPasswordNotSame: "Las contraseñas no coinciden",
         },
         success: {
           friendRequestSent: "Se envió la solicitud de amistad",
@@ -257,6 +280,19 @@ const resources: { [language: string]: Translation } = {
           couldntRemoveParticipant: "Could not remove participant",
           couldntSendMessage: "Could not send message",
           maxMessageLengthReached: "Max message size reached (1000)",
+          nameLeadingOrTrailingSpaces:
+            "Name can't start nor end with whitespaces",
+          nameTwoConsecutiveSpaces:
+            "Name can't have two consecutive whitespaces",
+          nameEmpty: "Name cannot be empty",
+          notValidEmail: "Not valid email",
+          formNotFilled: "Please, complete the form",
+          usernameEmpty: "Username cannot be empty",
+          usernameContainsSpaces: "Username cannot contain whitespaces",
+          passwordEmpty: "Password cannot be empty",
+          passwordWeak:
+            "Password should be length 8, and contain at least one of each of the following: lowercase letter, uppercase letter, symbol and number",
+          confirmPasswordNotSame: "Passwords don't match",
         },
         success: {
           friendRequestSent: "Friend request sent",
@@ -371,6 +407,19 @@ const resources: { [language: string]: Translation } = {
           couldntRemoveParticipant: "Teilnehmer konnte nicht entfernt werden",
           couldntSendMessage: "Nachricht konnte nicht gesendet werden",
           maxMessageLengthReached: "Maximale Nachrichtengröße erreicht (1000)",
+          nameLeadingOrTrailingSpaces:
+            "Der Name darf nicht mit Leerzeichen beginnen oder enden",
+          nameTwoConsecutiveSpaces:
+            "Name darf nicht zwei aufeinanderfolgende Leerzeichen haben",
+          nameEmpty: "Der Name darf nicht leer sein",
+          notValidEmail: "Ungültige E-Mail",
+          formNotFilled: "Bitte füllen Sie das Formular aus",
+          usernameEmpty: "Der Benutzername darf nicht leer sein",
+          usernameContainsSpaces: "Username cannot contain whitespaces",
+          passwordEmpty: "Der Benutzername darf keine Leerzeichen enthalten",
+          passwordWeak:
+            "Das Passwort sollte die Länge 8 haben und mindestens eines der folgenden Elemente enthalten: Kleinbuchstaben, Großbuchstaben, Symbol und Zahlr",
+          confirmPasswordNotSame: "Passwörter stimmen nicht überein",
         },
         success: {
           friendRequestSent: "Freundschaftsanfrage gesendet",

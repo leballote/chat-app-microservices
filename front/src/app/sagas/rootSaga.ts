@@ -1,4 +1,4 @@
-import { takeEvery, takeLatest } from "redux-saga/effects";
+import { debounce, takeEvery, takeLatest } from "redux-saga/effects";
 import {
   getChatPreview,
   getValue as getChatsPreviewsValue,
@@ -47,6 +47,12 @@ import { handleNewNotification } from "./handlers/newNotification.handler";
 import { triggerNewNotification } from "../features/appView/notifications/notificationsSlice";
 import { triggerLogout } from "../features/appData/authSlice";
 import { handleLogout } from "./handlers/logout.handle";
+import {
+  triggerDebounceSetErrors,
+  triggerDebounceSetFieldErrors,
+} from "../features/appView/signup/signupSlice";
+import { handleTriggerDebounceSetSignUpFieldErrors } from "./handlers/triggerDebounceSetFieldErrors";
+import { handleTriggerDebounceSetSignUpErrors } from "./handlers/triggerDebounceSetErrors";
 
 export function* watcherSaga() {
   yield takeLatest(getCurrentUserValue, handleGetUser);
@@ -75,4 +81,15 @@ export function* watcherSaga() {
   yield takeEvery(searchChats, handleSearchChats);
   yield takeEvery(triggerNewNotification, handleNewNotification);
   yield takeEvery(triggerLogout, handleLogout);
+  yield debounce(
+    700,
+    triggerDebounceSetFieldErrors,
+    handleTriggerDebounceSetSignUpFieldErrors
+  );
+
+  yield debounce(
+    700,
+    triggerDebounceSetErrors,
+    handleTriggerDebounceSetSignUpErrors
+  );
 }

@@ -25,6 +25,7 @@ import { watcherSaga } from "./sagas/rootSaga";
 import notificationsReducer from "./features/appView/notifications/notificationsSlice";
 import authReducer from "./features/appData/authSlice";
 import wsConnectionReducer from "./features/appData/wsConnectionSlice";
+import signupReducer from "./features/appView/signup/signupSlice";
 
 const combinedReducer = combineReducers({
   //appData
@@ -56,6 +57,7 @@ const combinedReducer = combineReducers({
   notifications: notificationsReducer,
   auth: authReducer,
   wsConnection: wsConnectionReducer,
+  signup: signupReducer,
 });
 
 function customCreateStore() {

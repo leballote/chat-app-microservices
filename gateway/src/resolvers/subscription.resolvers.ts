@@ -14,13 +14,14 @@ import { authError, createGQLError } from "../errors/utils";
 
 export const subscriptionResolvers: SubscriptionResolvers = {
   messageCreated: {
-    subscribe: async () => {
+    subscribe: async (_parent, _input, { dataSources }) => {
+      const viewer = dataSources.getViewer();
       return {
         [Symbol.asyncIterator]: withFilter(
           () => {
             return pubsub.asyncIterator([MESSAGE_CREATED]);
           },
-          function filterMessageCreated() {
+          function filterFn(payload) {
             return true;
           }
         ),
@@ -28,7 +29,7 @@ export const subscriptionResolvers: SubscriptionResolvers = {
     },
   },
   chatRemoved: {
-    subscribe: async (_parent, input, { dataSources }) => {
+    subscribe: async (_parent, _input, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       return {
         [Symbol.asyncIterator]: withFilter(
@@ -74,17 +75,20 @@ export const subscriptionResolvers: SubscriptionResolvers = {
   },
   friendshipRemoved: {
     subscribe: async (_parent, _input, { dataSources }) => {
-      // const viewer = await dataSources.getViewer();
+      const viewer = await dataSources.getViewer();
       return {
         [Symbol.asyncIterator]: withFilter(
           () => {
             return pubsub.asyncIterator([FRIENDSHIP_REMOVED]);
           },
           function filterFn(payload) {
-            return true;
-            // return [payload.remover._id, payload.removed._id].includes(
-            // viewer._id
-            // );
+            return (
+              viewer &&
+              [
+                payload.friendshipRemoved?.remover?._id,
+                payload.friendshipRemoved?.removed?._id,
+              ].includes(viewer?._id)
+            );
           }
         ),
       };
@@ -201,7 +205,6 @@ const responseSubscriptionResponses: Resolvers = {
   },
   ChatRemovedSubscriptionResponse: {
     chatRemoved: (parent) => {
-      console.log("chat removed resolver");
       const parentTemp = parent as any;
       return parentTemp;
     },

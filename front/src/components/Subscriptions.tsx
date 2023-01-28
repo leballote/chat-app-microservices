@@ -148,7 +148,6 @@ export function Subscriptions() {
     fetchPolicy: "no-cache",
     onData: ({ data }) => {
       const response = data.data?.friendshipRemoved;
-      console.log("data", data.data);
       if (response) {
         const { remover, removed } = response;
         if (remover.id === user?.id) {

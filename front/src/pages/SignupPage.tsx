@@ -1,28 +1,40 @@
 import { useMutation } from "@apollo/client";
-import { TextField, Stack, Button, Typography, Alert } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
+import { Stack, Button, Typography, Alert } from "@mui/material";
+import React, { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { setError } from "../app/features/appData/chatsPreviewsSlice";
+import { triggerNewNotification } from "../app/features/appView/notifications/notificationsSlice";
+import {
+  GenericErrorAppNotification,
+  NotificationType,
+} from "../app/features/appView/types";
+import { appNotificationManager } from "../app/features/appView/utils";
 import { SIGNUP } from "../app/graphql/mutations";
 import { useAppSelector } from "../app/hooks";
 import { FormCentered } from "../components/shared/FromCentered";
+import EmailField from "../components/SignUpPage/fields/EmailField";
+import FullNameField from "../components/SignUpPage/fields/FullNameField";
+import PasswordField from "../components/SignUpPage/fields/PasswordField";
+import UsernameField from "../components/SignUpPage/fields/UsernameField";
 
 export default function SignupPage() {
+  const haveError = useAppSelector(
+    (state) =>
+      Object.entries(state.signup.fields).reduce((acc, [, field]) => {
+        return acc + field.errors.length;
+      }, 0) > 0
+  );
+
   const usernameInput = useRef<HTMLInputElement>(null);
   const nameInput = useRef<HTMLInputElement>(null);
   const emailInput = useRef<HTMLInputElement>(null);
   const passwordInput = useRef<HTMLInputElement>(null);
   const confirmPasswordInput = useRef<HTMLInputElement>(null);
+  const dispatch = useDispatch();
   const { t } = useTranslation();
 
   const [mutationFunction, { data, error }] = useMutation(SIGNUP);
-
-  const [clientError, setClientError] = useState<{
-    message: string;
-    code: string;
-    meta?: object;
-  } | null>(null);
 
   const { value: user } = useAppSelector((state) => state.currentUser);
   const navigate = useNavigate();
@@ -40,21 +52,24 @@ export default function SignupPage() {
   //SUGGESTION: maybe some client side validation for the password and realtime feedback instead of on submit
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
+    if (haveError) {
+      const notification: Omit<GenericErrorAppNotification, "id"> = {
+        notificationType: NotificationType.GENERIC_ERROR,
+        message: t("app.error.formNotFilled") as string,
+      };
+      dispatch(
+        triggerNewNotification(
+          appNotificationManager.createNotification({
+            notification,
+          })
+        )
+      );
+    }
     const username = usernameInput.current?.value;
     const name = nameInput.current?.value;
     const email = emailInput.current?.value;
     const password = passwordInput.current?.value;
     const confirmPassword = confirmPasswordInput.current?.value;
-    if (password !== confirmPassword) {
-      setClientError({
-        message: "Passwords don't match",
-        code: "PASSWORDS_DONT_MATCH",
-      });
-      setError(undefined);
-      return;
-    } else {
-      setClientError(null);
-    }
 
     const requiredInputs = {
       username,
@@ -71,9 +86,8 @@ export default function SignupPage() {
       try {
         await mutationFunction({ variables: { input: inputs } });
       } catch (e) {
-        // disable-eslint-line
-        //this is handeled by the hook already
-      }
+        //error is managed by the hook
+      } // eslint-disable-line
     }
   }
   return (
@@ -88,49 +102,16 @@ export default function SignupPage() {
         >
           {t("signupPage.title")}
         </Typography>
-        <TextField
-          label={t("user.username")}
-          required
-          inputProps={{ maxLength: 20 }}
-          inputRef={usernameInput}
-        />
-        <TextField
-          label={t("user.fullName")}
-          inputProps={{ maxLength: 120 }}
-          required
-          inputRef={nameInput}
-        />
-        <TextField
-          label={t("user.email")}
-          type="email"
-          required
-          inputProps={{ maxLength: 320 }}
-          inputRef={emailInput}
-        />
 
-        <TextField
-          label={t("user.password")}
-          required
-          type="password"
-          inputRef={passwordInput}
-          inputProps={{ maxLength: 300 }}
-        />
-        <TextField
-          label={t("signupPage.confirmPassword")}
-          required
-          type="password"
-          inputProps={{ maxLength: 300 }}
-          inputRef={confirmPasswordInput}
-        />
+        <UsernameField />
+        <FullNameField />
+        <EmailField />
+        <PasswordField />
+
         <Button type="submit" variant="outlined">
           {t("signupPage.signupButton")}
         </Button>
-        {clientError ? (
-          <Alert severity="error">
-            {t(`errors.${clientError.code}`, { meta: clientError.meta })}
-          </Alert>
-        ) : null}
-        {error && !clientError ? (
+        {error ? (
           <Alert severity="error">
             {t(
               [
@@ -152,6 +133,7 @@ export default function SignupPage() {
             )}
           </Alert>
         ) : null}
+
         <Typography textAlign="center">
           {t("signupPage.haveAnAccount")} &nbsp;
           <Link to="/auth/login">{t("signupPage.login")}!</Link>

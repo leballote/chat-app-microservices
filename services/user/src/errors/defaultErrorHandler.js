@@ -4,8 +4,12 @@ const { Error: MongooseError } = require("mongoose");
 const { createErrorResponse } = require("./utils");
 
 function defaultErrorHandler(error, _req, res) {
-  if (error instanceof AppError) {
-    return res.status(400).send({ ...error });
+  const errors = Object.values(error.errors);
+  const firstError = errors[0];
+  if (firstError.reason instanceof AppError) {
+    return res
+      .status(400)
+      .send({ ...firstError.reason, message: firstError.reason.message });
   }
 
   if (error.name == "MongoError" && error?.code === 11000) {
@@ -17,7 +21,7 @@ function defaultErrorHandler(error, _req, res) {
     }
   }
   if (error instanceof MongooseError.ValidationError) {
-    const errors = Object.map(error.errors);
+    const errors = error.errors;
     return res.status(400).send(
       createErrorResponse(error.message, "VALIDATION_ERROR", {
         validatorErrors: Object.entries(errors).map(([, value]) => {

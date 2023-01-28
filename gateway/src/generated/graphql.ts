@@ -366,7 +366,7 @@ export enum Status {
 export type Subscription = {
   __typename?: 'Subscription';
   chatRemoved?: Maybe<ChatRemovedSubscriptionResponse>;
-  friendshipRemoved: Scalars['String'];
+  friendshipRemoved: FriendshipRemovedResponse;
   friendshipRequestReceived?: Maybe<FriendshipRequestReceivedSubscriptionResponse>;
   friendshipResponseReceived?: Maybe<FriendshipResponseReceivedSubscriptionResponse>;
   messageCreated?: Maybe<MessageCreatedSubscriptionResponse>;
@@ -780,7 +780,7 @@ export type SignUpResponseResolvers<ContextType = MyContext, ParentType extends 
 
 export type SubscriptionResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['Subscription'] = ResolversParentTypes['Subscription']> = {
   chatRemoved?: SubscriptionResolver<Maybe<ResolversTypes['ChatRemovedSubscriptionResponse']>, "chatRemoved", ParentType, ContextType>;
-  friendshipRemoved?: SubscriptionResolver<ResolversTypes['String'], "friendshipRemoved", ParentType, ContextType>;
+  friendshipRemoved?: SubscriptionResolver<ResolversTypes['FriendshipRemovedResponse'], "friendshipRemoved", ParentType, ContextType>;
   friendshipRequestReceived?: SubscriptionResolver<Maybe<ResolversTypes['FriendshipRequestReceivedSubscriptionResponse']>, "friendshipRequestReceived", ParentType, ContextType>;
   friendshipResponseReceived?: SubscriptionResolver<Maybe<ResolversTypes['FriendshipResponseReceivedSubscriptionResponse']>, "friendshipResponseReceived", ParentType, ContextType>;
   messageCreated?: SubscriptionResolver<Maybe<ResolversTypes['MessageCreatedSubscriptionResponse']>, "messageCreated", ParentType, ContextType>;

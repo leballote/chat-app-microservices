@@ -19,8 +19,22 @@ class DuplicationError extends AppError {
   }
 }
 
+class NameCantHaveLeadingNorTrailingSpacesError extends AppError {
+  constructor(message, moreMeta) {
+    super(message, "NAME_CANT_HAVE_LEADING_NOR_TRAILING_SPACES", moreMeta);
+  }
+}
+
+class NameCantHaveTwoConsecutiveSpacesError extends AppError {
+  constructor(message, moreMeta) {
+    super(message, "NAME_CANT_HAVE_TWO_CONSECUTIVE_SPACES", moreMeta);
+  }
+}
+
 module.exports = {
   AppError,
   AppValidationError,
   DuplicationError,
+  NameCantHaveLeadingNorTrailingSpacesError,
+  NameCantHaveTwoConsecutiveSpacesError,
 };

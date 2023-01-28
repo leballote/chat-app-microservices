@@ -1,4 +1,8 @@
 const mongoose = require("mongoose");
+const {
+  NameCantHaveLeadingNorTrailingSpacesError: NameCantHaveTrailingSpacesError,
+  NameCantHaveTwoConsecutiveSpacesError,
+} = require("../errors/throwable");
 
 const userSchema = new mongoose.Schema(
   {
@@ -16,7 +20,30 @@ const userSchema = new mongoose.Schema(
     name: {
       type: String,
       maxlength: 120,
+      minlength: 1,
       required: true,
+      validate: [
+        {
+          validator: (name) => {
+            const isValid = new RegExp("^(?!\\s)(.*)(?<!\\s)$").test(name);
+            if (!isValid) {
+              throw new NameCantHaveTrailingSpacesError(
+                "Name cannot have leading nor trailing spaces"
+              );
+            }
+          },
+        },
+        {
+          validator: (name) => {
+            const isNotValid = new RegExp("\\s{2,}").test(name);
+            if (isNotValid) {
+              throw new NameCantHaveTwoConsecutiveSpacesError(
+                "Name cannot have two consecutive spaces"
+              );
+            }
+          },
+        },
+      ],
     },
     birthDate: {
       type: mongoose.SchemaTypes.Date,
