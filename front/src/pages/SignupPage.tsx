@@ -52,19 +52,7 @@ export default function SignupPage() {
   //SUGGESTION: maybe some client side validation for the password and realtime feedback instead of on submit
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
-    if (haveError) {
-      const notification: Omit<GenericErrorAppNotification, "id"> = {
-        notificationType: NotificationType.GENERIC_ERROR,
-        message: t("app.error.formNotFilled") as string,
-      };
-      dispatch(
-        triggerNewNotification(
-          appNotificationManager.createNotification({
-            notification,
-          })
-        )
-      );
-    }
+
     const username = usernameInput.current?.value;
     const name = nameInput.current?.value;
     const email = emailInput.current?.value;
@@ -78,7 +66,19 @@ export default function SignupPage() {
       password,
     };
     const inputs = { ...requiredInputs };
-    if (Object.values(inputs).some((el) => el == null)) {
+    if (haveError) {
+      console.log(haveError, Object.values(inputs));
+      const notification: Omit<GenericErrorAppNotification, "id"> = {
+        notificationType: NotificationType.GENERIC_ERROR,
+        message: t("app.error.formNotFilled") as string,
+      };
+      dispatch(
+        triggerNewNotification(
+          appNotificationManager.createNotification({
+            notification,
+          })
+        )
+      );
       return;
     }
 
@@ -103,10 +103,13 @@ export default function SignupPage() {
           {t("signupPage.title")}
         </Typography>
 
-        <UsernameField />
-        <FullNameField />
-        <EmailField />
-        <PasswordField />
+        <UsernameField inputRef={usernameInput} />
+        <FullNameField inputRef={nameInput} />
+        <EmailField inputRef={emailInput} />
+        <PasswordField
+          passwordRef={passwordInput}
+          confirmPasswordRef={confirmPasswordInput}
+        />
 
         <Button type="submit" variant="outlined">
           {t("signupPage.signupButton")}

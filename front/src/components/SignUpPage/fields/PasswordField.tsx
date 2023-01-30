@@ -7,10 +7,15 @@ import {
 } from "../../../app/features/appView/signup/signupSlice";
 import { useAppSelector } from "../../../app/hooks";
 import isStrongPassword from "validator/lib/isStrongPassword";
-import { useRef } from "react";
+import React from "react";
 import { TFunction } from "i18next";
 
-export default function PasswordField() {
+type Props = {
+  passwordRef: React.ComponentProps<typeof TextField>["inputRef"];
+  confirmPasswordRef: React.ComponentProps<typeof TextField>["inputRef"];
+};
+
+const PasswordField = ({ passwordRef, confirmPasswordRef }: Props) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const passwordErrors = useAppSelector(
@@ -20,14 +25,14 @@ export default function PasswordField() {
     (state) => state.signup.fields.confirmPassword.errors
   );
 
-  const passwordInput = useRef<HTMLInputElement>(null);
-  const confirmPasswordInput = useRef<HTMLInputElement>(null);
+  // const passwordRef = useRef<HTMLInputElement>(null);
+  // const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
   function handlePasswordChange(
     ev: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>
   ) {
     const password = ev.currentTarget.value;
-    const confirmPassword = confirmPasswordInput.current?.value;
+    const confirmPassword = confirmPasswordRef.current?.value;
 
     const passwordNewErrors = checkPasswordErrors(password, t);
     const confirmPasswordNewErrors =
@@ -70,7 +75,7 @@ export default function PasswordField() {
     ev: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>
   ) {
     const confirmPassword = ev.currentTarget.value;
-    const password = passwordInput.current?.value;
+    const password = passwordRef.current?.value;
     if (password != undefined) {
       const confirmPasswordNewErrors = checkConfirmPasswordErrors(
         password,
@@ -103,8 +108,8 @@ export default function PasswordField() {
       <TextField
         label={t("user.password")}
         required
-        // type="password"
-        inputRef={passwordInput}
+        type="password"
+        inputRef={passwordRef}
         inputProps={{ maxLength: 300, onChange: handlePasswordChange }}
         error={passwordErrors.length > 0}
         helperText={passwordErrors[0]}
@@ -112,15 +117,15 @@ export default function PasswordField() {
       <TextField
         label={t("signupPage.confirmPassword")}
         required
-        // type="password"
+        type="password"
         inputProps={{ maxLength: 300, onChange: handleConfirmPasswordChange }}
-        inputRef={confirmPasswordInput}
+        inputRef={confirmPasswordRef}
         error={confirmPasswordErrors.length > 0}
         helperText={confirmPasswordErrors[0]}
       />
     </>
   );
-}
+};
 
 function checkPasswordErrors(password: string, t: TFunction): string[] {
   const newErrors = [] as string[];
@@ -142,9 +147,10 @@ function checkConfirmPasswordErrors(
   const newErrors = [] as string[];
 
   if (confirmPassword !== password) {
-    console.log(confirmPassword, password);
     newErrors.push(t("app.error.confirmPasswordNotSame"));
   }
 
   return newErrors;
 }
+
+export default PasswordField;
