@@ -11,8 +11,8 @@ import React from "react";
 import { TFunction } from "i18next";
 
 type Props = {
-  passwordRef: React.ComponentProps<typeof TextField>["inputRef"];
-  confirmPasswordRef: React.ComponentProps<typeof TextField>["inputRef"];
+  passwordRef: React.RefObject<HTMLInputElement>;
+  confirmPasswordRef: React.RefObject<HTMLInputElement>;
 };
 
 const PasswordField = ({ passwordRef, confirmPasswordRef }: Props) => {
@@ -24,9 +24,6 @@ const PasswordField = ({ passwordRef, confirmPasswordRef }: Props) => {
   const confirmPasswordErrors = useAppSelector(
     (state) => state.signup.fields.confirmPassword.errors
   );
-
-  // const passwordRef = useRef<HTMLInputElement>(null);
-  // const confirmPasswordRef = useRef<HTMLInputElement>(null);
 
   function handlePasswordChange(
     ev: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>
@@ -103,6 +100,45 @@ const PasswordField = ({ passwordRef, confirmPasswordRef }: Props) => {
     }
   }
 
+  function handlePasswordBlur(
+    ev: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) {
+    const password = ev.currentTarget.value;
+    const confirmPassword = confirmPasswordRef.current?.value;
+
+    const passwordNewErrors = checkPasswordErrors(password, t);
+    const confirmPasswordNewErrors =
+      //this second condition is not necesarry but for me is more explicit
+      confirmPassword && confirmPassword.length > 0
+        ? checkConfirmPasswordErrors(password, confirmPassword, t)
+        : [];
+    dispatch(
+      setErrors({
+        password: passwordNewErrors,
+        confirmPassword: confirmPasswordNewErrors,
+      })
+    );
+  }
+
+  function handleConfirmPasswordBlur(
+    ev: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>
+  ) {
+    const confirmPassword = ev.currentTarget.value;
+    const password = passwordRef.current?.value;
+    if (password != undefined) {
+      const confirmPasswordNewErrors = checkConfirmPasswordErrors(
+        password,
+        confirmPassword,
+        t
+      );
+      dispatch(
+        setErrors({
+          confirmPassword: confirmPasswordNewErrors,
+        })
+      );
+    }
+  }
+
   return (
     <>
       <TextField
@@ -110,7 +146,11 @@ const PasswordField = ({ passwordRef, confirmPasswordRef }: Props) => {
         required
         type="password"
         inputRef={passwordRef}
-        inputProps={{ maxLength: 300, onChange: handlePasswordChange }}
+        inputProps={{
+          maxLength: 300,
+          onChange: handlePasswordChange,
+          onBlur: handlePasswordBlur,
+        }}
         error={passwordErrors.length > 0}
         helperText={passwordErrors[0]}
       />
@@ -118,7 +158,11 @@ const PasswordField = ({ passwordRef, confirmPasswordRef }: Props) => {
         label={t("signupPage.confirmPassword")}
         required
         type="password"
-        inputProps={{ maxLength: 300, onChange: handleConfirmPasswordChange }}
+        inputProps={{
+          maxLength: 300,
+          onChange: handleConfirmPasswordChange,
+          onBlur: handleConfirmPasswordBlur,
+        }}
         inputRef={confirmPasswordRef}
         error={confirmPasswordErrors.length > 0}
         helperText={confirmPasswordErrors[0]}

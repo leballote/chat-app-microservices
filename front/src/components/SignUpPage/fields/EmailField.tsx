@@ -1,4 +1,5 @@
 import { TextField } from "@mui/material";
+import { TFunction } from "i18next";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import isEmail from "validator/lib/isEmail";
@@ -21,10 +22,7 @@ export default function EmailField({ inputRef }: Props) {
     ev: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>
   ) {
     const email = ev.currentTarget.value;
-    const newErrors = [] as string[];
-    if (!isEmail(email)) {
-      newErrors.push(t("app.error.notValidEmail"));
-    }
+    const newErrors = validateEmail(email, t);
 
     if (errors.length > newErrors.length) {
       dispatch(setFieldErrors({ field: "email", errors: newErrors }));
@@ -38,15 +36,29 @@ export default function EmailField({ inputRef }: Props) {
     }
   }
 
+  function onBlur(ev: React.FormEvent<HTMLTextAreaElement | HTMLInputElement>) {
+    const email = ev.currentTarget.value;
+    const newErrors = validateEmail(email, t);
+    dispatch(setFieldErrors({ field: "email", errors: newErrors }));
+  }
+
   return (
     <TextField
       label={t("user.email")}
       type="email"
       required
-      inputProps={{ maxLength: 320, onChange: handleChange }}
+      inputProps={{ maxLength: 320, onChange: handleChange, onBlur: onBlur }}
       inputRef={inputRef}
       error={errors.length > 0}
       helperText={errors.join(". ")}
     />
   );
+}
+
+function validateEmail(email: string, t: TFunction) {
+  const newErrors = [] as string[];
+  if (!isEmail(email)) {
+    newErrors.push(t("app.error.notValidEmail"));
+  }
+  return newErrors;
 }

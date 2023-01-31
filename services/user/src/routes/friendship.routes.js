@@ -1,4 +1,5 @@
 const { Promise } = require("mongoose");
+const { appErrors } = require("../errors");
 const FriendRequestModel = require("../models/friendRequest.model");
 const User = require("../models/user.model");
 
@@ -14,22 +15,24 @@ router.post("/friendship", async (req, res) => {
   const { user1Id, user2Id } = req.body;
   try {
     const [user1, user2] = await Promise.all([
-      User.findOne({ _id: user1Id }),
-      User.findOne({ _id: user2Id }),
+      User.findOneAndUpdate(
+        { _id: user1Id },
+        {
+          $addToSet: {
+            friends: user2Id,
+          },
+        }
+      ),
+      User.findOneAndUpdate(
+        { _id: user2Id },
+        {
+          $addToSet: {
+            friends: user1Id,
+          },
+        }
+      ),
     ]);
 
-    if (!user1 || !user2) {
-      return res.status(404).send(errors.userNotFound);
-    }
-
-    if (user1.friends.includes(user2._id)) {
-      return res.status(400).send({ error: { message: "Already friends" } });
-    }
-
-    user1.friends.push(user2._id);
-    user2.friends.push(user1._id);
-
-    await Promise.all([user1.save(), user2.save()]);
     //doesn't need to await this since is not necessary for returning
     await FriendRequestModel.deleteOne({
       $or: [

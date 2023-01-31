@@ -52,6 +52,10 @@ export default function SignupPage() {
   //SUGGESTION: maybe some client side validation for the password and realtime feedback instead of on submit
   async function handleSubmit(ev: React.FormEvent<HTMLFormElement>) {
     ev.preventDefault();
+    const input = nameInput.current;
+
+    const ev2 = new Event("change", { bubbles: true });
+    input?.dispatchEvent(ev2);
 
     const username = usernameInput.current?.value;
     const name = nameInput.current?.value;
