@@ -12,6 +12,7 @@ const config: CodegenConfig = {
           Chat: "../types/servicesRest#ChatModelSuccessResponse",
           Message: "../types/servicesRest#MessageModelSuccessResponse",
           User: "../types/servicesRest#UserModelSuccessResponse",
+          Viewer: "../types/servicesRest#UserModelSuccessResponse",
           ChatUser: "../types/servicesRest#ChatModelSuccessResponse",
           SignUpResponse: "../types/servicesRest#SignUpModelSuccessResponse",
           LogInResponse: "../types/servicesRest#LogInModelSuccessResponse",

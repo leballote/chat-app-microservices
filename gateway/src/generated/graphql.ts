@@ -278,7 +278,7 @@ export type Query = {
   friendshipRequestsReceived: Array<FriendRequest>;
   messages: Array<Message>;
   user: User;
-  viewer?: Maybe<User>;
+  viewer?: Maybe<Viewer>;
 };
 
 
@@ -375,22 +375,13 @@ export type Subscription = {
 export type User = UserInterface & {
   __typename?: 'User';
   avatar?: Maybe<Scalars['String']>;
-  chat?: Maybe<Chat>;
-  chats: Array<Chat>;
   email: Scalars['String'];
-  friends: Array<User>;
   id: Scalars['ID'];
   individualChat?: Maybe<Chat>;
   name: Scalars['String'];
   phrase: Scalars['String'];
-  settings?: Maybe<UserSettings>;
   status: Status;
   username: Scalars['String'];
-};
-
-
-export type UserChatArgs = {
-  chatId?: InputMaybe<Scalars['String']>;
 };
 
 export type UserInterface = {
@@ -546,7 +537,7 @@ export type ResolversTypes = {
   User: ResolverTypeWrapper<UserModelSuccessResponse>;
   UserInterface: ResolversTypes['ChatUser'] | ResolversTypes['User'] | ResolversTypes['Viewer'];
   UserSettings: ResolverTypeWrapper<UserSettings>;
-  Viewer: ResolverTypeWrapper<Omit<Viewer, 'chat' | 'chats' | 'friends'> & { chat?: Maybe<ResolversTypes['Chat']>, chats: Array<ResolversTypes['Chat']>, friends: Array<ResolversTypes['User']> }>;
+  Viewer: ResolverTypeWrapper<UserModelSuccessResponse>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -599,7 +590,7 @@ export type ResolversParentTypes = {
   User: UserModelSuccessResponse;
   UserInterface: ResolversParentTypes['ChatUser'] | ResolversParentTypes['User'] | ResolversParentTypes['Viewer'];
   UserSettings: UserSettings;
-  Viewer: Omit<Viewer, 'chat' | 'chats' | 'friends'> & { chat?: Maybe<ResolversParentTypes['Chat']>, chats: Array<ResolversParentTypes['Chat']>, friends: Array<ResolversParentTypes['User']> };
+  Viewer: UserModelSuccessResponse;
 };
 
 export type AcceptFriendshipResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['AcceptFriendshipResponse'] = ResolversParentTypes['AcceptFriendshipResponse']> = {
@@ -742,7 +733,7 @@ export type QueryResolvers<ContextType = MyContext, ParentType extends Resolvers
   friendshipRequestsReceived?: Resolver<Array<ResolversTypes['FriendRequest']>, ParentType, ContextType>;
   messages?: Resolver<Array<ResolversTypes['Message']>, ParentType, ContextType, RequireFields<QueryMessagesArgs, 'input'>>;
   user?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<QueryUserArgs, 'input'>>;
-  viewer?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType>;
+  viewer?: Resolver<Maybe<ResolversTypes['Viewer']>, ParentType, ContextType>;
 };
 
 export type RejectFriendshipResponseResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['RejectFriendshipResponse'] = ResolversParentTypes['RejectFriendshipResponse']> = {
@@ -788,15 +779,11 @@ export type SubscriptionResolvers<ContextType = MyContext, ParentType extends Re
 
 export type UserResolvers<ContextType = MyContext, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   avatar?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  chat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType, Partial<UserChatArgs>>;
-  chats?: Resolver<Array<ResolversTypes['Chat']>, ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  friends?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   individualChat?: Resolver<Maybe<ResolversTypes['Chat']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   phrase?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  settings?: Resolver<Maybe<ResolversTypes['UserSettings']>, ParentType, ContextType>;
   status?: Resolver<ResolversTypes['Status'], ParentType, ContextType>;
   username?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;

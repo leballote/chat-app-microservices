@@ -6,7 +6,7 @@ const typeDefs = gql`
     messages(input: GetMessagesInput!): [Message!]!
     friendshipRequestsReceived: [FriendRequest!]!
     user(input: GetUserInput!): User!
-    viewer: User
+    viewer: Viewer
   }
 
   type Mutation {
@@ -62,13 +62,9 @@ const typeDefs = gql`
     username: String!
     email: String!
     name: String!
-    chats: [Chat!]!
-    friends: [User!]!
     phrase: String!
     status: Status!
     avatar: String
-    chat(chatId: String): Chat
-    settings: UserSettings
     individualChat: Chat
   }
 

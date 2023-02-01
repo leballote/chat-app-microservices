@@ -53,6 +53,12 @@ export default function FriendRequestPreview({
           fontSize={"1.1rem"}
           fontWeight="bold"
           color="text.primary"
+          sx={{
+            overflowX: "hidden",
+            "&:hover": {
+              overflowX: "auto",
+            },
+          }}
         >
           {name}
         </Typography>

@@ -108,9 +108,16 @@ export default function ParticipantPreview({
       >
         <Typography
           component="h3"
-          fontSize={"1.1em"}
+          fontSize="1.1em"
           fontWeight="bold"
           color="text.primary"
+          margin="0 1em"
+          sx={{
+            overflowX: "hidden",
+            "&:hover": {
+              overflowX: "auto",
+            },
+          }}
         >
           {name}
         </Typography>

@@ -250,7 +250,7 @@ const mutationRelatedResolvers: MutationResolvers = {
       if (userToAddRes.data.length == 0) {
         throw new GraphQLError("User with that username doesn't exist", {
           extensions: {
-            code: "SERVER_ERROR",
+            code: "NOT_FOUND",
             meta: {
               username: userToAddUsername,
             },
@@ -528,9 +528,18 @@ const mutationRelatedResolvers: MutationResolvers = {
     if (!viewer) {
       throw authError;
     }
+
     const chatRes = await dataSources.chatAPI.addParticipants({
       chatId: input.chatId,
-      participants: input.participants,
+      participants: input.participants.filter((friend) => {
+        if (typeof viewer.friends[0] == "string") {
+          return (viewer.friends as string[]).includes(friend.id);
+        } else {
+          return (viewer.friends as UserModelSuccessResponse[])
+            .map((friend) => friend._id)
+            .includes(friend.id);
+        }
+      }),
     });
 
     if (isErrorResponse(chatRes)) {

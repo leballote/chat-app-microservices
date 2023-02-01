@@ -215,7 +215,7 @@ const resolvers: Resolvers = {
       return Status.Online;
     },
   },
-  User: {
+  Viewer: {
     id: (parent) => {
       return parent._id;
     },
@@ -265,6 +265,15 @@ const resolvers: Resolvers = {
       }
       return chatRes.data;
     },
+    status: () => {
+      //TODO see how you are going to solve this
+      return Status.Online;
+    },
+  },
+  User: {
+    id: (parent) => {
+      return parent._id;
+    },
     individualChat: async (parent, _, { dataSources }) => {
       const viewer = await dataSources.getViewer();
       if (!viewer) {
@@ -274,6 +283,7 @@ const resolvers: Resolvers = {
         user1Id: viewer._id,
         user2Id: parent._id,
       });
+      console.log("chatRes", chatRes);
 
       if (isErrorResponse(chatRes)) {
         throw createGQLError(chatRes);
